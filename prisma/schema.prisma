@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum STATUS {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  LOST
+}
+
+enum CUSTOMER_STATUS {
+  PURCHASED
+  INTERESTED
+  BOOKED
+  INPROGRESS
+  LOST
+  PAID_HALF
+}
+
+enum PROPERTY_STATUS {
+  AVAILABLE
+  SOLD
+  RESERVED
+}
+
+enum PROPERTY_TYPE {
+  BUY
+  RENT
+  SELL
+  PLOTS
+  RESIDENTIAL
+  COMMERCIAL
+}
+
+model Agent {
+  id         String     @id @default(uuid())
+  name       String
+  email      String     @unique
+  phone      String
+  properties Property[]
+  addedAt    DateTime   @default(now())
+}
+
+model Address {
+  id           String     @id @default(uuid())
+  city         String
+  street       String
+  state        String
+  zipCode      String
+  Longitude    Float?
+  Latitude     Float?
+  NearbyPlaces Json[]
+  GMAPS        String?
+  Properties   Property[]
+}
+
+model Leads {
+  id     String  @id @default(nanoid())
+  name   String
+  email  String  @unique
+  phone  String
+  budget String?
+  status STATUS  @default(NEW)
+  note   String?
+
+  // Relations with property
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id])
+  updatedAt  DateTime  @updatedAt
+  createdAt  DateTime  @default(now())
+}
+
+model Property {
+  id          String          @id @default(uuid())
+  title       String
+  description String
+  images      String[]
+  youtubeLink String?
+  amenities   String[]
+  features    String[]
+  isHidden    Boolean         @default(false)
+  type        PROPERTY_TYPE
+  status      PROPERTY_STATUS @default(AVAILABLE)
+  price       Int
+  Area        Int
+
+  // optional I d k what to keep what to not
+  BedRooms   Int?    @default(0)
+  Bathrooms  Int?    @default(0)
+  parking    Int?    @default(0)
+  furnishing String? @default("Unfurnished")
+  HoaFees    Int?    @default(0)
+  yearBuilt  Int?
+
+  // Relations
+  Leads      Leads[]
+  agent      Agent[]
+  addressId  String
+  address    Address    @relation(fields: [addressId], references: [id])
+  customerId String?
+  customer   Customers? @relation(fields: [customerId], references: [id])
+}
+
+model Customers {
+  id         String          @id @default(uuid())
+  name       String
+  image      String?
+  email      String          @unique
+  phone      String
+  status     CUSTOMER_STATUS @default(BOOKED)
+  properties Property[]
+  createdAt  DateTime        @default(now())
+}
