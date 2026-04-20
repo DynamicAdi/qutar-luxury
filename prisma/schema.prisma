@@ -54,11 +54,11 @@ model Address {
   street       String
   state        String
   zipCode      String
-  Longitude    Float?
-  Latitude     Float?
-  NearbyPlaces Json[]
-  GMAPS        String?
-  Properties   Property[]
+  longitude    Float?
+  latitude     Float?
+  nearbyPlaces Json[]
+  gmaps        String?
+  properties   Property[]
 }
 
 model Leads {
