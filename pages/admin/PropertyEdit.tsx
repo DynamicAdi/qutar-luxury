@@ -1,5 +1,6 @@
+"use client";
+
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/qlp/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,23 +16,22 @@ import { ArrowLeft, Save, Plus, X, Image as ImageIcon, MapPin, BadgeCheck } from
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import placeholderImg from "@/assets/property-2.jpg";
+import { useRouter } from "next/navigation";
 
 const blank = (id: string, category: PropertyCategory): Property => ({
   id, title: "", category, price: 0, currency: "QAR",
   address: "", city: "Doha", country: "Qatar",
   description: "", bedrooms: 3, bathrooms: 3, area: 2000, yearBuilt: new Date().getFullYear(),
-  furnishing: "Unfurnished", parking: 1, images: [placeholderImg],
+  furnishing: "Unfurnished", parking: 1, images: [placeholderImg.src],
   amenities: [], features: [], nearby: [], documents: [],
   agent: { name: "", phone: "", email: "" },
   hidden: false, status: "Available", createdAt: new Date().toISOString(),
 });
 
-export default function PropertyEdit() {
-  const { id } = useParams();
-  const [search] = useSearchParams();
-  const navigate = useNavigate();
+export default function PropertyEdit({search, id}: {search: any, id: string}) {
+  const navigate = useRouter();
   const { properties, upsertProperty, addresses, agents, addAddress, addAgent } = useCMS();
-  const initialCategory = (search.get("category") as PropertyCategory) || "Residential";
+  const initialCategory = search
   const existing = useMemo(() => properties.find((p) => p.id === id), [properties, id]);
   const [p, setP] = useState<Property>(existing ?? blank(id || "p" + Date.now(), initialCategory));
 
@@ -44,9 +44,8 @@ export default function PropertyEdit() {
     if (!p.title) return toast.error("Title is required");
     upsertProperty(p);
     toast.success(existing ? "Property updated" : "Property created");
-    navigate("/app/properties");
-  };
-
+    navigate.push("/dashboard/properties");
+  }
   const onPickAddress = (a: AddressEntry) => {
     setP((s) => ({
       ...s,
@@ -102,7 +101,7 @@ export default function PropertyEdit() {
         subtitle={`${p.category} · ${p.city}, ${p.country}`}
         actions={
           <>
-            <Button variant="outline" onClick={() => navigate(-1)} className="rounded-xl">
+            <Button variant="outline" onClick={() => navigate.back()} className="rounded-xl">
               <ArrowLeft className="h-4 w-4 mr-1.5" /> Back
             </Button>
             <Button onClick={save} className="rounded-xl bg-gradient-gold text-primary-foreground shadow-gold">
@@ -277,7 +276,7 @@ export default function PropertyEdit() {
                       </div>
                     ))}
                     <button
-                      onClick={() => upd("images", [...p.images, placeholderImg])}
+                      onClick={() => upd("images", [...p.images, placeholderImg.src])}
                       className="rounded-xl border-2 border-dashed border-border aspect-video flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors"
                     >
                       <ImageIcon className="h-5 w-5 mb-1" />
@@ -437,7 +436,7 @@ function ChipEditor({ label, items, onChange, suggestions }: {
 
 function EnquiriesList({ propertyId, propertyTitle }: { propertyId: string; propertyTitle: string }) {
   const { leads, properties, updateLead } = useCMS();
-  const navigate = useNavigate();
+  const navigate = useRouter();
   const propertyExists = properties.some((p) => p.id === propertyId);
   const items = leads.filter((l) => l.propertyId === propertyId);
 
@@ -504,7 +503,7 @@ function EnquiriesList({ propertyId, propertyTitle }: { propertyId: string; prop
       )}
 
       <div className="mt-4 text-right">
-        <Button variant="ghost" size="sm" onClick={() => navigate("/app/leads")} className="rounded-xl text-xs">
+        <Button variant="ghost" size="sm" onClick={() => navigate.push("/app/leads")} className="rounded-xl text-xs">
           Manage all leads →
         </Button>
       </div>

@@ -72,7 +72,7 @@ export default function DashboardLayout({
 
   const [open, setOpen] = useState(false);
 
-  const propertiesActive = pathname.startsWith("/app/properties");
+  const propertiesActive = pathname?.startsWith("/dashboard/properties");
 
   const [propsOpen, setPropsOpen] = useState(propertiesActive);
 
@@ -82,7 +82,7 @@ export default function DashboardLayout({
 
   const isActive = (href: string, exact?: boolean) => {
     if (exact) return pathname === href;
-    return pathname.startsWith(href);
+    return pathname?.startsWith(href);
   };
 
   return (
@@ -134,7 +134,7 @@ export default function DashboardLayout({
                       className={cn(
                         "group w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                         propertiesActive
-                          ? "bg-sidebar text-sidebar-foreground"
+                          ? "bg-gradient-gold-soft text-gradient-gold"
                           : "text-white"
                       )}
                     >
@@ -165,8 +165,8 @@ export default function DashboardLayout({
                               className={cn(
                                 "flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium transition-all",
                                 childActive
-                                  ? "bg-primary text-primary-foreground shadow-gold"
-                                  : "text-white hover:bg-primary hover:text-sidebar-accent"
+                                  ? "bg-gradient-gold-soft text-gradient-gold shadow-gold"
+                                  : "hover:bg-gradient-gold-soft hover:text-gradient-gold"
                               )}
                             >
                               <child.icon className="h-3.5 w-3.5" />
@@ -190,8 +190,8 @@ export default function DashboardLayout({
                   className={cn(
                     "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                     active
-                      ? "bg-gradient-gold shadow-gold"
-                      : "text-white hover:bg-gradient-gold-soft hover:text-sidebar-accent"
+                      ? "bg-gradient-gold-soft text-gradient-gold shadow-gold"
+                      : "text-white hover:bg-gradient-gold-soft hover:text-gradient-gold"
                   )}
                 >
                   <item.icon className="h-4 w-4" />

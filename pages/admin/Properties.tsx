@@ -1,5 +1,6 @@
+"use client";
+
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import { PageHeader } from "@/components/qlp/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const validCategories: PropertyCategory[] = ["Buy", "Sell", "Rent", "Plots", "Residential"];
 
@@ -23,18 +25,17 @@ const titleCase = (s: string): PropertyCategory | null => {
   return found ?? null;
 };
 
-export default function Properties() {
-  const navigate = useNavigate();
-  const { category } = useParams();
+export default function Properties({category}: {category: string}) {
+  const navigate = useRouter();
   const tab = titleCase(category ?? "residential") ?? "Residential";
 
   const { properties, deleteProperty, toggleHidden } = useCMS();
   const [view, setView] = useState<"grid" | "list">("grid");
   const [q, setQ] = useState("");
 
-  // Redirect /app/properties (no category) to default
+  // Redirect /dashboard/properties (no category) to default
   useEffect(() => {
-    if (!category) navigate("/app/properties/residential", { replace: true });
+    if (!category) navigate.push("/dashboard/properties/buy");
   }, [category, navigate]);
 
   const filtered = useMemo(
@@ -44,10 +45,12 @@ export default function Properties() {
         .filter((p) => p.title.toLowerCase().includes(q.toLowerCase()) || p.address.toLowerCase().includes(q.toLowerCase())),
     [properties, tab, q]
   );
+  // console.log(properties;
+  
 
   const newProperty = () => {
     const id = `p${Date.now()}`;
-    navigate(`/app/properties/${id}/edit?new=1&category=${tab}`);
+    navigate.push(`/dashboard/properties/${id}/edit?new=1&category=${tab}`);
   };
 
   return (
@@ -78,7 +81,7 @@ export default function Properties() {
       />
 
       {filtered.length === 0 ? (
-        <Card className="rounded-2xl p-12 shadow-card border-0 text-center">
+        <Card className="rounded-2xl p-12 shadow-card border-0 text-center py-0">
           <p className="text-muted-foreground">No properties in this category yet.</p>
           <Button onClick={newProperty} className="mt-4 rounded-xl bg-primary text-primary-foreground">
             <Plus className="h-4 w-4 mr-1.5" /> Add your first
@@ -88,8 +91,8 @@ export default function Properties() {
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.map((p, i) => (
             <PropertyCard key={p.id} property={p} index={i}
-              onView={() => navigate(`/app/properties/${p.id}/edit`)}
-              onEdit={() => navigate(`/app/properties/${p.id}/edit`)}
+              onView={() => navigate.push(`/dashboard/properties/${category}/${p.id}/edit`)}
+              onEdit={() => navigate.push(`/dashboard/properties/${category}/${p.id}/edit`)}
               onDelete={() => { deleteProperty(p.id); toast.success("Property deleted"); }}
               onToggleHide={() => toggleHidden(p.id)}
             />
@@ -134,7 +137,7 @@ export default function Properties() {
                         <IconBtn onClick={() => toggleHidden(p.id)} title={p.hidden ? "Unhide" : "Hide"}>
                           {p.hidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </IconBtn>
-                        <IconBtn onClick={() => navigate(`/app/properties/${p.id}/edit`)} title="Edit">
+                        <IconBtn onClick={() => navigate.push(`/dashboard/properties/${p.id}/edit`)} title="Edit">
                           <Pencil className="h-4 w-4" />
                         </IconBtn>
                         <DeleteBtn onConfirm={() => { deleteProperty(p.id); toast.success("Property deleted"); }} />
@@ -163,7 +166,7 @@ function StatusBadges({ p }: { p: Property }) {
 
 function IconBtn({ children, onClick, title }: { children: React.ReactNode; onClick: () => void; title: string }) {
   return (
-    <button onClick={onClick} title={title} className="rounded-lg p-2 hover:bg-secondary transition-colors">
+    <button onClick={onClick} title={title} className="rounded-lg p-2  hover:bg-secondary transition-colors">
       {children}
     </button>
   );
@@ -199,7 +202,7 @@ function PropertyCard({
 }) {
   return (
     <Card
-      className="group rounded-2xl border border-border/60 shadow-card overflow-hidden hover:shadow-luxury hover:-translate-y-0.5 transition-all duration-500 animate-fade-in-up bg-card flex flex-col"
+      className="group rounded-2xl py-0 border border-border/60 shadow-card overflow-hidden hover:shadow-luxury hover:-translate-y-0.5 transition-all duration-500 animate-fade-in-up bg-card flex flex-col"
       style={{ animationDelay: `${index * 50}ms` }}
     >
       <div className="relative h-52 overflow-hidden">
@@ -243,10 +246,7 @@ function PropertyCard({
         </div>
 
         <div className="mt-4 flex gap-2">
-          <Button onClick={onView} size="sm" variant="outline" className="flex-1 rounded-xl border-primary/40 text-primary-deep hover:bg-gold-soft hover:text-primary-deep">
-            <ExternalLink className="h-3.5 w-3.5 mr-1.5" /> View
-          </Button>
-          <Button onClick={onEdit} size="sm" className="flex-1 rounded-xl bg-primary text-primary-foreground shadow-gold hover:opacity-90">
+          <Button onClick={onEdit} size="lg" className="flex-1 rounded-xl bg-primary text-primary-foreground shadow-gold hover:opacity-90">
             <Pencil className="h-3.5 w-3.5 mr-1.5" /> Edit
           </Button>
           <DeleteBtn onConfirm={onDelete} />
