@@ -1,5 +1,6 @@
+"use client";
+
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { PageHeader } from "@/components/qlp/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,9 +14,10 @@ import {
 import { useCMS, AgentEntry } from "@/store/cms";
 import { Plus, Search, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function Agents() {
-  const navigate = useNavigate();
+  const navigate = useRouter();
   const { agents, properties, addAgent } = useCMS();
   const [q, setQ] = useState("");
   const [editing, setEditing] = useState<AgentEntry | null>(null);
@@ -73,10 +75,10 @@ export default function Agents() {
         }
       />
 
-      <Card className="rounded-2xl shadow-card border-0 overflow-hidden">
+      <Card className="rounded-lg shadow-card border-0 overflow-hidden py-0">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-secondary/60 text-xs uppercase tracking-wider text-muted-foreground">
+            <thead className="bg-gradient-gold text-xs uppercase tracking-wider text-white">
               <tr>
                 <th className="text-left px-4 py-3.5">Agent</th>
                 <th className="text-left px-4 py-3.5 hidden sm:table-cell">Email</th>
@@ -92,7 +94,7 @@ export default function Agents() {
               {filtered.map((a, i) => (
                 <tr
                   key={a.id}
-                  onClick={() => navigate(`/app/agents/${a.id}`)}
+                  onClick={() => navigate.push(`/dashboard/agents/${a.id}`)}
                   className="border-t border-border hover:bg-secondary/40 cursor-pointer transition-colors animate-fade-in-up"
                   style={{ animationDelay: `${i * 30}ms` }}
                 >

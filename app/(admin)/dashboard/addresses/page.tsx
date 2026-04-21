@@ -1,9 +1,9 @@
-import Agents from '@/pages/admin/Agents'
+import Addresses from '@/pages/admin/Addresses'
 import React from 'react'
 
 function page() {
   return (
-    <Agents />
+    <Addresses />
   )
 }
 

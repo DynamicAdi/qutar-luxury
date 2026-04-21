@@ -1,15 +1,17 @@
+"use client";
+
 import { useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCMS, formatPrice, Property } from "@/store/cms";
 import { ArrowLeft, MapPin, Building2, Trash2, Bed, Bath, Maximize2, ExternalLink, Pencil } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-export default function AddressDetail() {
-  const { id } = useParams();
-  const navigate = useNavigate();
+export default function AddressDetail({id}: Readonly<{id: string}>) {
+  const navigate = useRouter();
   const { addresses, properties, deleteAddress } = useCMS();
 
   const address = addresses.find((a) => a.id === id);
@@ -22,7 +24,7 @@ export default function AddressDetail() {
     return (
       <Card className="rounded-2xl p-12 text-center shadow-card border-0">
         <div className="text-muted-foreground mb-4">Address not found.</div>
-        <Button onClick={() => navigate("/app/addresses")} variant="outline" className="rounded-xl">
+        <Button onClick={() => navigate.back()} variant="outline" className="rounded-xl">
           <ArrowLeft className="h-4 w-4 mr-1.5" /> Back to addresses
         </Button>
       </Card>
@@ -33,14 +35,14 @@ export default function AddressDetail() {
     if (linked.length > 0) return toast.error(`Linked to ${linked.length} propert${linked.length === 1 ? "y" : "ies"}`);
     deleteAddress(address.id);
     toast.success("Address deleted");
-    navigate("/app/addresses");
+    navigate.back()
   };
 
   return (
     <>
       <Card className="rounded-2xl p-2 shadow-card border-0 mb-4">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/app/addresses")} className="rounded-xl gap-1.5 text-muted-foreground hover:text-foreground">
+          <Button variant="ghost" size="sm" onClick={() => navigate.back()} className="rounded-xl gap-1.5 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4" /> All addresses
           </Button>
           <div className="h-6 w-px bg-border mx-1" />
@@ -65,14 +67,14 @@ export default function AddressDetail() {
               <p className="text-muted-foreground">No properties linked to this address yet.</p>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
               {linked.map((p, i) => (
                 <PropertyCard
                   key={p.id}
                   property={p}
                   index={i}
-                  onView={() => navigate(`/app/properties/${p.id}/edit`)}
-                  onEdit={() => navigate(`/app/properties/${p.id}/edit`)}
+                  onView={() => navigate.push(`/dashboard/properties/${p.id}/edit`)}
+                  onEdit={() => navigate.push(`/dashboard/properties/${p.id}/edit`)}
                 />
               ))}
             </div>
@@ -118,7 +120,7 @@ function PropertyCard({
 }) {
   return (
     <Card
-      className="group rounded-2xl border border-border/60 shadow-card overflow-hidden hover:shadow-luxury hover:-translate-y-0.5 transition-all duration-500 animate-fade-in-up bg-card flex flex-col"
+      className="py-0 group rounded-2xl border border-border/60 shadow-card overflow-hidden hover:shadow-luxury hover:-translate-y-0.5 transition-all duration-500 animate-fade-in-up bg-card flex flex-col"
       style={{ animationDelay: `${index * 50}ms` }}
     >
       <div className="relative h-48 overflow-hidden">
