@@ -151,3 +151,14 @@
 
   --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}

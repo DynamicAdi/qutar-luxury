@@ -50,10 +50,11 @@ model Agent {
 
 model Address {
   id           String     @id @default(uuid())
+  label        String
   city         String
   street       String
   state        String
-  zipCode      String
+  zipCode      Int
   longitude    Float?
   latitude     Float?
   nearbyPlaces Json[]

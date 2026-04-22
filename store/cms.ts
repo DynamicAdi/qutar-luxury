@@ -17,7 +17,7 @@ export interface Property {
   currency: string;
   address: string;
   city: string;
-  country: string;
+  state: string;
   lat?: number;
   lng?: number;
   description: string;
@@ -83,13 +83,16 @@ export interface Customer {
 export interface AddressEntry {
   id: string;
   label: string; // short name e.g. "Pearl Marina, Doha"
-  address: string;
+  street: string;
   city: string;
-  country: string;
-  lat?: number;
-  lng?: number;
-  notes?: string;
+  state: string;
+  latitude?: number;
+  longitude?: number;
+  gmaps: string;
+  zipCode?: number;
+  _count?: {properties: number}
   createdAt: string;
+  properties: Property[]
 }
 
 export interface AgentEntry {
@@ -148,7 +151,7 @@ const seedProperties: Property[] = [
     currency: "QAR",
     address: "Porto Arabia, The Pearl",
     city: "Doha",
-    country: "Qatar",
+    state: "Qatar",
     lat: 25.36,
     lng: 51.55,
     description:
@@ -185,7 +188,7 @@ const seedProperties: Property[] = [
     currency: "QAR",
     address: "West Bay Tower 42",
     city: "Doha",
-    country: "Qatar",
+    state: "Qatar",
     description: "Full-floor penthouse with 360° city skyline. Private rooftop terrace and infinity jacuzzi.",
     bedrooms: 4, bathrooms: 5, area: 5400, yearBuilt: 2022, furnishing: "Furnished", parking: 3,
     images: [p2.src, p1.src], amenities: ["Concierge", "Rooftop Pool", "Gym", "Spa"],
@@ -199,7 +202,7 @@ const seedProperties: Property[] = [
     title: "Lusail Beachfront Estate",
     category: "Sell",
     price: 27500000, currency: "QAR",
-    address: "Marina District, Lusail", city: "Lusail", country: "Qatar",
+    address: "Marina District, Lusail", city: "Lusail", state: "Qatar",
     description: "Private beachfront with 80m of pristine coastline.",
     bedrooms: 7, bathrooms: 9, area: 14200, yearBuilt: 2024, furnishing: "Semi-Furnished", parking: 6,
     images: [p3.src, p1.src], amenities: ["Private Beach", "Boat Dock", "Helipad", "Pool", "Gym"],
@@ -212,7 +215,7 @@ const seedProperties: Property[] = [
     id: "p4",
     title: "Al Khor Premium Plot",
     category: "Plots", price: 4800000, currency: "QAR",
-    address: "Al Khor North Sector", city: "Al Khor", country: "Qatar",
+    address: "Al Khor North Sector", city: "Al Khor", state: "Qatar",
     description: "Premium 2,500 sqm development plot zoned residential.",
     bedrooms: 0, bathrooms: 0, area: 26900, yearBuilt: 0, furnishing: "Unfurnished", parking: 0,
     images: [p4.src], amenities: [], features: ["Corner Plot", "Road Access", "Utilities Ready"],
@@ -223,7 +226,7 @@ const seedProperties: Property[] = [
     id: "p5",
     title: "Msheireb Townhouse Collection",
     category: "Rent", price: 42000, currency: "QAR",
-    address: "Msheireb Downtown", city: "Doha", country: "Qatar",
+    address: "Msheireb Downtown", city: "Doha", state: "Qatar",
     description: "Heritage-inspired luxury townhouse in the heart of Doha.",
     bedrooms: 4, bathrooms: 4, area: 4200, yearBuilt: 2021, furnishing: "Furnished", parking: 2,
     images: [p5.src, p2.src], amenities: ["Pool", "Gym", "Concierge", "Kids Area"],
@@ -262,36 +265,7 @@ const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
 const extractedAddresses: AddressEntry[] = [];
 const extractedAgents: AgentEntry[] = [];
 
-for (const p of seedProperties) {
-  const aId = `addr-${slug(p.address)}-${slug(p.city)}`;
-  if (!extractedAddresses.find((a) => a.id === aId)) {
-    extractedAddresses.push({
-      id: aId,
-      label: `${p.address}, ${p.city}`,
-      address: p.address,
-      city: p.city,
-      country: p.country,
-      lat: p.lat,
-      lng: p.lng,
-      createdAt: new Date().toISOString(),
-    });
-  }
-  p.addressId = aId;
 
-  const gId = `agent-${slug(p.agent.email || p.agent.name)}`;
-  if (!extractedAgents.find((g) => g.id === gId)) {
-    extractedAgents.push({
-      id: gId,
-      name: p.agent.name,
-      phone: p.agent.phone,
-      email: p.agent.email,
-      avatar: p.agent.avatar,
-      createdAt: new Date().toISOString(),
-    });
-  }
-  p.agentId = gId;
-  p.agentIds = [gId];
-}
 
 export const useCMS = create<CMSState>()(
   persist(

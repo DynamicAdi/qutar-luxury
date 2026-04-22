@@ -6,10 +6,11 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
     try {
         const searchParams = req.nextUrl.searchParams;
-        const query = searchParams.get('all');
+        const query = searchParams.get('id');
 
         if (query) {
             const address = await db.address.findMany({
+                where: { id: query },
                 include: {
                     properties: true,
                 }
@@ -17,17 +18,25 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({data: address}, {status: 200})
         }
 
-        const address = await db.address.findMany()
+        const address = await db.address.findMany({
+          include: {_count: {
+            select: {
+              properties: true,
+            }
+          }}
+        })
         return NextResponse.json({data: address}, {status: 200})
 
     } catch (error) {
+      console.log(error);
         return NextResponse.json({ error: "Failed to fetch addresses", message: error }, { status: 500 });
     }
 }
 
 export async function DELETE(req: NextRequest) {
     try {
-        const {id} = await req.json()
+        const searchParams = req.nextUrl.searchParams;
+        const id = searchParams.get('id');
         if (!id) {
             return NextResponse.json({ error: "ID is required", message: "ID is required" }, { status: 400 });
         }
@@ -51,6 +60,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     const {
+      label,
       city,
       street,
       state,
@@ -71,6 +81,7 @@ export async function POST(req: NextRequest) {
 
     const address = await db.address.create({
       data: {
+        label,
         city,
         street,
         state,
@@ -106,7 +117,7 @@ export async function PUT(
     const body = await req.json();
 
     const {
-       id,
+      id,
       city,
       street,
       state,
