@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import AddressDialog from "@/misc/AddressDialog";
+import LoaderScreen from "@/misc/LoaderScreen";
 
 export default function Addresses() {
   const navigate = useRouter();
@@ -88,9 +89,8 @@ export default function Addresses() {
   return (
     <>
     {
-      transition && <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-        <Loader className="animate-spin" />
-      </div>
+      transition && 
+      <LoaderScreen />
     }
       <PageHeader
         eyebrow="Directory"

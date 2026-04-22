@@ -1,20 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { PageHeader } from "@/components/qlp/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
-} from "@/components/ui/dialog";
+
 import { useCMS, AgentEntry } from "@/store/cms";
 import { Plus, Search, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import AgentDialog from "@/misc/AgentDialog";
+import axios from "axios";
+import LoaderScreen from "@/misc/LoaderScreen";
 
 export default function Agents() {
   const navigate = useRouter();
@@ -22,22 +21,61 @@ export default function Agents() {
   const [q, setQ] = useState("");
   const [editing, setEditing] = useState<AgentEntry | null>(null);
   const [open, setOpen] = useState(false);
+  const [data, setData] = useState<AgentEntry[]>([]);
+  const [transition, startTransition] = useTransition();
+  const [postThread, startThread] = useTransition();
+
+  const fetchAgents = () => startTransition(async () => {
+    try {
+      const req = await axios.get("/api/agent")
+      if (req.status === 200) {
+        console.log(req.data);
+        setData(req.data.data)
+      }
+    } catch (error) {
+      alert("Failed to fetch agents");
+    }
+  })
+
+  const saveAgent = () => startThread(async() => {
+    try {
+    if (!editing) {
+        return
+      }
+      const req = await axios.post("/api/agent", {
+        name: editing?.name,
+        email: editing?.email,
+        phone: editing?.phone,
+        bio: editing?.bio,
+      })
+
+      if (req.status === 200) {
+        toast.success("Agent added");
+        fetchAgents();
+      }
+    } catch (error) {
+      alert("Failed to save agent");
+    }
+  })
+
+  useEffect(() => {
+    fetchAgents()
+  }, [])
 
   const filtered = useMemo(
     () =>
-      agents.filter(
+      data.filter(
         (a) =>
           a.name.toLowerCase().includes(q.toLowerCase()) ||
           a.email.toLowerCase().includes(q.toLowerCase()) ||
           a.phone.toLowerCase().includes(q.toLowerCase())
       ),
-    [agents, q]
+    [data, q]
   );
 
   const blank = (): AgentEntry => ({
-    id: "agent-" + Date.now(),
-    name: "", phone: "", email: "", bio: "",
-    createdAt: new Date().toISOString(),
+    id: "", name: "", phone: "", email: "", bio: "", properties: [],
+    addedAt: new Date().toISOString(),
   });
 
   const openNew = () => { setEditing(blank()); setOpen(true); };
@@ -45,7 +83,7 @@ export default function Agents() {
   const save = () => {
     if (!editing) return;
     if (!editing.name || !editing.email) return toast.error("Name and email are required");
-    addAgent(editing);
+    saveAgent();
     toast.success("Agent added");
     setOpen(false);
   };
@@ -56,6 +94,11 @@ export default function Agents() {
   const propertyCount = (agentId: string) =>
     properties.filter((p) => (p.agentIds ?? (p.agentId ? [p.agentId] : [])).includes(agentId)).length;
 
+  if (transition) {
+    return (
+      <LoaderScreen />
+    )
+  }
   return (
     <>
       <PageHeader
@@ -68,8 +111,8 @@ export default function Agents() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search agents" className="pl-9 h-9 rounded-xl" />
             </div>
-            <Button onClick={openNew} size="sm" className="rounded-xl bg-primary text-primary-foreground hover:opacity-90 shadow-gold">
-              <Plus className="h-4 w-4 mr-1" /> New Agent
+            <Button onClick={openNew} size="sm" className="rounded-lg bg-gradient-gold py-1 px-4 text-primary-foreground hover:opacity-90">
+              <Plus className="h-4 w-4" /> New Agent
             </Button>
           </>
         }
@@ -103,13 +146,13 @@ export default function Agents() {
                       <div className="h-9 w-9 rounded-full bg-primary/15 text-primary-deep font-semibold flex items-center justify-center text-xs">
                         {initials(a.name)}
                       </div>
-                      <div className="font-medium">{a.name}</div>
+                      <div className="font-medium leading-tight">{a.name} <br /><span className="text-xs text-gray-500 font-light leading-1">{a?.bio}</span></div>
                     </div>
                   </td>
                   <td className="px-4 py-3.5 hidden sm:table-cell text-muted-foreground">{a.email}</td>
                   <td className="px-4 py-3.5 hidden md:table-cell text-muted-foreground">{a.phone}</td>
                   <td className="px-4 py-3.5 text-right">
-                    <Badge variant="secondary" className="rounded-md">{propertyCount(a.id)}</Badge>
+                    <Badge variant="secondary" className="rounded-md">{(a._count?.properties)}</Badge>
                   </td>
                   <td className="px-4 py-3.5 text-muted-foreground">
                     <ChevronRight className="h-4 w-4" />
@@ -121,36 +164,14 @@ export default function Agents() {
         </div>
       </Card>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="rounded-2xl">
-          <DialogHeader>
-            <DialogTitle>New agent</DialogTitle>
-          </DialogHeader>
-          {editing && (
-            <div className="space-y-3">
-              <Field label="Name"><Input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} className="rounded-xl" /></Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Phone"><Input value={editing.phone} onChange={(e) => setEditing({ ...editing, phone: e.target.value })} className="rounded-xl" /></Field>
-                <Field label="Email"><Input type="email" value={editing.email} onChange={(e) => setEditing({ ...editing, email: e.target.value })} className="rounded-xl" /></Field>
-              </div>
-              <Field label="Bio"><Textarea value={editing.bio ?? ""} onChange={(e) => setEditing({ ...editing, bio: e.target.value })} className="rounded-xl" /></Field>
-            </div>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)} className="rounded-xl">Cancel</Button>
-            <Button onClick={save} className="rounded-xl bg-primary text-primary-foreground shadow-gold">Save</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+<AgentDialog 
+editing={editing}
+open={open}
+setOpen={setOpen}
+setEditing={setEditing}
+save={save}
+loading={postThread}
+/>
     </>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-xs uppercase tracking-wider text-muted-foreground">{label}</Label>
-      {children}
-    </div>
   );
 }

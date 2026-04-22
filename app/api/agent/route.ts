@@ -10,6 +10,16 @@ export async function GET(req: NextRequest) {
     const limit = Number(searchParams.get("limit")) || 10;
     const search = searchParams.get("search") || "";
     const status = searchParams.get("status");
+    const id = searchParams.get("id");
+
+    if (id) {
+      const data = await db.agent.findUnique({
+        where: { id },
+        include: { properties: true },
+      });
+
+      return NextResponse.json({ data }, { status: 200 });
+    }
 
     const skip = (page - 1) * limit;
 
@@ -50,10 +60,14 @@ export async function GET(req: NextRequest) {
       skip,
       take: limit,
       orderBy: {
-        createdAt: "desc",
+        addedAt: "desc",
       },
       include: {
-        property: true,
+        _count: {
+          select: {
+            properties: true,
+          },
+        },
       },
     });
 
@@ -73,29 +87,31 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { error: "Failed to fetch agent" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-export async function DELET(req: Request) {
-    const {id} = await req.json();
-    if (!id) {
-        return NextResponse.json({error: "ID is not provided"}, {status: 404})
-    }
+export async function DELETE(req: NextRequest) {
+  const searchParams = req.nextUrl.searchParams;
+  const id = searchParams.get("id");
+  if (!id) {
+    return NextResponse.json({ error: "ID is not provided" }, { status: 404 });
+  }
 
-    try {
-        const agent = await db.agent.delete({
-            where: { id }
-        })
-        if (agent) {
-            return NextResponse.json({message: "Deleted Successfully"}, {status: 200, statusText: "OK"});
-        }
+  try {
+    const agent = await db.agent.delete({
+      where: { id },
+    });
+    if (agent) {
+      return NextResponse.json(
+        { message: "Deleted Successfully" },
+        { status: 200, statusText: "OK" },
+      );
     }
-    catch (error) {
-        return NextResponse.json({error: error}, {status: 500})
-    }
+  } catch (error) {
+    return NextResponse.json({ error: error }, { status: 500 });
+  }
 }
-
 
 /**
  * POST /api/agent
@@ -107,8 +123,8 @@ export async function POST(req: NextRequest) {
 
     const {
       name,
-      image,
       email,
+      bio,
       phone,
       propertyIds, // optional array of property ids
     } = body;
@@ -117,15 +133,15 @@ export async function POST(req: NextRequest) {
     if (!name || !email || !phone) {
       return NextResponse.json(
         { error: "Name, email and phone are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const customer = await db.agent.create({
       data: {
         name,
-        image,
         email,
+        bio,
         phone,
 
         ...(propertyIds?.length && {
@@ -144,7 +160,7 @@ export async function POST(req: NextRequest) {
         message: "Customer created successfully",
         data: customer,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: any) {
     console.error(error);
@@ -152,27 +168,25 @@ export async function POST(req: NextRequest) {
     if (error.code === "P2002") {
       return NextResponse.json(
         { error: "Email already exists" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
     return NextResponse.json(
       { error: "Failed to create customer" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-export async function PUT(
-  req: NextRequest
-) {
+export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
 
     const {
-        id,
+      id,
       name,
-      image,
+      bio,
       email,
       phone,
       propertyIds, // full replace property relations
@@ -182,7 +196,7 @@ export async function PUT(
       where: { id },
       data: {
         name,
-        image,
+        bio,
         email,
         phone,
 
@@ -205,7 +219,7 @@ export async function PUT(
         message: "Customer updated successfully",
         data: customer,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     console.error(error);
@@ -213,17 +227,13 @@ export async function PUT(
     if (error.code === "P2002") {
       return NextResponse.json(
         { error: "Email already exists" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
     return NextResponse.json(
       { error: "Failed to update customer" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-
-
-
-

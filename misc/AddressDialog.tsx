@@ -4,11 +4,12 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Field } from "@/components/ui/field";
 import { AddressEntry } from "@/store/cms";
 import { Loader } from "lucide-react";
 
 import React from 'react'
+import { handleKeyDown } from "@/lib/InputKeyDown";
 
 function AddressDialog({ open, setOpen, editing, save, loading, setEditing}: Readonly<{
     open: boolean;
@@ -19,25 +20,7 @@ function AddressDialog({ open, setOpen, editing, save, loading, setEditing}: Rea
     save: () => void;
 }>) {
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const allowedKeys = /[0-9.\-]/;
 
-    // Allow control/navigation keys
-    if (
-      e.key === "Backspace" ||
-      e.key === "Delete" ||
-      e.key === "ArrowLeft" ||
-      e.key === "ArrowRight" ||
-      e.key === "Tab"
-    ) {
-      return;
-    }
-
-    // Block anything not allowed
-    if (!allowedKeys.test(e.key)) {
-      e.preventDefault();
-    }
-  };
 
   return (
           <Dialog open={open || loading} onOpenChange={setOpen}>
@@ -75,14 +58,6 @@ function AddressDialog({ open, setOpen, editing, save, loading, setEditing}: Rea
 }
 
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-xs uppercase tracking-wider text-muted-foreground">{label}</Label>
-      {children}
-    </div>
-  );
-}
 
 
 export default AddressDialog

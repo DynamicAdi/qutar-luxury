@@ -102,7 +102,9 @@ export interface AgentEntry {
   email: string;
   avatar?: string;
   bio?: string;
-  createdAt: string;
+  _count?: {properties: number}
+  properties: Property[]
+  addedAt: string;
 }
 
 export interface HomeContent {

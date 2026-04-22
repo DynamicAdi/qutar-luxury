@@ -44,6 +44,7 @@ model Agent {
   name       String
   email      String     @unique
   phone      String
+  bio        String?
   properties Property[]
   addedAt    DateTime   @default(now())
 }

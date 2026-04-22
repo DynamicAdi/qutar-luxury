@@ -50,7 +50,7 @@ export default function Properties({category}: {category: string}) {
 
   const newProperty = () => {
     const id = `p${Date.now()}`;
-    navigate.push(`/dashboard/properties/${id}/edit?new=1&category=${tab}`);
+    navigate.push(`/dashboard/properties/${category}/new/edit`);
   };
 
   return (
