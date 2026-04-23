@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     const limit = Number(searchParams.get("limit")) || 10;
     const search = searchParams.get("search") || "";
     const status = searchParams.get("status");
-    const property_type = searchParams.get("property_type");
+    const category = searchParams.get("category");
     const full = searchParams.get("details");
     const id = searchParams.get("id");
 
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
     // Filters
     const where: any = {
-        ...(property_type && {property_type}),
+        ...(category && {category}),
       ...(status && { status }),
 
       ...(search && {
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
       youtubeLink,
       amenities = [],
       features = [],
-      type,
+      category,
       status = "AVAILABLE",
       price,
       Area,
@@ -127,13 +127,13 @@ export async function POST(req: NextRequest) {
       furnishing = "Unfurnished",
       HoaFees = 0,
       yearBuilt,
-
+NearByLocations,
       addressId,
       agentIds = [],
     } = body;
 
     // basic validation
-    if (!title || !description || !type || !price || !Area || !addressId) {
+    if (!title || !description || !category || !price || !Area || !addressId) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -148,8 +148,8 @@ export async function POST(req: NextRequest) {
         youtubeLink,
         amenities,
         features,
-
-        type: type as PROPERTY_TYPE,
+        NearByLocations,
+        category: category as PROPERTY_TYPE,
         status: status as PROPERTY_STATUS,
 
         price,
@@ -215,11 +215,12 @@ export async function PUT(req: NextRequest) {
       amenities,
       features,
       isHidden,
-      type,
+      category,
       status,
       price,
       Area,
 
+      NearByLocations,
       BedRooms,
       Bathrooms,
       parking,
@@ -251,8 +252,8 @@ export async function PUT(req: NextRequest) {
         ...(features !== undefined && { features }),
         ...(isHidden !== undefined && { isHidden }),
 
-        ...(type !== undefined && {
-          type: type as PROPERTY_TYPE,
+        ...(category !== undefined && {
+          category: category as PROPERTY_TYPE,
         }),
 
         ...(status !== undefined && {
@@ -268,7 +269,7 @@ export async function PUT(req: NextRequest) {
         ...(furnishing !== undefined && { furnishing }),
         ...(HoaFees !== undefined && { HoaFees }),
         ...(yearBuilt !== undefined && { yearBuilt }),
-
+        ...(NearByLocations !== undefined && {NearByLocations}),
         // update address relation
         ...(addressId && {
           address: {
