@@ -155,12 +155,9 @@ export default function AgentDetail({id}: {id: string}) {
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
               {data.properties.map((p, i) => (
                 <PropertyCard
-                onDelete={() => {}}
-                onToggleHide={() => {}}
                   key={p.id}
-                  property={p}
+                  p={p}
                   index={i}
-                  onView={() => navigate.push(`/dashboard/properties/${p.id}/edit`)}
                   onEdit={() => navigate.push(`/dashboard/properties/${p.id}/edit`)}
                 />
               ))}

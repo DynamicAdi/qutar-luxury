@@ -24,13 +24,25 @@ function Media({p, upd}: {p: any, upd: any}) {
                         </button>
                       </div>
                     ))}
-                    <button
-                      onClick={() => upd("images", [...p.images, placeholderImg.src])}
-                      className="rounded-xl border-2 border-dashed border-border aspect-video flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors"
-                    >
-                      <ImageIcon className="h-5 w-5 mb-1" />
-                      <span className="text-xs">Add image</span>
-                    </button>
+<input
+  type="file"
+  accept="image/png, image/jpeg"
+  onChange={(e) => {
+    const files = Array.from(e.target.files || []);
+    const imageUrls = files.map((file) => URL.createObjectURL(file));
+    upd("images", [...p.images, ...imageUrls]);
+  }}
+  className="hidden"
+  id="imageUpload"
+/>
+
+<label
+  htmlFor="imageUpload"
+  className="rounded-xl border-2 border-dashed border-border aspect-video flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors cursor-pointer"
+>
+  <ImageIcon className="h-5 w-5 mb-1" />
+  <span className="text-xs">Add image</span>
+</label>
                   </div>
                 </div>
                 <Field label="Video Tour URL">

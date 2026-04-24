@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
     const category = searchParams.get("category");
     const full = searchParams.get("details");
     const id = searchParams.get("id");
+    const custm = searchParams.get("customers")
 
     const skip = (page - 1) * limit;
 
@@ -38,6 +39,25 @@ export async function GET(req: NextRequest) {
     // Total count
     const total = await db.property.count({ where });
 
+    if (custm) {
+      const forCustomers = await db.property.findMany({
+        where: {
+          OR: [
+            {status: "AVAILABLE"},
+            {status: "RESERVED"}
+          ]
+        },
+        select: {
+          id: true,
+          title: true,
+          address: true,
+          price: true,
+        }
+      })
+
+      return NextResponse.json({data: forCustomers}, {status: 200})
+    }
+
     if (full) {
         if (!id) {
             return NextResponse.json({error: "ID is not provided"}, {status: 400})
@@ -59,6 +79,18 @@ export async function GET(req: NextRequest) {
     const property = await db.property.findMany({
       where,
       skip,
+      select: {
+        id: true,
+        title: true,
+        images: true,
+        isHidden: true,
+        address: true,
+        BedRooms: true,
+        Bathrooms: true,
+        Area: true,
+        price: true,
+        category: true
+      },
       take: limit,
       orderBy: {
         createdAt: "desc",
@@ -85,8 +117,9 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-export async function DELET(req: Request) {
-    const {id} = await req.json();
+export async function DELETE(req: NextRequest) {
+  const searchParams = req.nextUrl.searchParams;
+  const id = searchParams.get("id");
     if (!id) {
         return NextResponse.json({error: "ID is not provided"}, {status: 404})
     }
@@ -127,7 +160,7 @@ export async function POST(req: NextRequest) {
       furnishing = "Unfurnished",
       HoaFees = 0,
       yearBuilt,
-NearByLocations,
+      NearByLocations,
       addressId,
       agentIds = [],
     } = body;
@@ -203,8 +236,8 @@ NearByLocations,
 
 export async function PUT(req: NextRequest) {
   try {
-    const body = await req.json();
 
+    const body = await req.json();
     const {
       id,
 
@@ -230,7 +263,22 @@ export async function PUT(req: NextRequest) {
 
       addressId,
       agentIds = [],
+
+      toggleHide
     } = body;
+
+    if (toggleHide) {
+      const data = await db.property.update({
+        where: {
+          id: id
+        },
+        data: {
+          isHidden: Boolean(toggleHide)
+        }
+      });
+    return NextResponse.json({data}, {status: 200})  
+}
+
 
     if (!id) {
       return NextResponse.json(
@@ -303,7 +351,7 @@ export async function PUT(req: NextRequest) {
     console.error(error);
 
     return NextResponse.json(
-      { error: "Failed to update property" },
+      { error: error },
       { status: 500 }
     );
   }

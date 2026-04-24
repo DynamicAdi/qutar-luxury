@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
         createdAt: "desc",
       },
       include: {
-        property: true,
+        properties: true,
       },
     });
 
@@ -78,8 +78,9 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-export async function DELET(req: Request) {
-    const {id} = await req.json();
+export async function DELETE(req: NextRequest) {
+  const searchParams = req.nextUrl.searchParams;
+  const id = searchParams.get("id");
     if (!id) {
         return NextResponse.json({error: "ID is not provided"}, {status: 404})
     }
@@ -112,6 +113,7 @@ export async function POST(req: NextRequest) {
       email,
       phone,
       status,
+      nationality,
       propertyIds, // optional array of property ids
     } = body;
 
@@ -129,6 +131,7 @@ export async function POST(req: NextRequest) {
         image,
         email,
         phone,
+        nationality,
         status: status || CUSTOMER_STATUS.BOOKED,
 
         ...(propertyIds?.length && {

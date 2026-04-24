@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-export async function DELET(req: Request) {
+export async function DELETE(req: Request) {
     const {id} = await req.json();
     if (!id) {
         return NextResponse.json({error: "ID is not provided"}, {status: 404})

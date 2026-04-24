@@ -1,6 +1,6 @@
 "use client";
 
-import { AddressEntry } from "@/store/cms";
+import { AddressEntry, Property } from "@/store/cms";
 import axios from "axios";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { handleKeyDown } from "@/lib/InputKeyDown";
 
 
-export function AddressPicker({upd}: {upd: any}) {
+export function AddressPicker({p, upd}: {p: Property, upd: any}) {
   const [mode, setMode] = useState<"select" | "new">("select");
   const [draft, setDraft] = useState<AddressEntry>({
     city: "", gmaps: "", label: "", id: "", createdAt: "", state: "", street: "", properties: []
@@ -23,7 +23,7 @@ export function AddressPicker({upd}: {upd: any}) {
   const [transition, setTransition] = useTransition();
   const [preview, setPreview] = useState<AddressEntry | null>(null);
   const [thread, startThread] = useTransition();
-
+  
   const fetchAddress = () => setTransition(async () =>{
     const res = await axios.get("/api/address");
     if (res.status === 200) {
@@ -82,6 +82,9 @@ export function AddressPicker({upd}: {upd: any}) {
   
   useEffect(() => {
     fetchAddress();
+    if (p.address) {
+      setPreview(p.address)
+    }
   }, [])
 
   return (

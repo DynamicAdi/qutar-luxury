@@ -120,6 +120,7 @@ model Customers {
   image      String?
   email      String          @unique
   phone      String
+  nationality String?        @default("Qatari")
   status     CUSTOMER_STATUS @default(BOOKED)
   properties Property[]
   createdAt  DateTime        @default(now())

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { PageHeader } from "@/components/qlp/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Property, PropertyCategory } from "@/store/cms";
-import { ArrowLeft, Loader, Save } from "lucide-react";
+import { ArrowLeft, Loader, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Overview from "@/misc/properties/tabs/Overview";
@@ -18,6 +18,7 @@ import Location from "@/misc/properties/tabs/Location";
 import placeholderImg from "@/assets/property-2.jpg";
 import Media from "@/misc/properties/tabs/Media";
 import axios from "axios";
+import LoaderScreen from "@/misc/LoaderScreen";
 
 const blank = (id: string, category: PropertyCategory): Property => ({
   id,
@@ -25,24 +26,24 @@ const blank = (id: string, category: PropertyCategory): Property => ({
   category,
   price: 0,
   currency: "QAR",
-  address: "",
+  addressId: "",
   city: "Doha",
   state: "Qatar",
   description: "",
-  bedrooms: 3,
-  bathrooms: 3,
-  area: 2000,
+  BedRooms: 3,
+  Bathrooms: 3,
+  Area: 2000,
   yearBuilt: new Date().getFullYear(),
   furnishing: "Unfurnished",
   parking: 1,
   images: [placeholderImg.src],
   amenities: [],
   features: [],
-  nearby: [],
+  NearByLocations: [],
   documents: [],
-  agent: { name: "", phone: "", email: "" },
-  hidden: false,
-  status: "Available",
+  agent: [],
+  isHidden: false,
+  status: "AVAILABLE",
   createdAt: new Date().toISOString(),
 });
 
@@ -56,41 +57,82 @@ export default function PropertyEdit({
   const navigate = useRouter();
   const existing = id !== "new" ? true : false;
 
+  const [deleteProcess, startProcess] = useTransition()
   const [p, setP] = useState<Property>(blank(id, search));
   const [thread, startThread] = useTransition()
+  const [load, startLoad] = useTransition()
 
-  const saveNewProperty = () => startThread(async () => {
-    const req = await axios.post("/api/properties", {
-      title: p.title,
-      description: p.description,
-      images: p.images,
-      youtubeLink: p.videoTourUrl,
-      amenities: p.amenities,
-      features: p.features,
-      category: p.category.toUpperCase(),
-      status: p.status.toUpperCase(),
-      price: p.price,
-      Area: p.area,
-      NearByLocations: p.nearby,
-      BedRooms: p.bedrooms,
-      Bathrooms: p.bathrooms,
-      parking: p.parking,
-      furnishing: p.furnishing,
-      HoaFees: p.hoaFee,
-      yearBuilt: p.yearBuilt,
-      addressId: p.addressId,
-      agentIds: p.agentIds,
-    })
-
+  const fetchData = (id: string) => startLoad(async () => {
+    const req = await axios.get(`/api/properties?id=${id}&details=${Boolean('true')}`)
     if (req.status === 200) {
-    navigate.push(`/dashboard/properties/${search}`);
-      toast.success("Added successfully!")
-    }
-    else {
-      alert("Got some error")
-    }
+      console.log(req.data)
+      setP(req.data.data[0])
 
+    }
   })
+
+    const onDelete = () => startProcess(async () => {
+    const req = await axios.delete(`/api/properties?id=${p.id}`)
+  
+    if (req.status === 200) {
+      navigate.back()
+    }
+  })
+
+    const onToggleHide = () => startThread(async () => {
+    console.log(p.id)
+    const req = await axios.put(`/api/properties`, {
+      toggleHide: !p.isHidden,
+      id: p.id
+    })
+    if (req.status === 200) {
+      toast.success("Done!")
+      p.isHidden = !p.isHidden
+    }
+    
+  })
+
+  const propertyPayload = {
+  title: p.title,
+  description: p.description,
+  images: p.images,
+  youtubeLink: p.videoTourUrl,
+  amenities: p.amenities,
+  features: p.features,
+  category: p.category.toUpperCase(),
+  status: p.status.toUpperCase(),
+  price: p.price,
+  Area: p.Area,
+  NearByLocations: p.NearByLocations,
+  BedRooms: p.BedRooms,
+  Bathrooms: p.Bathrooms,
+  parking: p.parking,
+  furnishing: p.furnishing,
+  HoaFees: p.hoaFee,
+  yearBuilt: p.yearBuilt,
+  addressId: p.addressId,
+  agentIds: p.agentIds,
+};
+const saveNewProperty = () => startThread(async () => {
+  const req = await axios.post("/api/properties", propertyPayload);
+  if (req.status === 201) {
+    navigate.push(`/dashboard/properties/${search}`);
+    toast.success("Added successfully!");
+  }
+});
+
+const updateProperty = (id: string) => startThread(async () => {
+  const req = await axios.put("/api/properties", {
+    id,
+    ...propertyPayload,
+  });
+
+  if (req.status === 200) {
+    navigate.push(`/dashboard/properties/${search}`);
+    toast.success("Updated successfully!");
+  }
+});
+
 
   const upd = <K extends keyof Property>(k: K, v: Property[K]) =>
     setP((s) => ({ ...s, [k]: v }));
@@ -106,7 +148,7 @@ const requiredFields: PropertyKeys[] = [
   "features",
   "category",
   "price",
-  "area",
+  "Area",
   "addressId"
 ];
 
@@ -123,9 +165,22 @@ for (const key of requiredFields) {
     return
   }
 }
-    saveNewProperty()
+    existing ? updateProperty(id) : saveNewProperty()
     toast.success(existing ? "Property updated" : "Property created");
   };
+
+
+  useEffect(() => {
+    if (existing) {
+      fetchData(id)
+    }
+  }, [])
+
+  if (load) {
+    return (
+      <LoaderScreen />
+    )
+  }
 
   return (
     <>
@@ -149,7 +204,7 @@ for (const key of requiredFields) {
               {
                 thread ? <Loader className="animate-spin" /> :
                 <div className="flex gap-2 justify-center items-center">
-              <Save className="h-4 w-4" /> Save
+              <Save className="h-4 w-4" /> {existing ? "Update" : "Save"}
                 </div>
               }
             </Button>
@@ -192,18 +247,18 @@ for (const key of requiredFields) {
             </TabsContent>
 
             <TabsContent value="agent">
-              <AgentsTab update={upd} />
+              <AgentsTab p={p} update={upd} />
             </TabsContent>
           </Tabs>
         </div>
 
         {/* Right: preview + visibility */}
         <div className="space-y-4">
-          <Card className="rounded-2xl shadow-card border-0 overflow-hidden">
+          {/* <Card className="rounded-2xl shadow-card border-0 overflow-hidden"> */}
             <img
               src={p.images[0]}
               alt=""
-              className="h-44 w-full object-cover"
+              className="h-52 w-full object-cover rounded-xl"
               loading="lazy"
             />
             <div className="p-4 space-y-2">
@@ -211,12 +266,12 @@ for (const key of requiredFields) {
                 <Badge variant="secondary" className="rounded-md">
                   {p.category}
                 </Badge>
-                {p.status === "Sold" && (
+                {p.status === "SOLD" && (
                   <Badge className="bg-success text-success-foreground rounded-md">
                     Sold
                   </Badge>
                 )}
-                {p.hidden && (
+                {p.isHidden && (
                   <Badge variant="outline" className="rounded-md">
                     Hidden
                   </Badge>
@@ -225,14 +280,14 @@ for (const key of requiredFields) {
               <div className="font-grotesk font-semibold">
                 {p.title || "Untitled"}
               </div>
-              <div className="text-xs text-muted-foreground">{p.address}</div>
+              <div className="text-xs text-muted-foreground">{p.address?.street}, {p.address?.city}, {p.address?.state}, {p.address?.zipCode}</div>
               <div className="text-lg font-grotesk text-gold-gradient font-semibold">
                 {p.currency} {p.price.toLocaleString()}
               </div>
             </div>
-          </Card>
-          <Card className="rounded-2xl p-4 shadow-card border-0">
-            <div className="flex items-center justify-between">
+          {/* </Card> */}
+          {/* <Card className="rounded-2xl p-4 shadow-card border-0"> */}
+            <div className="flex items-center justify-between px-4 pt-4 border-t border-gray-300">
               <div>
                 <div className="font-medium text-sm">Visibility on website</div>
                 <div className="text-xs text-muted-foreground">
@@ -240,11 +295,23 @@ for (const key of requiredFields) {
                 </div>
               </div>
               <Switch
-                checked={!p.hidden}
-                onCheckedChange={(v) => upd("hidden", !v)}
+                checked={!p.isHidden}
+                onCheckedChange={onToggleHide}
               />
             </div>
-          </Card>
+            {
+              existing && 
+                        <div className="flex items-center justify-between px-4 pt-4 border-t border-gray-300">
+              <div>
+                <div className="font-medium text-sm">Delete the Project</div>
+              </div>
+              <Trash2
+              size={16}
+              className="text-red-400 cursor-pointer"
+              onClick={onDelete}
+              />
+            </div>
+            }
         </div>
       </div>
     </>

@@ -1,9 +1,14 @@
+"use client";
+
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { formatPrice, Property } from "@/store/cms";
-import { Bath, Bed, Eye, EyeOff, MapPin, Maximize2, Pencil, Trash2 } from "lucide-react";
+import axios from "axios";
+import { Bath, Bed, Eye, EyeOff, Loader2, MapPin, Maximize2, Pencil, Trash2 } from "lucide-react";
+import { useTransition } from "react";
+import { toast } from "sonner";
 
 
 export function DeleteBtn({ onConfirm }: { onConfirm: () => void }) {
@@ -29,11 +34,36 @@ export function DeleteBtn({ onConfirm }: { onConfirm: () => void }) {
 }
 
 export function PropertyCard({
-  property: p, index, onEdit, onDelete, onToggleHide,
+  p, index, onEdit
 }: {
-  property: Property; index: number;
-  onView: () => void; onEdit: () => void; onDelete: () => void; onToggleHide: () => void;
+  p: Property; index: number; onEdit: () => void;
 }) {
+
+  const [Thread, startThread] = useTransition()
+  const [transition, startTransition] = useTransition()
+
+  const onDelete = () => startTransition(async () => {
+    const req = await axios.delete(`/api/properties?id=${p.id}`)
+  
+    if (req.status === 200) {
+      window.location.reload();
+    }
+  })
+
+  const onToggleHide = () => startThread(async () => {
+    console.log(p.id)
+    const req = await axios.put(`/api/properties`, {
+      toggleHide: !p.isHidden,
+      id: p.id
+    })
+    if (req.status === 200) {
+      toast.success("Done!")
+      p.isHidden = !p.isHidden
+    }
+    
+  })
+
+
   return (
     <Card
       className="group rounded-2xl py-0 border border-border/60 shadow-card overflow-hidden hover:shadow-luxury hover:-translate-y-0.5 transition-all duration-500 animate-fade-in-up bg-card flex flex-col"
@@ -45,16 +75,18 @@ export function PropertyCard({
           <Badge className="bg-card/95 backdrop-blur text-foreground hover:bg-card/95 rounded-md border border-border/40 font-medium">
             {p.category}
           </Badge>
-          {p.status === "Sold" && (
+          {p.status === "SOLD" && (
             <Badge className="bg-success text-success-foreground hover:bg-success rounded-md">Sold</Badge>
           )}
-          {p.hidden && (
+          {p.isHidden && (
             <Badge className="bg-foreground/80 text-background hover:bg-foreground/80 rounded-md backdrop-blur">Hidden</Badge>
           )}
         </div>
         <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button onClick={onToggleHide} title={p.hidden ? "Unhide" : "Hide"} className="rounded-lg bg-card/95 backdrop-blur p-2 hover:bg-card shadow-card">
-            {p.hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+          <button 
+          onClick={onToggleHide} 
+          title={p.isHidden ? "Unhide" : "Hide"} className="rounded-lg bg-card/95 backdrop-blur p-2 hover:bg-card shadow-card">
+            {Thread ? <Loader2 size={14} className="animate-spin"/> : p.isHidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
           </button>
         </div>
       </div>
@@ -63,13 +95,13 @@ export function PropertyCard({
         <h3 className="font-grotesk font-semibold text-base leading-tight line-clamp-1">{p.title}</h3>
         <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
           <MapPin className="h-3 w-3 shrink-0" />
-          <span className="truncate">{p.address}, {p.city}</span>
+          <span className="truncate">{p.address?.street}, {p.address?.city}, {p.address?.state}, {p.address?.zipCode}</span>
         </div>
 
         <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground border-y border-border/60 py-2.5">
-          {p.bedrooms > 0 && <span className="flex items-center gap-1.5"><Bed className="h-3.5 w-3.5 text-primary" /> {p.bedrooms}</span>}
-          {p.bathrooms > 0 && <span className="flex items-center gap-1.5"><Bath className="h-3.5 w-3.5 text-primary" /> {p.bathrooms}</span>}
-          <span className="flex items-center gap-1.5 ml-auto"><Maximize2 className="h-3.5 w-3.5 text-primary" /> {p.area.toLocaleString()} sqft</span>
+          {p.BedRooms > 0 && <span className="flex items-center gap-1.5"><Bed className="h-3.5 w-3.5 text-primary" /> {p.BedRooms}</span>}
+          {p.Bathrooms > 0 && <span className="flex items-center gap-1.5"><Bath className="h-3.5 w-3.5 text-primary" /> {p.Bathrooms}</span>}
+          <span className="flex items-center gap-1.5 ml-auto"><Maximize2 className="h-3.5 w-3.5 text-primary" /> {p.Area.toLocaleString()} sqft</span>
         </div>
 
         <div className="mt-3">
@@ -83,7 +115,10 @@ export function PropertyCard({
           <Button onClick={onEdit} size="lg" className="flex-1 rounded-xl bg-primary text-primary-foreground shadow-gold hover:opacity-90">
             <Pencil className="h-3.5 w-3.5 mr-1.5" /> Edit
           </Button>
-          <DeleteBtn onConfirm={onDelete} />
+          {
+            transition ? <Loader2 className="animate-spin"/> : <DeleteBtn onConfirm={onDelete} />
+          }
+        
         </div>
       </div>
     </Card>

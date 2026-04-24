@@ -4,13 +4,13 @@ import { Card } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AgentEntry } from "@/store/cms";
+import { AgentEntry, Property } from "@/store/cms";
 import axios from "axios";
 import { BadgeCheck, Plus, X } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
-export function AgentPicker({update}: {update: any}) {
+export function AgentPicker({p, update}: {p: Property, update: any}) {
 
   const [pickerOpen, setPickerOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -24,16 +24,18 @@ const removeAgentById = (id: string) => {
   setSelectedAgent(prev =>
     prev.filter(agent => agent.id !== id)
   );
+
+  update(
+    "agentIds",
+    (p.agentIds ?? []).filter(agentId => agentId !== id)
+  );
 };
 
 const addAgent = (agent: AgentEntry) => {
   setSelectedAgent([...selectedAgents, agent])
   setSelectedIds([...selectedIds, agent.id])
-  console.log(selectedIds);
-  
-  update("agent", selectedAgents)
-  update("agentIds", selectedIds)
-
+  update("agent", agent)
+  update("agentIds", [...(p.agentIds ?? []), agent.id])
 }
 
   const fetchData = () => {startTransition(async () => {
@@ -45,6 +47,9 @@ const addAgent = (agent: AgentEntry) => {
 
   useEffect(() => {
     fetchData()
+    if (p.agent.length) {
+      setSelectedAgent(p.agent)
+    }
   }, [])
 
 

@@ -7,7 +7,6 @@ export default async function Page({
   params: Promise<{category: string, id: string }>
 }>) {
   const { category, id } = await params
-  console.log(category, id);
   
   return <PropertyEdit 
   id={id}

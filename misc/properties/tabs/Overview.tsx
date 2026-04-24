@@ -19,7 +19,7 @@ function Overview({p, upd}: {p: any, upd: any}) {
                     <Select value={p.category} onValueChange={(v) => upd("category", v as PropertyCategory)}>
                       <SelectTrigger className="rounded-xl" ><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        {(["Buy","Sell","Rent","Plots","Residential"] as PropertyCategory[]).map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                        {(["BUY","SELL","RENT","PLOTS", "RESIDENTIAL"] as PropertyCategory[]).map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </Field>
@@ -27,7 +27,7 @@ function Overview({p, upd}: {p: any, upd: any}) {
                     <Select value={p.status} onValueChange={(v) => upd("status", v as Property["status"])}>
                       <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        {["Available","Reserved","Sold"].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                        {["AVAILABLE","RESERVED","SOLD"].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </Field>
@@ -42,7 +42,7 @@ function Overview({p, upd}: {p: any, upd: any}) {
                     <Input type="number" value={p.price} onChange={(e) => upd("price", +e.target.value)} className="rounded-xl" />
                   </Field>
                   <Field label={p.category === "Plots" ? "Land Area (sqft)" : "Built-up Area (sqft)"}>
-                    <Input type="number" value={p.area} onChange={(e) => upd("area", +e.target.value)} className="rounded-xl" />
+                    <Input type="number" value={p.Area} onChange={(e) => upd("Area", +e.target.value)} className="rounded-xl" />
                   </Field>
                   {p.category === "Plots" && (
                     <Field label="Plot Area (sqm)">
@@ -55,10 +55,10 @@ function Overview({p, upd}: {p: any, upd: any}) {
                 {p.category !== "Plots" && (
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <Field label="Bedrooms">
-                      <Input type="number" value={p.bedrooms} onChange={(e) => upd("bedrooms", +e.target.value)} className="rounded-xl" />
+                      <Input type="number" value={p.BedRooms} onChange={(e) => upd("BedRooms", +e.target.value)} className="rounded-xl" />
                     </Field>
                     <Field label="Bathrooms">
-                      <Input type="number" value={p.bathrooms} onChange={(e) => upd("bathrooms", +e.target.value)} className="rounded-xl" />
+                      <Input type="number" value={p.Bathrooms} onChange={(e) => upd("Bathrooms", +e.target.value)} className="rounded-xl" />
                     </Field>
                     <Field label="Year Built">
                       <Input type="number" value={p.yearBuilt} onChange={(e) => upd("yearBuilt", +e.target.value)} className="rounded-xl" />

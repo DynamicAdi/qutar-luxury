@@ -6,8 +6,17 @@ import p3 from "@/assets/property-3.jpg";
 import p4 from "@/assets/property-4.jpg";
 import p5 from "@/assets/property-5.jpg";
 
-export type PropertyCategory = "Buy" | "Sell" | "Rent" | "Plots" | "Residential";
-export type PropertyStatus = "Available" | "Sold" | "Reserved";
+export enum CUSTOMER_STATUS {
+  PURCHASED = "PURCHASED",
+  INTERESTED = "INTERESTED",
+  BOOKED = "BOOKED",
+  INPROGRESS = "INPROGRESS",
+  LOST = "LOST",
+  PAID_HALF = "PAID_HALF",
+}
+
+export type PropertyCategory = "BUY" | "SELL" | "RENT" | "PLOTS" | "RESIDENTIAL";
+export type PropertyStatus = "AVAILABLE" | "SOLD" | "RESERVED";
 
 export interface Property {
   id: string;
@@ -15,15 +24,15 @@ export interface Property {
   category: PropertyCategory;
   price: number;
   currency: string;
-  address: string;
+  address?: AddressEntry;
   city: string;
   state: string;
   lat?: number;
   lng?: number;
   description: string;
-  bedrooms: number;
-  bathrooms: number;
-  area: number; // sqft
+  BedRooms: number;
+  Bathrooms: number;
+  Area: number; // sqft
   yearBuilt: number;
   furnishing: "Furnished" | "Semi-Furnished" | "Unfurnished";
   parking: number;
@@ -44,13 +53,12 @@ export interface Property {
   virtualTourUrl?: string;
   amenities: string[];
   features: string[];
-  nearby: { name: string; type: string; distanceKm: number }[];
-  agent: { name: string; phone: string; email: string; avatar?: string };
-  agentId?: string; // legacy single-agent (kept for back-compat)
+  NearByLocations: { name: string; type: string }[];
+  agent: AgentEntry[];
   agentIds?: string[]; // multi-agent assignment
   addressId?: string;
   documents: { name: string; url: string }[];
-  hidden: boolean;
+  isHidden: boolean;
   status: PropertyStatus;
   hoaFee?: number;
   createdAt: string;
@@ -76,8 +84,10 @@ export interface Customer {
   email: string;
   phone: string;
   nationality: string;
-  joinedAt: string;
+  createdAt: string;
   propertyIds: string[];
+  properties: Property[];
+  status: CUSTOMER_STATUS;
 }
 
 export interface AddressEntry {
@@ -158,9 +168,9 @@ const seedProperties: Property[] = [
     lng: 51.55,
     description:
       "An architectural masterpiece on The Pearl with private infinity pool, 12-meter ceilings, imported Italian marble and panoramic marina views. Designed by Atelier Lumière, this signature residence redefines luxury living in Qatar.",
-    bedrooms: 6,
-    bathrooms: 8,
-    area: 9800,
+    BedRooms: 6,
+    Bathrooms: 8,
+    Area: 9800,
     yearBuilt: 2023,
     furnishing: "Furnished",
     parking: 4,
@@ -170,14 +180,14 @@ const seedProperties: Property[] = [
     virtualTourUrl: "",
     amenities: ["Private Pool", "Smart Home", "Home Cinema", "Wine Cellar", "Gym", "Sauna", "Maid Quarters", "Driver Quarters"],
     features: ["Sea View", "Marina Access", "Private Elevator", "Smart Lighting", "Italian Marble", "Solar Roof"],
-    nearby: [
+    NearByLocations: [
       { name: "Lagoona Mall", type: "Mall", distanceKm: 1.2 },
       { name: "Qatar Academy", type: "School", distanceKm: 3.4 },
       { name: "Hamad Hospital", type: "Hospital", distanceKm: 5.8 },
     ],
     agent: { name: "Layla Al-Mansoori", phone: "+974 5500 1122", email: "layla@qlp.qa" },
     documents: [{ name: "Title Deed.pdf", url: "#" }, { name: "Floor Plan.pdf", url: "#" }],
-    hidden: false,
+    isHidden: false,
     status: "Available",
     hoaFee: 4200,
     createdAt: new Date().toISOString(),
@@ -192,12 +202,12 @@ const seedProperties: Property[] = [
     city: "Doha",
     state: "Qatar",
     description: "Full-floor penthouse with 360° city skyline. Private rooftop terrace and infinity jacuzzi.",
-    bedrooms: 4, bathrooms: 5, area: 5400, yearBuilt: 2022, furnishing: "Furnished", parking: 3,
+    BedRooms: 4, Bathrooms: 5, Area: 5400, yearBuilt: 2022, furnishing: "Furnished", parking: 3,
     images: [p2.src, p1.src], amenities: ["Concierge", "Rooftop Pool", "Gym", "Spa"],
     features: ["Skyline View", "Private Lift", "Smart Home"],
-    nearby: [{ name: "City Center Doha", type: "Mall", distanceKm: 0.8 }],
+    NearByLocations: [{ name: "City Center Doha", type: "Mall", distanceKm: 0.8 }],
     agent: { name: "Omar Faisal", phone: "+974 5500 3344", email: "omar@qlp.qa" },
-    documents: [], hidden: false, status: "Available", createdAt: new Date().toISOString(),
+    documents: [], isHidden: false, status: "Available", createdAt: new Date().toISOString(),
   },
   {
     id: "p3",
@@ -206,12 +216,12 @@ const seedProperties: Property[] = [
     price: 27500000, currency: "QAR",
     address: "Marina District, Lusail", city: "Lusail", state: "Qatar",
     description: "Private beachfront with 80m of pristine coastline.",
-    bedrooms: 7, bathrooms: 9, area: 14200, yearBuilt: 2024, furnishing: "Semi-Furnished", parking: 6,
+    BedRooms: 7, Bathrooms: 9, Area: 14200, yearBuilt: 2024, furnishing: "Semi-Furnished", parking: 6,
     images: [p3.src, p1.src], amenities: ["Private Beach", "Boat Dock", "Helipad", "Pool", "Gym"],
     features: ["Beachfront", "Helipad", "Boat Access"],
-    nearby: [{ name: "Lusail Marina", type: "Landmark", distanceKm: 0.4 }],
+    NearByLocations: [{ name: "Lusail Marina", type: "Landmark", distanceKm: 0.4 }],
     agent: { name: "Layla Al-Mansoori", phone: "+974 5500 1122", email: "layla@qlp.qa" },
-    documents: [], hidden: false, status: "Available", createdAt: new Date().toISOString(),
+    documents: [], isHidden: false, status: "Available", createdAt: new Date().toISOString(),
   },
   {
     id: "p4",
@@ -219,10 +229,10 @@ const seedProperties: Property[] = [
     category: "Plots", price: 4800000, currency: "QAR",
     address: "Al Khor North Sector", city: "Al Khor", state: "Qatar",
     description: "Premium 2,500 sqm development plot zoned residential.",
-    bedrooms: 0, bathrooms: 0, area: 26900, yearBuilt: 0, furnishing: "Unfurnished", parking: 0,
+    BedRooms: 0, Bathrooms: 0, Area: 26900, yearBuilt: 0, furnishing: "Unfurnished", parking: 0,
     images: [p4.src], amenities: [], features: ["Corner Plot", "Road Access", "Utilities Ready"],
-    nearby: [], agent: { name: "Omar Faisal", phone: "+974 5500 3344", email: "omar@qlp.qa" },
-    documents: [], hidden: false, status: "Sold", createdAt: new Date().toISOString(),
+    NearByLocations: [], agent: { name: "Omar Faisal", phone: "+974 5500 3344", email: "omar@qlp.qa" },
+    documents: [], isHidden: false, status: "Sold", createdAt: new Date().toISOString(),
   },
   {
     id: "p5",
@@ -230,12 +240,12 @@ const seedProperties: Property[] = [
     category: "Rent", price: 42000, currency: "QAR",
     address: "Msheireb Downtown", city: "Doha", state: "Qatar",
     description: "Heritage-inspired luxury townhouse in the heart of Doha.",
-    bedrooms: 4, bathrooms: 4, area: 4200, yearBuilt: 2021, furnishing: "Furnished", parking: 2,
+    BedRooms: 4, Bathrooms: 4, Area: 4200, yearBuilt: 2021, furnishing: "Furnished", parking: 2,
     images: [p5.src, p2.src], amenities: ["Pool", "Gym", "Concierge", "Kids Area"],
     features: ["Heritage Design", "Smart Home", "Private Garden"],
-    nearby: [{ name: "Souq Waqif", type: "Landmark", distanceKm: 0.6 }],
+    NearByLocations: [{ name: "Souq Waqif", type: "Landmark", distanceKm: 0.6 }],
     agent: { name: "Sara Al-Thani", phone: "+974 5500 5566", email: "sara@qlp.qa" },
-    documents: [], hidden: false, status: "Available", createdAt: new Date().toISOString(),
+    documents: [], isHidden: false, status: "Available", createdAt: new Date().toISOString(),
   },
 ];
 
@@ -285,7 +295,7 @@ export const useCMS = create<CMSState>()(
         }),
       deleteProperty: (id) => set((s) => ({ properties: s.properties.filter((p) => p.id !== id) })),
       toggleHidden: (id) =>
-        set((s) => ({ properties: s.properties.map((p) => (p.id === id ? { ...p, hidden: !p.hidden } : p)) })),
+        set((s) => ({ properties: s.properties.map((p) => (p.id === id ? { ...p, isHidden: !p.isHidden } : p)) })),
       addLead: (l) => set((s) => ({ leads: [l, ...s.leads] })),
       updateLead: (id, patch) => set((s) => ({ leads: s.leads.map((l) => (l.id === id ? { ...l, ...patch } : l)) })),
       deleteLead: (id) => set((s) => ({ leads: s.leads.filter((l) => l.id !== id) })),
