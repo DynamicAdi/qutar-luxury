@@ -18,7 +18,7 @@ export default function WhyFindSection() {
             viewport={{ once: true, amount: 0.6 }}
           >
             <p className="text-2xl md:text-sm font-semibold uppercase text-black">
-              Why FIND
+              Why QLP
             </p>
           </motion.div>
 

@@ -212,18 +212,18 @@ export default function Hero() {
           {/* Stroke */}
           <h2
             ref={strokeTextRef}
-            className="block text-center text-[4rem] font-black leading-none tracking-tight text-transparent sm:text-[7rem] md:text-[10rem] lg:text-[13rem]"
+            className="block text-center text-[4rem] font-black leading-none tracking-tight text-transparent sm:text-[7rem] md:text-[8rem]"
             style={{
               WebkitTextStroke: "2px #111",
             }}
           >
-            FIND HOME
+            LUXURY PROPERTY
           </h2>
 
           {/* Fill */}
           <h2
             ref={fillTextRef}
-            className="absolute inset-0 block text-center text-[4rem] font-black leading-none tracking-tight text-transparent sm:text-[7rem] md:text-[10rem] lg:text-[13rem]"
+            className="absolute inset-0 block text-center text-[4rem] font-black leading-none tracking-tight text-transparent sm:text-[7rem] md:text-[8rem]"
             style={{
               WebkitBackgroundClip: "text",
               backgroundClip: "text",
@@ -233,7 +233,7 @@ export default function Hero() {
               backgroundPosition: "50% 0%",
             }}
           >
-            FIND HOME
+            LUXURY PROPERTY
           </h2>
         </div>
       </div>

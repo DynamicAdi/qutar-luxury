@@ -76,7 +76,7 @@ export default function ForAgents() {
               variants={fadeUp}
               className="text-xl font-medium leading-snug text-black md:text-3xl"
             >
-              At FIND, our agents don’t just work for the brand—they own a part
+              At QLP, our agents don’t just work for the brand—they own a part
               of it.
             </motion.p>
 

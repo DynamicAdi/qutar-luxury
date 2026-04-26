@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { geistMono, InstrumentSans } from "@/fonts";
+import { geistMono, InstrumentSans, jakarta, syne } from "@/fonts";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import Providers from "@/components/Providers";
 
@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${InstrumentSans.className} h-full antialiased`}
+      className={`${InstrumentSans.className} ${syne.variable} ${jakarta.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
@@ -25,8 +25,7 @@ export default function RootLayout({
           attribute={"class"}
           enableSystem
           disableTransitionOnChange
-          defaultTheme="light"
-        >
+          defaultTheme="light">
           <Providers>{children}</Providers>
         </ThemeProvider>
       </body>

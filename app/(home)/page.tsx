@@ -14,7 +14,6 @@ import Footer from "./_components/Footer";
 export default function Home() {
   return (
    <div className="grid">
-    <Navbar/>
     <Hero/>
     <WhyFind/>
     <RealEstateRewired/>
@@ -23,7 +22,6 @@ export default function Home() {
     <Services/>
     <BlogsAndResources/>
     <CTA/>
-    <Footer/>
    </div>
   );
 }

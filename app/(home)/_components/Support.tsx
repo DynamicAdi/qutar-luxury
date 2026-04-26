@@ -94,7 +94,7 @@ export default function SupportSection() {
           </p>{" "}
           <Button className="bg-transparent border-border rounded-full px-5 py-5 text-lg">
             {" "}
-            Get Started With FIND <ArrowRight size={20} />{" "}
+            Get Started With QLP <ArrowRight size={20} />{" "}
           </Button>{" "}
         </div>{" "}
         <div className="flex max-md:flex-col gap-16 lg:gap-24">
