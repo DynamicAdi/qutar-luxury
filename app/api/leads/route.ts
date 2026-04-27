@@ -60,7 +60,8 @@ export async function GET(req: NextRequest) {
         property: {
           select: {
             id: true,
-            title: true
+            title: true,
+            price: true
           }
         },
       },

@@ -4,7 +4,7 @@ import { signToken } from "@/lib/auth";
 export async function POST(req: Request) {
   const { username, password } = await req.json();
 
-  if (username === "admin" && password === "password123") {
+  if (username === "admin@qlp.qa" && password === "luxury") {
     const token = await signToken({ username });
 
     const res = NextResponse.json({ success: true });

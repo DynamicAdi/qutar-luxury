@@ -84,6 +84,23 @@ export default function DashboardLayout({
     return pathname?.startsWith(href);
   };
 
+  const handleLogout = async () => {
+  try {
+    const res = await fetch("/api/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      window.location.href = "/"; // redirect after logout
+    }
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};
+
   return (
     <div className="min-h-screen w-full p-3 md:p-5">
       {/* Mobile top bar */}
@@ -110,7 +127,7 @@ export default function DashboardLayout({
           className={cn(
             "fixed md:sticky inset-y-3 left-3 md:left-0 md:top-5 z-40 w-64 md:w-60",
             "h-[calc(100vh-1.5rem)] md:h-[calc(100vh-2.5rem)]",
-            "rounded-3xl bg-foreground text-white shadow-float",
+            "rounded-3xl bg-emerald text-white shadow-float",
             "flex flex-col p-4 transition-transform duration-300",
             open ? "translate-x-0" : "-translate-x-[110%] md:translate-x-0"
           )}
@@ -201,20 +218,16 @@ export default function DashboardLayout({
           </nav>
 
           {/* Footer */}
-          <div className="mt-3 rounded-xl bg-sidebar-accent p-3">
-            <div className="text-xs text-sidebar-foreground/60">
-              Signed in as
-            </div>
+          <div className="mt-3 rounded-xl bg-gradient-gold p-3">
+            <div className="text-sm font-semibold text-white">Admin · QLP</div>
 
-            <div className="text-sm font-semibold text-black">Admin · QLP</div>
-
-            <Link
-              href="/"
-              className="mt-2 flex items-center gap-2 text-xs text-destructive hover:underline"
+            <button
+              onClick={handleLogout}
+              className="mt-2 flex items-center gap-2 text-xs text-white underline hover:underline"
             >
               <LogOut className="h-3.5 w-3.5" />
               Sign out
-            </Link>
+            </button>
           </div>
         </aside>
 

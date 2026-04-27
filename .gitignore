@@ -20,6 +20,8 @@
 # production
 /build
 
+/public/uplaods/*
+/public/uplaods/
 # misc
 .DS_Store
 *.pem

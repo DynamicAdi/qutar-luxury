@@ -22,7 +22,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { useCMS, Lead } from "@/store/cms";
+import { Lead } from "@/store/cms";
 import {
   Search,
   Mail,
@@ -30,11 +30,12 @@ import {
   Trash2,
   ArrowUpRight,
   UserCheck,
+  LucideLoader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import { Field } from "@/components/ui/field";
+import LoaderScreen from "@/misc/LoaderScreen";
 
 const statusStyle: Record<Lead["status"], string> = {
   NEW: "bg-primary/10 text-primary-deep border-primary/30",
@@ -45,7 +46,6 @@ const statusStyle: Record<Lead["status"], string> = {
 };
 
 export default function Leads() {
-  const { updateLead, deleteLead, addCustomer, linkProperty } = useCMS();
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<string>("All");
   const [convertLead, setConvertLead] = useState<Lead | null>(null);
@@ -54,7 +54,6 @@ export default function Leads() {
 
   const [data, setData] = useState<Lead[]>([]);
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
   async function updateLeadStatus(id: string, status: string) {
     const res = await axios.put("/api/leads", {
@@ -125,6 +124,12 @@ export default function Leads() {
   useEffect(() => {
     getData();
   }, []);
+
+  if (getter) {
+    return (
+      <LoaderScreen />
+    )
+  }
   return (
     <>
       <PageHeader
@@ -289,7 +294,10 @@ export default function Leads() {
                         }}
                         className="rounded-lg p-2 hover:bg-destructive/10 hover:text-destructive"
                       >
+                        {
+                          deleteThread ? <LucideLoader2 size={12} className="animate-spin" /> :
                         <Trash2 className="h-4 w-4" />
+                        }
                       </button>
                     </div>
                   </td>
@@ -322,13 +330,10 @@ function ConvertDialog({
   lead: Lead | null;
   onClose: () => void;
 }) {
-  const { properties } = useCMS();
-  const property = lead?.propertyId
-    ? properties.find((p) => p.id === lead.propertyId)
-    : undefined;
+
 
   const [nationality, setNationality] = useState("Qatari");
-  const [dealAmount, setDealAmount] = useState<number>(property?.price ?? 0);
+  const [dealAmount, setDealAmount] = useState<number>(Number(lead?.property?.price ) ?? 0);
   const [paymentMethod, setPaymentMethod] = useState("Bank Transfer");
   const [closingDate, setClosingDate] = useState(
     new Date().toISOString().slice(0, 10),
@@ -336,13 +341,6 @@ function ConvertDialog({
   const [notes, setNotes] = useState("");
   const [saveProcess, startSaveProcess] = useTransition();
   // reset when lead changes
-  useMemo(() => {
-    setDealAmount(property?.price ?? 0);
-    setNationality("Qatari");
-    setPaymentMethod("Bank Transfer");
-    setClosingDate(new Date().toISOString().slice(0, 10));
-    setNotes("");
-  }, [lead?.id]);
 
   const saveCustomer = () =>
     startSaveProcess(async () => {
@@ -392,12 +390,12 @@ function ConvertDialog({
           <DialogDescription>
             Closing the deal with{" "}
             <span className="font-medium text-foreground">{lead.name}</span>
-            {property ? (
+            {lead.property ? (
               <>
                 {" "}
                 for{" "}
                 <span className="font-medium text-foreground">
-                  {property.title}
+                  {lead.property.title}
                 </span>
               </>
             ) : null}
@@ -428,9 +426,9 @@ function ConvertDialog({
               className="rounded-xl"
               placeholder="e.g. 18500000"
             />
-            {property && (
+            {lead.property && (
               <p className="text-[11px] text-muted-foreground mt-1">
-                Listed price: QAR {property.price.toLocaleString()}
+                Listed price: QAR {lead.property.price.toLocaleString()}
               </p>
             )}
           </Field>
