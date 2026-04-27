@@ -12,7 +12,6 @@ export default function HomeLayout({
       <Navbar />
       {children}
       <Footer />
-      {/* <Toaster /> */}
     </>
   );
 }
