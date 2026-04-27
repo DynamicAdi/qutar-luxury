@@ -7,40 +7,40 @@ import { ArrowRight } from "lucide-react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 
 export default function CTA() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      /* start lower and force it to be an overlay */
-      gsap.set(sectionRef.current, {
-        y: 40,
-        position: "relative", // Required for z-index to work
-        zIndex: 10, // Keeps this section on top of the section below it
-      });
+  // const sectionRef = useRef<HTMLDivElement>(null);
+  // useEffect(() => {
+  //   const ctx = gsap.context(() => {
+  //     /* start lower and force it to be an overlay */
+  //     gsap.set(sectionRef.current, {
+  //       y: 40,
+  //       position: "relative", // Required for z-index to work
+  //       zIndex: 10, // Keeps this section on top of the section below it
+  //     });
 
-      /* move upward on scroll */
-      gsap.to(sectionRef.current, {
-        yPercent: -108,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          // Changing to "top top" usually works best for overlay reveals,
-          // meaning the effect starts when the section hits the top of the viewport.
-          start: "top top",
-          end: "+=100%", // Animates over the scroll distance of its own height
-          scrub: 1.2,
-          pin: true,
-          pinSpacing: false, // CRITICAL FIX: Stops GSAP from adding extra padding/layout disruption
-          anticipatePin: 1,
-        },
-      });
-    }, sectionRef);
+  //     /* move upward on scroll */
+  //     gsap.to(sectionRef.current, {
+  //       yPercent: -108,
+  //       ease: "none",
+  //       scrollTrigger: {
+  //         trigger: sectionRef.current,
+  //         // Changing to "top top" usually works best for overlay reveals,
+  //         // meaning the effect starts when the section hits the top of the viewport.
+  //         start: "top top",
+  //         end: "+=100%", // Animates over the scroll distance of its own height
+  //         scrub: 1.2,
+  //         pin: true,
+  //         pinSpacing: false, // CRITICAL FIX: Stops GSAP from adding extra padding/layout disruption
+  //         anticipatePin: 1,
+  //       },
+  //     });
+  //   }, sectionRef);
 
-    return () => ctx.revert();
-  }, []);
+  //   return () => ctx.revert();
+  // }, []);
 
   return (
     <section
-      ref={sectionRef}
+      // ref={sectionRef}
       className="relative min-h-screen overflow-hidden bg-transparent"
     >
       {/* Background */}
