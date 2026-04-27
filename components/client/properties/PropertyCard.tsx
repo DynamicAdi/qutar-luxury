@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
 import { ArrowUpRight, BedDouble, Bath, Maximize, MapPin } from "lucide-react";
-import { Property, formatQAR } from "@/lib/properties";
+import {  formatQAR } from "@/lib/properties";
 import Link from "next/link";
+import { Property } from "@/store/cms";
 
 interface Props {
   property: Property;
@@ -104,7 +105,7 @@ const PropertyCard = ({ property, index = 0 }: Props) => {
               </div>
                 <p className="text-sm font-sans text-gray-400 font-light pb-4 line-clamp-2">{property.description.slice(0, 110)}... <span className="text-gold-glow">Read More</span></p>
               <p className="font-body text-xs text-muted-foreground uppercase tracking-[0.2em]">
-                {property.address.label}, {property.address.city}
+                {property.address?.street}, {property.address?.city}, {property.address?.state}
               </p>
               <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
                 <span className="font-jakarta text-xl text-emerald font-bold">
@@ -128,13 +129,13 @@ const PropertyCard = ({ property, index = 0 }: Props) => {
             {/* Idle badges */}
             <div className="absolute top-4 left-4 flex gap-2">
               <span className="px-3 py-1 bg-emerald text-primary-foreground font-display text-xs tracking-[0.2em] uppercase">
-                {property.category}
+                {property.propertyType}
               </span>
-              {property.status !== "AVAILABLE" && (
-                <span className="px-3 py-1 bg-gold text-gold-foreground font-display text-xs tracking-[0.2em] uppercase">
+              
+                <span className="px-3 py-1 bg-gold text-white font-display text-xs tracking-[0.2em] uppercase">
                   {property.status}
                 </span>
-              )}
+              
             </div>
             <div className="absolute top-4 right-4 size-10 rounded-full bg-background/95 flex items-center justify-center text-emerald">
               <ArrowUpRight className="size-5" />
@@ -225,7 +226,7 @@ const PropertyCard = ({ property, index = 0 }: Props) => {
               }}
             >
               <img
-                src={property.buildingImage}
+                src={property.pngImage}
                 alt=""
                 aria-hidden
                 loading="lazy"
@@ -258,7 +259,7 @@ const PropertyCard = ({ property, index = 0 }: Props) => {
           >
             <p className="font-display font-medium text-white text-base leading-tight truncate">{property.title}</p>
             <p className="font-body text-[10px] tracking-[0.25em] uppercase text-white inline-flex items-center gap-1 mt-0.5">
-              <MapPin className="size-3" /> {property.address.city}
+              <MapPin className="size-3" /> {property.address?.city}
             </p>
             {/* <p className="font-display text-emerald font-bold text-base mt-0.5">
               {formatQAR(property.price)}

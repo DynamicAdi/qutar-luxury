@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
-import { useCMS, AgentEntry } from "@/store/cms";
+import { AgentEntry } from "@/store/cms";
 import { Plus, Search, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -17,7 +17,6 @@ import LoaderScreen from "@/misc/LoaderScreen";
 
 export default function Agents() {
   const navigate = useRouter();
-  const { agents, properties, addAgent } = useCMS();
   const [q, setQ] = useState("");
   const [editing, setEditing] = useState<AgentEntry | null>(null);
   const [open, setOpen] = useState(false);
@@ -91,8 +90,6 @@ export default function Agents() {
   const initials = (n: string) =>
     n.split(" ").filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
 
-  const propertyCount = (agentId: string) =>
-    properties.filter((p) => (p.agentIds ?? (p.agentId ? [p.agentId] : [])).includes(agentId)).length;
 
   if (transition) {
     return (

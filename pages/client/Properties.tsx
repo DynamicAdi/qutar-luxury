@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import Filters, { FilterState, PRICE_FLOOR, PRICE_CEIL } from "@/components/client/properties/Filters";
 import PropertyCard from "@/components/client/properties/PropertyCard";
 import { properties } from "@/lib/properties";
+import axios from "axios";
+import { Property } from "@/store/cms";
 
 const Properties = () => {
   const [filters, setFilters] = useState<FilterState>({
@@ -14,17 +16,33 @@ const Properties = () => {
     priceMin: PRICE_FLOOR,
     priceMax: PRICE_CEIL,
   });
+  const [data, setData] = useState<Property[]>([])
+  const [getProcess, StartGetProcess] = useTransition()
+  
+  const allProperties = () => {
+    StartGetProcess(async () => {
+      const req = await axios.get("/api/properties");
+      if (req.status === 200) {
+        setData(req.data.data)
+        console.log(req.data);
+      }
+    })
+  }
 
-  const filtered = useMemo(() => {
-    return properties.filter((p) => {
-      const catOK = filters.category === "ALL" || p.category === filters.category;
-      const stateOK = !filters.state || p.address.state === filters.state;
-      const cityOK = !filters.city || p.address.city === filters.city;
-      const streetOK = !filters.street || p.address.street === filters.street;
-      const priceOK = p.price >= filters.priceMin && p.price <= filters.priceMax;
-      return catOK && stateOK && cityOK && streetOK && priceOK;
-    });
-  }, [filters]);
+  useEffect(() => {
+    allProperties()
+  }, [])
+
+  // const filtered = useMemo(() => {
+  //   return data.filter((p) => {
+  //     const catOK = filters.category === "ALL" || p.category === filters.category;
+  //     const stateOK = !filters.state || p.address?.state === filters.state;
+  //     const cityOK = !filters.city || p.address?.city === filters.city;
+  //     const streetOK = !filters.street || p.address?.street === filters.street;
+  //     const priceOK = p.price >= filters.priceMin && p.price <= filters.priceMax;
+  //     return catOK && stateOK && cityOK && streetOK && priceOK;
+  //   });
+  // }, [filters]);
 
   return (
     <>
@@ -41,7 +59,7 @@ const Properties = () => {
             <div className="text-left md:text-right">
               <p className="font-display text-xs tracking-[0.3em] text-muted-foreground uppercase">Showing</p>
               <p className="font-display text-3xl md:text-4xl text-foreground font-bold">
-                {filtered.length}<span className="text-muted-foreground"> / {properties.length}</span>
+                {data.length}<span className="text-muted-foreground"> / {properties.length}</span>
               </p>
             </div>
           </div>
@@ -56,13 +74,13 @@ const Properties = () => {
 
         {/* Grid */}
         <section className="mx-auto px-24 pb-32">
-          {filtered.length === 0 ? (
+          {data.length === 0 ? (
             <div className="border border-dashed border-border py-32 text-center">
               <p className="font-display text-3xl text-muted-foreground">No properties match your filters.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-24">
-              {filtered.map((p, i) => (
+              {data.map((p, i) => (
                 <PropertyCard key={p.id} property={p} index={i} />
               ))}
             </div>

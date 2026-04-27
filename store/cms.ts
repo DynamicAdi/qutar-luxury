@@ -17,13 +17,17 @@ export enum CUSTOMER_STATUS {
 
 export type PropertyCategory = "BUY" | "SELL" | "RENT" | "PLOTS" | "RESIDENTIAL";
 export type PropertyStatus = "AVAILABLE" | "SOLD" | "RESERVED";
+export type PropertyType = "BUILDING" | "APARTMENT" | "PLOT"
 
 export interface Property {
   id: string;
   title: string;
   category: PropertyCategory;
+  propertyType: PropertyType;
   price: number;
   currency: string;
+  pngImage?: string;
+  youtubeLink?: string;
   address?: AddressEntry;
   city: string;
   state: string;

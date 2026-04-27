@@ -3,6 +3,7 @@ import "./globals.css";
 import { geistMono, InstrumentSans, jakarta, syne } from "@/fonts";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import Providers from "@/components/Providers";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -27,6 +28,7 @@ export default function RootLayout({
           disableTransitionOnChange
           defaultTheme="light">
           <Providers>{children}</Providers>
+          <Toaster richColors position="top-right" />
         </ThemeProvider>
       </body>
     </html>
