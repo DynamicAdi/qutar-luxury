@@ -74,30 +74,31 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { error: "Failed to fetch customers" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 export async function DELETE(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const id = searchParams.get("id");
-    if (!id) {
-        return NextResponse.json({error: "ID is not provided"}, {status: 404})
-    }
+  if (!id) {
+    return NextResponse.json({ error: "ID is not provided" }, { status: 404 });
+  }
 
-    try {
-        const customers = await db.customers.delete({
-            where: { id }
-        })
-        if (customers) {
-            return NextResponse.json({message: "Deleted Successfully"}, {status: 200, statusText: "OK"});
-        }
+  try {
+    const customers = await db.customers.delete({
+      where: { id },
+    });
+    if (customers) {
+      return NextResponse.json(
+        { message: "Deleted Successfully" },
+        { status: 200, statusText: "OK" },
+      );
     }
-    catch (error) {
-        return NextResponse.json({error: error}, {status: 500})
-    }
+  } catch (error) {
+    return NextResponse.json({ error: error }, { status: 500 });
+  }
 }
-
 
 /**
  * POST /api/customers
@@ -113,6 +114,10 @@ export async function POST(req: NextRequest) {
       email,
       phone,
       status,
+      dealAmount,
+      paymentMethod,
+      closingDate,
+      note,
       nationality,
       propertyIds, // optional array of property ids
     } = body;
@@ -121,7 +126,7 @@ export async function POST(req: NextRequest) {
     if (!name || !email || !phone) {
       return NextResponse.json(
         { error: "Name, email and phone are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -131,6 +136,12 @@ export async function POST(req: NextRequest) {
         image,
         email,
         phone,
+
+        dealAmount,
+        paymentMethod,
+        closingDate,
+        note,
+
         nationality,
         status: status || CUSTOMER_STATUS.BOOKED,
 
@@ -150,7 +161,7 @@ export async function POST(req: NextRequest) {
         message: "Customer created successfully",
         data: customer,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: any) {
     console.error(error);
@@ -158,25 +169,23 @@ export async function POST(req: NextRequest) {
     if (error.code === "P2002") {
       return NextResponse.json(
         { error: "Email already exists" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
     return NextResponse.json(
       { error: "Failed to create customer" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-export async function PUT(
-  req: NextRequest
-) {
+export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
 
     const {
-        id,
+      id,
       name,
       image,
       email,
@@ -215,7 +224,7 @@ export async function PUT(
         message: "Customer updated successfully",
         data: customer,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     console.error(error);
@@ -223,17 +232,13 @@ export async function PUT(
     if (error.code === "P2002") {
       return NextResponse.json(
         { error: "Email already exists" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
     return NextResponse.json(
       { error: "Failed to update customer" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-
-
-
-

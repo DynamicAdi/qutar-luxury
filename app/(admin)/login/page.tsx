@@ -8,15 +8,29 @@ import { Logo } from "@/components/qlp/Logo";
 import { Eye, EyeOff } from "lucide-react";
 import heroImg from "@/assets/property-1.jpg";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 
 export default function Login() {
   const router = useRouter()
   const [show, setShow] = useState(false);
+  const [form, setForm] = useState({ username: "", password: "" });
 
-  const onSubmit = () => {
-    router.push("/dashboard");
+  const onSubmit = async (e: any) => {
+    e.preventDefault()
+    const res = await fetch("/api/login", {
+      method: "POST",
+      body: JSON.stringify(form),
+    });
+
+    if (res.status === 200) {
+      toast.success("Login success")
+      router.push("/dashboard");
+    } else {
+      toast.error("Login failed");
+    }
   };
+
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
@@ -28,7 +42,7 @@ export default function Login() {
           <Logo />
           <div className="max-w-md animate-fade-in-up">
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs tracking-[0.2em] uppercase text-primary-glow">
-              CMS Console
+              Welcome to QLP
             </div>
             <h1 className="font-grotesk text-4xl font-light leading-tight">
               Manage Qatar's most <em className="not-italic text-gold-gradient font-medium">distinguished</em> portfolio.
@@ -54,8 +68,12 @@ export default function Login() {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" defaultValue="admin@qlp.qa" required className="h-11 rounded-xl" />
+              <Label htmlFor="username">Username</Label>
+              <Input id="username" 
+              type="username" 
+              value={form.username}
+              onChange={(e) => setForm({...form, username: e.target.value})}
+              required className="h-11 rounded-xl" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -63,7 +81,8 @@ export default function Login() {
                 <Input
                   id="password"
                   type={show ? "text" : "password"}
-                  defaultValue="luxury"
+                  value={form.password}
+                  onChange={(e) => setForm({...form, password: e.target.value})}
                   required
                   className="h-11 rounded-xl pr-10"
                 />
@@ -77,12 +96,12 @@ export default function Login() {
                 </button>
               </div>
             </div>
-            <div className="flex items-center justify-between text-xs">
+            {/* <div className="flex items-center justify-between text-xs">
               <label className="flex items-center gap-2 text-muted-foreground">
                 <input type="checkbox" className="accent-[hsl(var(--primary))]" /> Remember me
               </label>
-              <a href="#" className="text-primary hover:underline">Forgot password?</a>
-            </div>
+              {/* <a href="#" className="text-primary hover:underline">Forgot password?</a>
+            </div> */}
 
             <Button type="submit" className="w-full h-11 rounded-xl hover:opacity-80 cursor-pointer text-primary-foreground shadow-gold transition-all">
               Sign in

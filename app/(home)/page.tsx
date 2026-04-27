@@ -8,13 +8,11 @@ import Carousel from "@/components/client/home/Carousel";
 import Services from "@/components/client/home/Services";
 import BlogsAndResourcesSection from "@/components/client/home/BlogsAndResources";
 import CTA from "@/components/client/home/CTA";
-import Navbar from "@/components/client/global/Navbar";
-import Footer from "@/components/client/global/Footer";
 
 export default function Home() {
   return (
    <div className="grid">
-    <Navbar/>
+    {/* <Navbar/> */}
     <Hero/>
     <WhyFind/>
     <RealEstateRewired/>
@@ -23,7 +21,7 @@ export default function Home() {
     <Services/>
     <BlogsAndResourcesSection/>
     <CTA />
-    <Footer/>
+    {/* <Footer/> */}
    </div>
   );
 }

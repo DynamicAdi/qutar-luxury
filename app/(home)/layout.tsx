@@ -1,5 +1,5 @@
 import Navbar from "@/components/client/global/Navbar";
-import { Footer } from "react-day-picker";
+import Footer from "@/components/client/global/Footer";
 import { Toaster } from "sonner";
 
 export default function HomeLayout({
@@ -9,8 +9,9 @@ export default function HomeLayout({
 }) {
   return (
     <>
-      
+      <Navbar />
       {children}
+      <Footer />
       {/* <Toaster /> */}
     </>
   );

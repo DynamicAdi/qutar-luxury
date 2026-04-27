@@ -40,7 +40,6 @@ type NavItem = {
 
 const nav: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/dashboard/cms", label: "Home Page", icon: Home },
   {
     href: "/dashboard/properties",
     label: "Properties",

@@ -80,9 +80,9 @@ model Leads {
 
   // Relations with property
   propertyId   String?
-  property     Property?      @relation(fields: [propertyId], references: [id])
-  updatedAt    DateTime       @updatedAt
-  createdAt    DateTime       @default(now())
+  property     Property?     @relation(fields: [propertyId], references: [id])
+  updatedAt    DateTime      @updatedAt
+  createdAt    DateTime      @default(now())
   fingerprints Fingerprints?
 }
 
@@ -124,15 +124,21 @@ model Property {
 }
 
 model Customers {
-  id          String          @id @default(uuid())
-  name        String
-  image       String?
-  email       String          @unique
-  phone       String
-  nationality String?         @default("Qatari")
-  status      CUSTOMER_STATUS @default(BOOKED)
-  properties  Property[]
-  createdAt   DateTime        @default(now())
+  id            String          @id @default(uuid())
+  name          String
+  image         String?
+  email         String          @unique
+  phone         String
+
+  dealAmount    Int?
+  paymentMethod String?
+  closingDate   DateTime?
+  note          String?
+  
+  nationality   String?         @default("Qatari")
+  status        CUSTOMER_STATUS @default(BOOKED)
+  properties    Property[]
+  createdAt     DateTime        @default(now())
 }
 
 model Fingerprints {

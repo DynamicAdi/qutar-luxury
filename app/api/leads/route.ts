@@ -57,7 +57,12 @@ export async function GET(req: NextRequest) {
         createdAt: "desc",
       },
       include: {
-        property: true,
+        property: {
+          select: {
+            id: true,
+            title: true
+          }
+        },
       },
     });
 
@@ -81,8 +86,9 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-export async function DELETE(req: Request) {
-  const { id } = await req.json();
+export async function DELETE(req: NextRequest) {
+  const params = req.nextUrl.searchParams
+  const id = params.get("id")
   if (!id) {
     return NextResponse.json({ error: "ID is not provided" }, { status: 404 });
   }

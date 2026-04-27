@@ -45,6 +45,8 @@ import {
   Check,
   Loader,
   Edit2,
+  Banknote,
+  WalletCards,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -65,8 +67,12 @@ export default function Customers() {
     nationality: "Qatari",
     propertyIds: [""],
     status: "",
+    dealAmount: 0,
+    paymentMethod: "",
+    closingDate: "",
+    note: "",
   });
-  const [formType, setFormType] = useState<"EDIT" | "NEW">("NEW")
+  const [formType, setFormType] = useState<"EDIT" | "NEW">("NEW");
   const [avaprop, setAvaprop] = useState([]);
   const [search, startSearch] = useTransition();
   const [saveProcess, startSaveProcess] = useTransition();
@@ -104,18 +110,23 @@ export default function Customers() {
       }
     });
 
-    const updateCustomer = async () => {startSaveProcess(async () => {
-    const req = await axios.put(`/api/customers`, {
-      id: form.customId,
-      name: form.name,
-      email: form.email,
-      phone: form.phone,
-      status: form.status,
-      nationality: form.nationality,
-      propertyIds: form.propertyIds,
-    })
+  const updateCustomer = async () => {
+    startSaveProcess(async () => {
+      const req = await axios.put(`/api/customers`, {
+        id: form.customId,
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        status: form.status,
+        nationality: form.nationality,
+        propertyIds: form.propertyIds,
+        dealAmount: form.dealAmount,
+        paymentMethod: form.paymentMethod,
+        closingDate: new Date(form.closingDate),
+        note: form.note,
+      });
 
-    if (req.status === 200) {
+      if (req.status === 200) {
         toast.success("Customer updated");
         setForm({
           customId: "",
@@ -125,13 +136,18 @@ export default function Customers() {
           nationality: "Qatari",
           propertyIds: [],
           status: "",
+          dealAmount: 0,
+          paymentMethod: "",
+          closingDate: "",
+          note: "",
         });
         setOpen(false);
-    }
-  })
-}
+      }
+    });
+  };
 
-  const saveCustomer = () => startSaveProcess(async () => {
+  const saveCustomer = () =>
+    startSaveProcess(async () => {
       const req = await axios.post("/api/customers", {
         name: form.name,
         email: form.email,
@@ -139,6 +155,10 @@ export default function Customers() {
         status: form.status,
         nationality: form.nationality,
         propertyIds: form.propertyIds,
+        dealAmount: form.dealAmount,
+        paymentMethod: form.paymentMethod,
+        closingDate: new Date(form.closingDate),
+        note: form.note,
       });
 
       if (req.status === 201) {
@@ -151,17 +171,22 @@ export default function Customers() {
           nationality: "Qatari",
           propertyIds: [],
           status: "",
+          dealAmount: 0,
+          paymentMethod: "",
+          closingDate: "",
+          note: "",
         });
         setOpen(false);
       }
     });
+
   const submit = (e: React.SubmitEvent, cId?: string) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.phone)
       return toast.error("Name and email required");
     if (form.propertyIds.length === 0)
       return toast.error("Please link at least one property");
-    formType === "NEW" ? saveCustomer() : updateCustomer()
+    formType === "NEW" ? saveCustomer() : updateCustomer();
   };
 
   useEffect(() => {
@@ -194,13 +219,13 @@ export default function Customers() {
               <DialogHeader>
                 <DialogTitle>{formType} Customer</DialogTitle>
               </DialogHeader>
-              <form onSubmit={submit} className="space-y-3">
+              <form onSubmit={submit} className="space-y-2 h-auto">
                 <div>
                   <Label>
                     Full Name <span className="text-destructive">*</span>
                   </Label>
                   <Input
-                    className="rounded-xl mt-1"
+                    className="rounded-xl my-1 "
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                   />
@@ -211,7 +236,7 @@ export default function Customers() {
                   </Label>
                   <Input
                     type="email"
-                    className="rounded-xl mt-1"
+                    className="rounded-xl my-3"
                     value={form.email}
                     onChange={(e) =>
                       setForm({ ...form, email: e.target.value })
@@ -225,7 +250,7 @@ export default function Customers() {
                     </Label>
                     <Input
                       type="number"
-                      className="rounded-xl mt-1"
+                      className="rounded-xl my-3"
                       onKeyDown={(e) => handleKeyDown(e)}
                       value={form.phone}
                       onChange={(e) =>
@@ -236,7 +261,7 @@ export default function Customers() {
                   <div>
                     <Label>Nationality</Label>
                     <Input
-                      className="rounded-xl mt-1"
+                      className="rounded-xl my-3"
                       value={form.nationality}
                       onChange={(e) =>
                         setForm({ ...form, nationality: e.target.value })
@@ -244,6 +269,79 @@ export default function Customers() {
                     />
                   </div>
                 </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>
+                      Deal Amount <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      type="number"
+                      className="rounded-xl my-3"
+                      onKeyDown={(e) => handleKeyDown(e)}
+                      value={form.dealAmount}
+                      onChange={(e) =>
+                        setForm({ ...form, dealAmount: Number(e.target.value) })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label>
+                      Payment Method <span className="text-destructive">*</span>
+                    </Label>
+                    <Select
+                      value={form.paymentMethod || "Bank Transfer"}
+                      onValueChange={(e) =>
+                        setForm({ ...form, paymentMethod: e })
+                      }
+                    >
+                      <SelectTrigger className="rounded-xl">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[
+                          "Bank Transfer",
+                          "Cash",
+                          "Mortgage",
+                          "Installments",
+                          "Cheque",
+                        ].map((m) => (
+                          <SelectItem key={m} value={m}>
+                            {m}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>
+                      Closing Date <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      type="date"
+                      className="rounded-xl my-3"
+                      onKeyDown={(e) => handleKeyDown(e)}
+                      value={form.closingDate}
+                      onChange={(e) =>
+                        setForm({ ...form, closingDate: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label>Note</Label>
+                    <Input
+                      className="rounded-xl my-3"
+                      value={form.note}
+                      onChange={(e) =>
+                        setForm({ ...form, note: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+
                 {/*  */}
 
                 <CustomerStatusSelect
@@ -269,7 +367,9 @@ export default function Customers() {
                   >
                     {saveProcess ? (
                       <Loader size={14} className="animate-spin" />
-                    ) : ( formType === "EDIT" ? "Update Customer" :
+                    ) : formType === "EDIT" ? (
+                      "Update Customer"
+                    ) : (
                       "Add Customer"
                     )}
                   </Button>
@@ -290,10 +390,14 @@ export default function Customers() {
                   Contact
                 </th>
                 <th className="text-left px-4 py-3.5 hidden sm:table-cell">
-                  Nationality
+                  Deal Amount
                 </th>
+                <th className="text-left px-4 py-3.5">Closing Date</th>
+
                 <th className="text-left px-4 py-3.5">Status</th>
                 <th className="text-left px-4 py-3.5">Linked Properties</th>
+                <th className="text-left px-4 py-3.5">Nationality</th>
+                <th className="text-left px-4 py-3.5">Note</th>
                 <th className="text-right px-4 py-3.5">Actions</th>
               </tr>
             </thead>
@@ -332,8 +436,19 @@ export default function Customers() {
                     </div>
                   </td>
                   <td className="px-4 py-3.5 hidden sm:table-cell text-muted-foreground">
-                    {c.nationality}
+                    <div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Banknote className="h-3 w-3" /> {c.dealAmount}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <WalletCards className="h-3 w-3" /> {c.paymentMethod}
+                      </span>
+                    </div>
                   </td>
+                   <td className="px-4 py-3.5 hidden sm:table-cell text-muted-foreground">
+                    {c.closingDate?.split("T")[0]}
+                  </td>
+
                   <td className="px-4 py-3.5 hidden sm:table-cell text-muted-foreground">
                     {c.status.charAt(0) + c.status.slice(1).toLowerCase()}
                   </td>
@@ -356,12 +471,17 @@ export default function Customers() {
                       })}
                     </div>
                   </td>
+                                    <td className="px-4 py-3.5 hidden sm:table-cell text-muted-foreground">
+                    {c.nationality}
+                  </td>
+                  <td className="px-4 py-3.5 hidden sm:table-cell text-muted-foreground">
+                    {c?.note ? c.note : "-"}
+                  </td>
                   <td className="px-4 py-3.5">
                     <div className="flex justify-end gap-1">
-
                       <button
                         onClick={() => {
-                          setFormType("EDIT")
+                          setFormType("EDIT");
                           setOpen(true);
                           setForm({
                             customId: c.id,
@@ -370,8 +490,12 @@ export default function Customers() {
                             nationality: c.nationality,
                             phone: c.phone,
                             status: c.status,
-                            propertyIds: c.properties?.map((p) => p.id) ?? []
-                          })
+                            propertyIds: c.properties?.map((p) => p.id) ?? [],
+                            dealAmount: c?.dealAmount as number,
+                            paymentMethod: c?.paymentMethod as string,
+                            closingDate: c?.closingDate as string,
+                            note: c?.note as string,
+                          });
                         }}
                         className="rounded-lg p-2 hover:text-yellow-600"
                       >
@@ -525,7 +649,7 @@ function PropertySelect({
             variant="outline"
             role="combobox"
             disabled={search}
-            className="w-full justify-between mt-1 rounded-xl h-auto py-2"
+            className="w-full justify-between my-3 rounded-xl py-4 h-auto"
           >
             {search ? (
               "Loading Properties..."
@@ -611,7 +735,7 @@ function PropertySelect({
         </PopoverContent>
       </Popover>
 
-      <p className="text-[11px] text-muted-foreground mt-1">
+      <p className="text-[11px] text-muted-foreground my-3">
         Required. Properties will be marked as Sold.
       </p>
     </div>
@@ -633,7 +757,7 @@ function CustomerStatusSelect({
         value={value}
         onValueChange={(v) => onChange(v as CUSTOMER_STATUS)}
       >
-        <SelectTrigger className="mt-1 w-full rounded-xl">
+        <SelectTrigger className="my-3 w-full rounded-xl">
           <SelectValue placeholder="Select status" />
         </SelectTrigger>
 
