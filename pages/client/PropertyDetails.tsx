@@ -31,11 +31,12 @@ import {
 
 import EnquiryForm from "@/components/client/properties/EnquiryForm";
 import ImageLightbox from "@/components/client/properties/ImageLightbox";
-import { properties, formatQAR } from "@/lib/properties";
+import { formatQAR } from "@/lib/properties";
 import Link from "next/link";
 import { Property } from "@/store/cms";
 import axios from "axios";
 import LoaderScreen from "@/misc/LoaderScreen";
+import StickySidebar from "./EnquireSide";
 
 const ytId = (url?: string) => {
   if (!url) return null;
@@ -49,7 +50,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
   const [bldgTilt, setBldgTilt] = useState({ x: 0, y: 0 });
   const heroRef = useRef<HTMLDivElement>(null);
   const [property, setProperty] = useState<Property>();
-  const [load, startLoad] = useTransition()
+  const [load, startLoad] = useTransition();
 
   const fetchData = () =>
     startLoad(async () => {
@@ -63,21 +64,8 @@ const PropertyDetails = ({ id }: { id: string }) => {
     });
 
   useEffect(() => {
-    fetchData()
-  }, [])
-
-  const similar = useMemo(
-    () =>
-      properties
-        .filter(
-          (p) =>
-            p.id !== id &&
-            (p.category === property?.category ||
-              p.address.city === property?.address?.city),
-        )
-        .slice(0, 3),
-    [id, property?.category, property?.address?.city],
-  );
+    fetchData();
+  }, []);
 
   const onHeroMove = (e: React.MouseEvent) => {
     const el = heroRef.current;
@@ -90,9 +78,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
   const onHeroLeave = () => setBldgTilt({ x: 0, y: 0 });
 
   if (load) {
-    return (
-      <LoaderScreen />
-    )
+    return <LoaderScreen />;
   }
   if (!property) {
     return (
@@ -119,7 +105,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
 
   return (
     <>
-      <main className="animate-fade-in">
+      <main className="animate-fade-in mt-12">
         {/* Breadcrumb */}
         <div className="px-24 mx-auto pt-6 pb-4">
           <nav className="flex items-center gap-2 text-xs font-body text-muted-foreground">
@@ -336,7 +322,19 @@ const PropertyDetails = ({ id }: { id: string }) => {
               {property?.address?.street}, {property?.address?.state},{" "}
               {property?.address?.zipCode}
             </p>
-
+            {
+              property.address?.gmaps && (
+            <div className="h-96 w-full">
+                <iframe
+                    title="Maps"
+                      src={property.address?.gmaps || undefined}
+                      loading="lazy"
+                      className="w-full h-full my-2"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    ></iframe>
+            </div>
+              )
+            }
             {/* Description — light, breathable */}
             <div>
               <p className="font-display tracking-[0.3em] text-emerald text-xs uppercase mb-3">
@@ -733,105 +731,11 @@ const PropertyDetails = ({ id }: { id: string }) => {
                 ))}
               </div>
             </div>
-
-            {/* Similar properties */}
-            {similar.length > 0 && (
-              <div>
-                <p className="font-display tracking-[0.3em] text-emerald text-xs uppercase mb-3">
-                  More to explore
-                </p>
-                <h3 className="font-display text-3xl md:text-4xl font-bold mb-6">
-                  Similar properties
-                </h3>
-                <div className="grid sm:grid-cols-3 gap-3">
-                  {similar.map((s) => (
-                    <Link
-                      key={s.id}
-                      href={`/properties/${s.id}`}
-                      className="group block bg-card border border-border  overflow-hidden hover:border-emerald transition-colors"
-                    >
-                      <div className="aspect-[4/3] overflow-hidden bg-secondary">
-                        <img
-                          src={s.images[0]}
-                          alt={s.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      </div>
-                      <div className="p-4">
-                        <p className="font-body text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
-                          {s.address.label}
-                        </p>
-                        <p className="font-display text-lg font-bold leading-tight truncate">
-                          {s.title}
-                        </p>
-                        <p className="font-display text-emerald font-bold mt-1">
-                          {formatQAR(s.price)}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* SIDEBAR — 40% sticky */}
           <aside className="min-w-0">
-            <div className="lg:sticky lg:top-4 space-y-4">
-
-
-              {/* Quick contact strip */}
-              <div className="grid grid-cols-2 gap-2">
-                <a
-                  href="tel:+97400000000"
-                  className="flex items-center justify-center gap-2 py-3 bg-card border border-border hover:border-emerald hover:text-emerald transition-colors font-display text-sm tracking-[0.2em] uppercase"
-                >
-                  <Phone className="size-4" /> Call
-                </a>
-                <a
-                  href="mailto:hello@qatarestate.qa"
-                  className="flex items-center justify-center gap-2 py-3 bg-card border border-border hover:border-emerald hover:text-emerald transition-colors font-display text-sm tracking-[0.2em] uppercase"
-                >
-                  <Mail className="size-4" /> Email
-                </a>
-              </div>
-              <EnquiryForm property={property.id} />
-                            {/* Agent card */}
-
-              {/* {
-                property.agent.length > 0 && property.agent.map((agent, idx) => (
-                            <div key={idx} className="bg-card border border-border  p-5 flex items-center gap-4">
-                <div className="size-14 rounded-full bg-gradient-to-br from-emerald to-emerald-deep text-primary-foreground flex items-center justify-center font-display text-xl font-bold shrink-0">
-                  {agent.name.charAt(0)}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
-                    Listing agent
-                  </p>
-                  <p className="font-display text-lg font-bold leading-tight">
-                    {agent.name}
-                  </p>
-                  <p className="font-body text-xs text-muted-foreground">
-                    {agent.phone} · {agent.email}
-                  </p>
-                </div>
-              </div>
-                ))
-              } */}
-              {/* Trust strip */}
-              <div className="bg-secondary/50  p-4 flex items-start gap-3">
-                <ShieldCheck className="size-5 text-emerald shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-display text-sm font-bold">
-                    Verified listing
-                  </p>
-                  <p className="font-body text-xs text-muted-foreground mt-0.5">
-                    Documents reviewed and ownership confirmed by our legal
-                    team.
-                  </p>
-                </div>
-              </div>
-            </div>
+            <StickySidebar property={property} />
           </aside>
         </section>
       </main>

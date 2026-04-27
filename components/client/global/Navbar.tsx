@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { SITE_NAME } from "@/config";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";

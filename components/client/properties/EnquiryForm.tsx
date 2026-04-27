@@ -5,17 +5,18 @@ import { Property } from "@/store/cms";
 import axios from "axios";
 import { LoaderCircle } from "lucide-react";
 import { getCookie, setCookie } from "cookies-next";
+import { formatQAR } from "@/lib/properties";
 
 
 const schema = z.object({
   name: z.string().trim().min(2, "Enter your name").max(100),
   email: z.string().trim().email("Invalid email").max(255),
   phone: z.string().trim().min(6, "Enter a valid phone").max(20),
-  budget: z.string().max(50).optional().or(z.literal("")),
+  // budget: z.string().max(50).optional().or(z.literal("")),
   note: z.string().max(1000).optional().or(z.literal("")),
 });
 
-const EnquiryForm = ({ property }: { property: string }) => {
+const EnquiryForm = ({ property, price }: { property: string, price: number }) => {
   const [form, setForm] = useState({ name: "", email: "", phone: "", budget: "", note: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [transition, startTransition] = useTransition()
@@ -28,7 +29,7 @@ const submitLead = () =>
         name: form.name,
         email: form.email,
         phone: form.phone,
-        budget: form.budget,
+        budget: String(form.budget),
         note: form.note,
         propertyId: property,
         fingerprint: userFingers,
@@ -90,6 +91,35 @@ const submitLead = () =>
   }, []);
 
 
+
+const STEP = 1000;
+
+const getBudgetRange = (price: number) => {
+  const min = Math.floor((price * 0.5) / STEP) * STEP; // -30%
+  const max = Math.ceil((price * 1.5) / STEP) * STEP;  // +30%
+
+  return {
+    floor: Math.max(0, min),
+    ceil: max,
+  };
+};
+
+const { floor: PRICE_FLOOR, ceil: PRICE_CEIL } = getBudgetRange(price);
+
+// parse current string budget
+const [minBudget, maxBudget] = form.budget
+  ? form.budget.split("-").map(Number)
+  : [PRICE_FLOOR, PRICE_CEIL];
+
+const pct = (val: number) =>
+  ((val - PRICE_FLOOR) / (PRICE_CEIL - PRICE_FLOOR)) * 100;
+
+const updateBudget = (min: number, max: number) => {
+  setForm({
+    ...form,
+    budget: `${min}-${max}`,
+  });
+};
   const field = (name: keyof typeof form, label: string, type = "text", placeholder = "", required: boolean) => (
     <div>
       <label className="block font-display text-sm text-muted-foreground mb-1">{label}</label>
@@ -115,7 +145,70 @@ const submitLead = () =>
         {field("name", "Full Name", "text", "Your name", true)}
         {field("email", "Email", "email", "you@example.com", true)}
         {field("phone", "Phone", "tel", "+974 …", true)}
-        {field("budget", "Budget (optional)", "text", "e.g. 5M – 8M QAR", false)}
+        <p className="block font-display text-sm text-muted-foreground -mb-1">Budget</p>
+<div className="relative h-20 w-full">
+  {/* Track */}
+  <div className="absolute top-5 left-0 right-0 h-1 rounded-full bg-secondary" />
+
+  {/* Active Range */}
+  <div
+    className="absolute top-5 h-1 rounded-full bg-emerald"
+    style={{
+      left: `${pct(minBudget)}%`,
+      width: `${pct(maxBudget) - pct(minBudget)}%`,
+    }}
+  />
+
+  {/* MIN Slider */}
+  <input
+    type="range"
+    min={PRICE_FLOOR}
+    max={PRICE_CEIL}
+    step={STEP}
+    value={minBudget}
+    onChange={(e) => {
+      const val = Math.min(+e.target.value, maxBudget - 1000);
+      updateBudget(val, maxBudget);
+    }}
+    className="absolute top-0 left-0 w-full h-10 appearance-none bg-transparent z-20
+    pointer-events-none
+    [&::-webkit-slider-thumb]:pointer-events-auto
+    [&::-webkit-slider-thumb]:appearance-none
+    [&::-webkit-slider-thumb]:h-5
+    [&::-webkit-slider-thumb]:w-5
+    [&::-webkit-slider-thumb]:rounded-full
+    [&::-webkit-slider-thumb]:bg-emerald
+    [&::-webkit-slider-thumb]:cursor-pointer"
+  />
+
+  {/* MAX Slider */}
+  <input
+    type="range"
+    min={PRICE_FLOOR}
+    max={PRICE_CEIL}
+    step={1000}
+    value={maxBudget}
+    onChange={(e) => {
+      const val = Math.max(+e.target.value, minBudget + 1000);
+      updateBudget(minBudget, val);
+    }}
+    className="absolute top-0 left-0 w-full h-10 appearance-none bg-transparent z-10
+    pointer-events-none
+    [&::-webkit-slider-thumb]:pointer-events-auto
+    [&::-webkit-slider-thumb]:appearance-none
+    [&::-webkit-slider-thumb]:h-5
+    [&::-webkit-slider-thumb]:w-5
+    [&::-webkit-slider-thumb]:rounded-full
+    [&::-webkit-slider-thumb]:bg-gold
+    [&::-webkit-slider-thumb]:cursor-pointer"
+  />
+
+  {/* Static Values */}
+  <div className="absolute bottom-6 left-0 right-0 flex justify-between text-xs font-medium">
+    <span className="text-emerald">{formatQAR(minBudget)}</span>
+    <span className="text-gold">{formatQAR(maxBudget)}</span>
+  </div>
+</div>
         <div>
           <label className="block font-display text-sm text-muted-foreground mb-1">Note (optional)</label>
           <textarea

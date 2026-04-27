@@ -340,10 +340,8 @@ export async function PUT(req: NextRequest) {
           },
         }),
 
-        // replace connected agents
         ...(agentIds && {
           agent: {
-            set: [],
             connect: agentIds.map((agentId: string) => ({
               id: agentId,
             })),

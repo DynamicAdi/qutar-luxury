@@ -81,7 +81,7 @@ export default function AboutPage() {
           className="text-center"
         >
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
-            About Us
+            JOIN US
           </h1>
 
           <p className="mt-3 text-sm md:text-base text-zinc-600">
@@ -115,7 +115,7 @@ export default function AboutPage() {
           className="mt-10 max-w-5xl"
         >
           <p className="text-2xl md:text-4xl font-medium leading-tight">
-            At FIND, we're more than a real estate brokerage; we're a movement
+            At QLP, we're more than a real estate brokerage; we're a movement
             dedicated to helping our clients and agents move forward.
           </p>
 
@@ -180,7 +180,7 @@ export default function AboutPage() {
             >
               <p className="text-2xl md:text-4xl font-medium leading-tight">
                 Founded on the belief that real estate should be empowering for
-                everyone involved, FIND combines innovative tools, a
+                everyone involved, QLP combines innovative tools, a
                 client-centered approach, and an agent-owned model.
               </p>
 
@@ -196,12 +196,12 @@ export default function AboutPage() {
 
           <section className="bg-zinc-100 px-6 py-24">
       <div className="mx-auto max-w-6xl space-y-28">
-        {/* What Sets FIND Apart */}
+        {/* What Sets QLP Apart */}
         <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr]">
           <div>
             <h2 className="text-5xl font-semibold leading-none tracking-tight">
               <span className="text-zinc-400">What</span> Sets <br />
-              FIND Apart
+              QLP Apart
             </h2>
           </div>
 
@@ -244,7 +244,7 @@ export default function AboutPage() {
         {/* Team */}
         <div className="space-y-10">
           <h2 className="text-5xl font-semibold leading-none tracking-tight">
-            <span className="text-zinc-400">Meet the</span> FIND Team
+            <span className="text-zinc-400">Meet the</span> QLP Team
           </h2>
 
           <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
@@ -291,7 +291,7 @@ export default function AboutPage() {
 
             <p className="text-lg md:text-2xl text-zinc-500 leading-relaxed">
               From experienced agents and support staff to forward-thinking
-              leaders, everyone at FIND is united in creating meaningful real
+              leaders, everyone at QLP is united in creating meaningful real
               estate experiences.
             </p>
 
