@@ -1,4 +1,4 @@
-export const SITE_NAME = "FIND";
+export const SITE_NAME = "QLP";
 
 export const NAV_ITEMS = [
   { label: "Search", href: "/search" },

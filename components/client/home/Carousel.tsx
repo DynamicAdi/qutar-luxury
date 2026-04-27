@@ -80,7 +80,7 @@ export default function TestimonialsSection() {
             variants={imageReveal}
             whileHover={{ scale: 1.015 }}
             transition={{ duration: 0.5 }}
-            className="relative max-md:max-w-lg h-[520px] overflow-hidden"
+            className="relative max-md:max-w-sm h-[520px] overflow-hidden"
           >
             <Image
               src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1600&auto=format&fit=crop"
@@ -93,7 +93,7 @@ export default function TestimonialsSection() {
           {/* Right */}
           <motion.div
             variants={fadeUp}
-            className="max-w-lg justify-self-end"
+            className="max-w-sm md:max-w-lg justify-self-end"
           >
             <div className="border-t border-black/30 pt-10" />
 

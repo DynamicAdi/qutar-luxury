@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useCMS, formatPrice, Property, PropertyCategory } from "@/store/cms";
+import { Property, PropertyCategory } from "@/store/cms";
 import {Pencil, Eye, EyeOff,
   LayoutGrid, List, Plus, Search,
 } from "lucide-react";

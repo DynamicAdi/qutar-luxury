@@ -52,7 +52,7 @@ export default function ServicesSection() {
 
           <motion.div variants={fadeUp}>
             <h2 className="text-5xl font-light leading-[0.95] tracking-tight md:text-6xl">
-              How FIND
+              How QLP
               <br />
               <span className="text-white/45">Can Help You</span>
             </h2>

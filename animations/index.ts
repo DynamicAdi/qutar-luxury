@@ -203,3 +203,62 @@ export const imageReveal: Variants = {
     },
   },
 };
+
+export default function useZoomScroll() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const ctx = gsap.context(() => {
+      const cards = gsap.utils.toArray<HTMLElement>(".zoom-card");
+
+      cards.forEach((card) => {
+        const image = card.querySelector(".zoom-image");
+        const overlay = card.querySelector(".zoom-overlay");
+
+        if (!image || !overlay) return;
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: card,
+            start: "top top",
+            end: "+=150%",
+            scrub: true,
+            pin: true,
+            anticipatePin: 1,
+          },
+        });
+
+        tl.fromTo(
+          image,
+          { scale: 0.75, opacity: 0.7 },
+          { scale: 1.15, opacity: 1, ease: "none" }
+        )
+          .fromTo(
+            overlay,
+            { opacity: 0, y: 40 },
+            { opacity: 1, y: 0, duration: 0.3 },
+            0.35
+          )
+          .to(
+            overlay,
+            { opacity: 0, y: -30, duration: 0.25 },
+            0.8
+          )
+          .to(
+            image,
+            { opacity: 0, scale: 1.25, duration: 0.3 },
+            0.85
+          );
+      });
+    }, containerRef);
+
+    return () => {
+      ctx.revert();
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    };
+  }, []);
+
+  return containerRef;
+}

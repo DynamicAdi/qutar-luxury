@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import LineRevealOnScroll from "@/components/LineReveal";
 
 const pressItems = [
   {
@@ -19,19 +20,20 @@ const pressItems = [
 export default function PressMediaPage() {
   return (
     <main className="min-h-screen bg-[#ececec] text-black">
-      <section className="mx-auto max-w-[1240px] px-6 py-20 md:px-10 lg:px-16">
+      <section className="mx-auto max-w-[1400px] px-6 py-20 md:px-10 lg:px-16">
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-5xl font-semibold tracking-tight md:text-7xl lg:text-8xl">
-            Press & Media
+            <LineRevealOnScroll text={"Press & Media"} />
           </h1>
 
           <p className="mx-auto mt-8 max-w-2xl text-base leading-8 text-black/80 md:text-xl">
+            <LineRevealOnScroll text={`
             FIND is making waves in the real estate industry with our
             client-focused approach, innovative agent empowerment, and
             commitment to excellence. Explore our latest media mentions,
             press releases, and features that highlight how we’re moving
-            the real estate experience forward.
+            the real estate experience forward.`}/>
           </p>
         </div>
 
@@ -62,14 +64,14 @@ export default function PressMediaPage() {
 
               {/* Button */}
               <Button
-                asChild
+                // asChild
                 variant="outline"
                 className="mt-10 h-12 rounded-full border-black/20 bg-transparent px-7 text-sm hover:bg-black hover:text-white"
               >
-                <Link href={item.href}>
+                {/* <Link href={item.href}> */}
                   Read More
                   <ArrowRight className="ml-3 h-4 w-4" />
-                </Link>
+                {/* </Link> */}
               </Button>
             </article>
           ))}

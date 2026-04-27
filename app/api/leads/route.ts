@@ -1,5 +1,5 @@
 import { STATUS } from "@/generated/prisma/enums";
-import {db} from "@/lib/client";
+import { db } from "@/lib/client";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -77,27 +77,29 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { error: "Failed to fetch leads" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 export async function DELETE(req: Request) {
-    const {id} = await req.json();
-    if (!id) {
-        return NextResponse.json({error: "ID is not provided"}, {status: 404})
-    }
+  const { id } = await req.json();
+  if (!id) {
+    return NextResponse.json({ error: "ID is not provided" }, { status: 404 });
+  }
 
-    try {
-        const leads = await db.leads.delete({
-            where: { id }
-        })
-        if (leads) {
-            return NextResponse.json({message: "Deleted Successfully"}, {status: 200, statusText: "OK"});
-        }
+  try {
+    const leads = await db.leads.delete({
+      where: { id },
+    });
+    if (leads) {
+      return NextResponse.json(
+        { message: "Deleted Successfully" },
+        { status: 200, statusText: "OK" },
+      );
     }
-    catch (error) {
-        return NextResponse.json({error: error}, {status: 500})
-    }
+  } catch (error) {
+    return NextResponse.json({ error: error }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -112,16 +114,52 @@ export async function POST(req: NextRequest) {
       status,
       note,
       propertyId,
+      fingerprint,
     } = body;
 
     // Basic validation
     if (!name || !email || !phone) {
       return NextResponse.json(
-        { error: "Name, email, and phone are required" },
-        { status: 400 }
+        { data: "Name, email, and phone are required" },
+        { status: 403 },
       );
     }
+    const fingerprinting = await db.fingerprints.findMany({
+      where: {
+        fingerprint: fingerprint,
+      },
+    });
+    console.log(fingerprinting);
 
+    if (fingerprinting.length > 0) {
+      return NextResponse.json(
+        {
+          data: "You have already filled the form",
+        },
+        { status: 403 },
+      );
+    }
+    const check = await db.leads.findMany({
+      where: {
+        OR: [
+          {
+            email: email,
+          },
+          {
+            phone: phone,
+          },
+        ],
+      },
+    });
+
+    if (check.length > 0) {
+      return NextResponse.json(
+        {
+          data: "Email or Phone is already rigestered.",
+        },
+        { status: 403 },
+      );
+    }
     const lead = await db.leads.create({
       data: {
         name,
@@ -129,10 +167,16 @@ export async function POST(req: NextRequest) {
         phone,
         budget,
         note,
+        fingerprints: {
+          create: {
+            fingerprint: fingerprint,
+            username: name,
+          },
+        },
         status: status || STATUS.NEW,
         property: {
-            connect: { id: propertyId },
-          },
+          connect: { id: propertyId },
+        },
       },
     });
 
@@ -141,7 +185,7 @@ export async function POST(req: NextRequest) {
         message: "Lead created successfully",
         data: lead,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: any) {
     console.error(error);
@@ -150,21 +194,18 @@ export async function POST(req: NextRequest) {
     if (error.code === "P2002") {
       return NextResponse.json(
         { error: "Email already exists" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
     return NextResponse.json(
       { error: "Something went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-
-export async function PUT(
-  req: NextRequest
-) {
+export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
     const { id, status } = body;
@@ -172,7 +213,7 @@ export async function PUT(
     if (!status) {
       return NextResponse.json(
         { error: "Status is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -188,14 +229,14 @@ export async function PUT(
         message: "Lead status updated successfully",
         data: updatedLead,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     console.error(error);
 
     return NextResponse.json(
       { error: "Failed to update status" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

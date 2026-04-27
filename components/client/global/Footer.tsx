@@ -101,7 +101,7 @@ export default function Footer() {
         {/* Huge Logo */}
         <div className="mt-12">
           <h1 className="select-none text-[22vw] font-[800] font-black leading-none tracking-tight text-white font-bold md:text-[20rem]">
-            FIND
+            QLP
           </h1>
         </div>
 
@@ -118,7 +118,7 @@ export default function Footer() {
           </div>
 
           <div className="flex max-lg:flex-wrap gap-8">
-            <span>FIND Real Estate</span>
+            <span>QLP Real Estate</span>
             <span>Copyright © 2026</span>
           </div>
         </div>

@@ -18,7 +18,7 @@ const sourceColors = ["hsl(41 78% 58%)", "hsl(38 60% 38%)", "hsl(30 18% 25%)", "
 
 export default function DashboardHome() {
   const { properties, leads, customers } = useCMS();
-  const sold = properties.filter((p) => p.status === "Sold").length;
+  const sold = properties.filter((p: any) => p.status === "Sold").length;
   const totalValue = properties.reduce((sum, p) => sum + p.price, 0);
 
   const categoryData = ["Buy", "Sell", "Rent", "Plots", "Residential"].map((c) => ({

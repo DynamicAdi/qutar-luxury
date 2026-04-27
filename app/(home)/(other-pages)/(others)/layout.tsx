@@ -1,6 +1,6 @@
 import React from 'react'
-import Navbar from '../../_components/Navbar'
-import Footer from '../../_components/Footer'
+import Navbar from '@/components/client/global/Navbar';
+import Footer from '@/components/client/global/Footer';
 
 export default function layout({children}:React.PropsWithChildren) {
   return (

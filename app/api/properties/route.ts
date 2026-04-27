@@ -67,8 +67,9 @@ export async function GET(req: NextRequest) {
                 id: id
             },
             include: {
+
                 address: true,
-                agent: true
+                agent: true,
             }
         })
         return NextResponse.json({
@@ -83,6 +84,10 @@ export async function GET(req: NextRequest) {
         id: true,
         title: true,
         images: true,
+        status: true,
+        description: true,
+        propertyType: true,
+        pngImage: true,
         isHidden: true,
         address: true,
         BedRooms: true,
@@ -117,6 +122,7 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
 export async function DELETE(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const id = searchParams.get("id");
@@ -154,6 +160,8 @@ export async function POST(req: NextRequest) {
       price,
       Area,
 
+      pngImage,
+      propertyType,
       BedRooms = 0,
       Bathrooms = 0,
       parking = 0,
@@ -184,7 +192,8 @@ export async function POST(req: NextRequest) {
         NearByLocations,
         category: category as PROPERTY_TYPE,
         status: status as PROPERTY_STATUS,
-
+        pngImage,
+        propertyType,
         price,
         Area,
 
@@ -253,6 +262,8 @@ export async function PUT(req: NextRequest) {
       price,
       Area,
 
+      pngImage,
+      propertyType,
       NearByLocations,
       BedRooms,
       Bathrooms,
@@ -310,6 +321,8 @@ export async function PUT(req: NextRequest) {
 
         ...(price !== undefined && { price }),
         ...(Area !== undefined && { Area }),
+        ...(pngImage !== undefined && { pngImage }),
+        ...(propertyType !== undefined && { propertyType }),
 
         ...(BedRooms !== undefined && { BedRooms }),
         ...(Bathrooms !== undefined && { Bathrooms }),

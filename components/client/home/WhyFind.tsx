@@ -2,9 +2,23 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import {fadeUp,stagger} from "@/animations";
-
+import useZoomScroll, { fadeUp, stagger } from "@/animations";
+const CONTENT = [
+  {
+    image:
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=2200&auto=format&fit=crop",
+    title: "Find Your Identity",
+    desc: "A home that reflects your ambition, growth, and future.",
+  },
+  {
+    image:
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2200&auto=format&fit=crop",
+    title: "Move Forward",
+    desc: "Every next chapter begins with the right foundation.",
+  },
+];
 export default function WhyFindSection() {
+  const containerRef = useZoomScroll();
   return (
     <div className="grid">
       {/* SECTION 1 */}
@@ -18,7 +32,7 @@ export default function WhyFindSection() {
             viewport={{ once: true, amount: 0.6 }}
           >
             <p className="text-2xl md:text-sm font-semibold uppercase text-black">
-              Why FIND
+              Why QLP
             </p>
           </motion.div>
 
@@ -66,6 +80,42 @@ export default function WhyFindSection() {
       </section>
 
       {/* SECTION 2 */}
+      <section ref={containerRef} className="bg-black">
+        {CONTENT.map((item, index) => (
+          <div
+            key={index}
+            className="zoom-card relative h-screen w-full overflow-hidden"
+          >
+            <div className="zoom-image absolute inset-0">
+              <Image
+                src={item.image}
+                alt={item.title}
+                fill
+                className="object-cover"
+                priority={index === 0}
+              />
+            </div>
+
+            <div className="zoom-overlay absolute inset-0 z-10 flex items-center justify-center px-6">
+              <div className="max-w-3xl text-center text-white">
+                <p className="mb-4 text-sm uppercase tracking-[0.35em] text-white/70">
+                  Chapter {index + 1}
+                </p>
+
+                <h2 className="text-5xl font-semibold md:text-7xl">
+                  {item.title}
+                </h2>
+
+                <p className="mt-6 text-lg text-white/80 md:text-xl">
+                  {item.desc}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* SECTION 3 */}
       <section className="px-6 py-20 md:px-10 lg:px-16 xl:px-24 overflow-hidden">
         {/* Heading */}
         <motion.div

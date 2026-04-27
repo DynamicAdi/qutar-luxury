@@ -1,26 +1,25 @@
+"use client";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/qlp/Logo";
 import { Eye, EyeOff } from "lucide-react";
 import heroImg from "@/assets/property-1.jpg";
-
+import { useRouter } from "next/navigation";
 export default function Login() {
-  const navigate = useNavigate();
   const [show, setShow] = useState(false);
-
+  const router = useRouter();
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/app");
+    router.push("/app");
   };
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
       {/* Visual side */}
       <div className="relative hidden lg:block overflow-hidden">
-        <img src={heroImg} alt="Luxury villa" className="absolute inset-0 h-full w-full object-cover" />
+        <img src={heroImg.src} alt="Luxury villa" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-br from-[hsl(30_18%_10%/0.85)] via-[hsl(30_18%_10%/0.55)] to-transparent" />
         <div className="relative z-10 flex h-full flex-col justify-between p-10 text-[hsl(40_30%_95%)]">
           <Logo />

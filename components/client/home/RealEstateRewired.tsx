@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { motion, Variants } from "framer-motion";
-import {fadeUp,lineReveal,staggerWrap} from "@/animations";
+import { fadeUp, lineReveal, staggerWrap } from "@/animations";
+import { Button } from "@/components/ui/button";
 const STEPS = [
   {
     number: "01",
@@ -21,7 +22,6 @@ const STEPS = [
     text: "We find what fits — and make it happen.",
   },
 ];
-
 
 export default function RealEstateRewiredSection() {
   return (
@@ -45,13 +45,13 @@ export default function RealEstateRewiredSection() {
           </motion.h2>
 
           <motion.div variants={fadeUp}>
-            <Link
-              href="#"
-              className="mt-10 inline-flex w-fit items-center gap-3 rounded-full bg-black px-8 py-4 text-sm font-medium text-white transition hover:translate-x-1"
+            <Button
+              // href="#"
+              className="mt-10 inline-flex w-fit items-center gap-3 rounded-full bg-black px-8 py-6 text-sm font-medium text-white transition hover:translate-x-1"
             >
               Start Your Search
               <ArrowRight size={18} />
-            </Link>
+            </Button>
           </motion.div>
         </div>
 
@@ -70,10 +70,7 @@ export default function RealEstateRewiredSection() {
               className="absolute top-0 left-0 h-px w-full bg-black/10"
             />
 
-            <motion.div
-              variants={staggerWrap}
-              className="relative"
-            >
+            <motion.div variants={staggerWrap} className="relative">
               {STEPS.map((step, i) => (
                 <motion.div
                   key={step.number}

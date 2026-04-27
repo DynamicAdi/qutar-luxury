@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { motion, Variants } from "framer-motion";
 import { fadeUp,staggerWrap,imageReveal } from "@/animations";
+import { Button } from "@/components/ui/button";
 
 export default function ForAgents() {
   return (
@@ -76,7 +77,7 @@ export default function ForAgents() {
               variants={fadeUp}
               className="text-xl font-medium leading-snug text-black md:text-3xl"
             >
-              At FIND, our agents don’t just work for the brand—they own a part
+              At QLP, our agents don’t just work for the brand—they own a part
               of it.
             </motion.p>
 
@@ -95,13 +96,13 @@ export default function ForAgents() {
 
             {/* CTA */}
             <motion.div variants={fadeUp}>
-              <Link
-                href="#"
-                className="mt-8 inline-flex items-center gap-3 rounded-full bg-black px-7 py-4 text-sm font-medium text-white transition hover:translate-x-1"
+              <Button
+                // href="#"
+                className="mt-8 inline-flex items-center gap-3 rounded-full bg-black px-7 py-6 text-sm font-medium text-white transition hover:translate-x-1"
               >
                 Join The Movement
                 <ArrowRight size={18} />
-              </Link>
+              </Button>
             </motion.div>
           </motion.div>
         </div>

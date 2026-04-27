@@ -34,7 +34,7 @@ import {
   CommandList,
   CommandEmpty,
 } from "@/components/ui/command";
-import { useCMS, Customer, formatPrice } from "@/store/cms";
+import { Customer, formatPrice } from "@/store/cms";
 import {
   Plus,
   Trash2,
@@ -54,7 +54,6 @@ import { CUSTOMER_STATUS } from "@/generated/prisma/enums";
 import LoaderScreen from "@/misc/LoaderScreen";
 
 export default function Customers() {
-  const { linkProperty } = useCMS();
   const [openLink, setOpenLink] = useState(false);
   const [open, setOpen] = useState(false);
   const [linkFor, setLinkFor] = useState<Customer | null>(null);
@@ -359,16 +358,6 @@ export default function Customers() {
                   </td>
                   <td className="px-4 py-3.5">
                     <div className="flex justify-end gap-1">
-                      <button
-                        onClick={() => {
-
-                          (setLinkFor(c), setOpenLink(!openLink));
-                        }}
-                        className="rounded-lg p-2 hover:bg-gold-soft hover:text-primary-deep"
-                        title="Link property"
-                      >
-                        <Link2 className="h-4 w-4" />
-                      </button>
 
                       <button
                         onClick={() => {
@@ -384,7 +373,7 @@ export default function Customers() {
                             propertyIds: c.properties?.map((p) => p.id) ?? []
                           })
                         }}
-                        className="rounded-lg p-2 hover:bg-destructive/10 hover:text-destructive"
+                        className="rounded-lg p-2 hover:text-yellow-600"
                       >
                         <Edit2 className="h-4 w-4" />
                       </button>
@@ -418,7 +407,7 @@ export default function Customers() {
       </Card>
 
       {/* Link property dialog */}
-      <Dialog
+      {/* <Dialog
         open={openLink}
         onOpenChange={() => {
           (setOpenLink(!openLink), setLinkFor(null));
@@ -447,13 +436,12 @@ export default function Customers() {
               <button
                 key={p.id}
                 onClick={() => {
-                  linkProperty(linkFor!.id, p.id);
                   toast.success(`${p.title} linked & marked Sold`);
                   setLinkFor(null);
                 }}
                 className="w-full flex items-center gap-3 rounded-xl border border-border p-2.5 hover:border-primary hover:bg-gold-soft transition-colors text-left"
               >
-                {/* <img src={p.images[0]} alt="" className="h-12 w-16 rounded-lg object-cover" /> */}
+
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-sm truncate">
                     {p.title} · {formatPrice(p.price)}
@@ -470,7 +458,7 @@ export default function Customers() {
             ))}
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </>
   );
 }

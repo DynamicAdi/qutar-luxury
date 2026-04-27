@@ -39,6 +39,12 @@ enum PROPERTY_TYPE {
   COMMERCIAL
 }
 
+enum PROPERTY_CATEGORY {
+  BUILDING
+  APARTMENT
+  PLOT
+}
+
 model Agent {
   id         String     @id @default(uuid())
   name       String
@@ -73,34 +79,37 @@ model Leads {
   note   String?
 
   // Relations with property
-  propertyId String?
-  property   Property? @relation(fields: [propertyId], references: [id])
-  updatedAt  DateTime  @updatedAt
-  createdAt  DateTime  @default(now())
+  propertyId   String?
+  property     Property?      @relation(fields: [propertyId], references: [id])
+  updatedAt    DateTime       @updatedAt
+  createdAt    DateTime       @default(now())
+  fingerprints Fingerprints?
 }
 
 model Property {
-  id          String          @id @default(uuid())
-  title       String
-  description String
-  images      String[]
-  youtubeLink String?
-  amenities   String[]
-  features    String[]
-  isHidden    Boolean         @default(false)
-  category    PROPERTY_TYPE
-  status      PROPERTY_STATUS @default(AVAILABLE)
-  price       Int
-  Area        Int
+  id           String            @id @default(uuid())
+  title        String
+  description  String
+  images       String[]
+  youtubeLink  String?
+  amenities    String[]
+  features     String[]
+  isHidden     Boolean           @default(false)
+  category     PROPERTY_TYPE
+  status       PROPERTY_STATUS   @default(AVAILABLE)
+  propertyType PROPERTY_CATEGORY @default(APARTMENT)
+  pngImage     String?
+  price        Int
+  Area         Int
 
   NearByLocations Json[]
   // optional I d k what to keep what to not
-  BedRooms   Int?    @default(0)
-  Bathrooms  Int?    @default(0)
-  parking    Int?    @default(0)
-  furnishing String? @default("Unfurnished")
-  HoaFees    Int?    @default(0)
-  yearBuilt  Int?
+  BedRooms        Int?    @default(0)
+  Bathrooms       Int?    @default(0)
+  parking         Int?    @default(0)
+  furnishing      String? @default("Unfurnished")
+  HoaFees         Int?    @default(0)
+  yearBuilt       Int?
 
   // Relations
   Leads      Leads[]
@@ -110,18 +119,26 @@ model Property {
   customerId String?
   customer   Customers? @relation(fields: [customerId], references: [id])
 
-  updateAt   DateTime   @updatedAt
-  createdAt  DateTime   @default(now())
+  updateAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
 }
 
 model Customers {
-  id         String          @id @default(uuid())
-  name       String
-  image      String?
-  email      String          @unique
-  phone      String
-  nationality String?        @default("Qatari")
-  status     CUSTOMER_STATUS @default(BOOKED)
-  properties Property[]
-  createdAt  DateTime        @default(now())
+  id          String          @id @default(uuid())
+  name        String
+  image       String?
+  email       String          @unique
+  phone       String
+  nationality String?         @default("Qatari")
+  status      CUSTOMER_STATUS @default(BOOKED)
+  properties  Property[]
+  createdAt   DateTime        @default(now())
+}
+
+model Fingerprints {
+  id          String @id @default(nanoid())
+  fingerprint String
+  username    String
+  leadId      String @unique
+  Lead        Leads  @relation(fields: [leadId], references: [id])
 }

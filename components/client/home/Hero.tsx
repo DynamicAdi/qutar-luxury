@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import LineRevealOnScroll from "@/components/LineReveal";
+import { Button } from "@/components/ui/button";
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -175,16 +176,16 @@ export default function Hero() {
           <LineRevealOnScroll text={`Find What Moves You.`}/>
         </h1>
 
-        <p className="mt-6 max-w-4xl flex text-lg font-medium text-black/80 sm:text-2xl md:text-2xl">
+        <p className="mt-6 max-w-4xl flex max-md:flex-col text-lg font-medium text-black/80 sm:text-2xl md:text-2xl">
           <span className="text-black"><LineRevealOnScroll text={`Expert agents. Real guidance.`}/></span>{" "}
           <span className="text-black/45">
             <LineRevealOnScroll text={`A clear path to find what’s next.`} />
           </span>
         </p>
 
-        <button className="mt-8 inline-flex items-center gap-4 rounded-full bg-[#161819] px-6 py-3 text-md font-medium text-white">
+        <Button className="mt-8 inline-flex items-center gap-4 rounded-full bg-[#161819] px-6 py-5 text-md font-medium text-white">
           Find Properties <ArrowRight size={20} />
-        </button>
+        </Button>
       </div>
 
       {/* House */}
@@ -212,18 +213,18 @@ export default function Hero() {
           {/* Stroke */}
           <h2
             ref={strokeTextRef}
-            className="block text-center text-[4rem] font-black leading-none tracking-tight text-transparent sm:text-[7rem] md:text-[10rem] lg:text-[13rem]"
+            className="block text-center text-[3rem] font-black leading-none tracking-tight text-transparent sm:text-[5rem] md:text-[8rem]"
             style={{
               WebkitTextStroke: "2px #111",
             }}
           >
-            FIND HOME
+            LUXURY PROPERTY
           </h2>
 
           {/* Fill */}
           <h2
             ref={fillTextRef}
-            className="absolute inset-0 block text-center text-[4rem] font-black leading-none tracking-tight text-transparent sm:text-[7rem] md:text-[10rem] lg:text-[13rem]"
+            className="absolute inset-0 block text-center text-[3rem] font-black leading-none tracking-tight text-transparent sm:text-[5rem] md:text-[8rem]"
             style={{
               WebkitBackgroundClip: "text",
               backgroundClip: "text",
@@ -233,7 +234,7 @@ export default function Hero() {
               backgroundPosition: "50% 0%",
             }}
           >
-            FIND HOME
+            LUXURY PROPERTY
           </h2>
         </div>
       </div>

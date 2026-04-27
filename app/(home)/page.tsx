@@ -1,15 +1,15 @@
 "use client";
-import Image from "next/image";
-import Navbar from "./_components/Navbar";
-import Hero from "./_components/Hero";
-import WhyFind from "./_components/WhyFind";
-import RealEstateRewired from "./_components/RealEstateRewired";
-import ForAgents from "./_components/ForAgents";
-import Carousel from "./_components/Carousel";
-import Services from "./_components/Services";
-import BlogsAndResources from "./_components/BlogsAndResources";
-import CTA from "./_components/CTA";
-import Footer from "./_components/Footer";
+
+import Hero from "@/components/client/home/Hero";
+import WhyFind from "@/components/client/home/WhyFind";
+import RealEstateRewired from "@/components/client/home/RealEstateRewired";
+import ForAgents from "@/components/client/home/ForAgents";
+import Carousel from "@/components/client/home/Carousel";
+import Services from "@/components/client/home/Services";
+import BlogsAndResourcesSection from "@/components/client/home/BlogsAndResources";
+import CTA from "@/components/client/home/CTA";
+import Navbar from "@/components/client/global/Navbar";
+import Footer from "@/components/client/global/Footer";
 
 export default function Home() {
   return (
@@ -21,8 +21,8 @@ export default function Home() {
     <ForAgents/>
     <Carousel/>
     <Services/>
-    <BlogsAndResources/>
-    <CTA/>
+    <BlogsAndResourcesSection/>
+    <CTA />
     <Footer/>
    </div>
   );

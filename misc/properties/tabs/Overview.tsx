@@ -14,7 +14,7 @@ function Overview({p, upd}: {p: any, upd: any}) {
                 <Field label="Title">
                   <Input value={p.title} onChange={(e) => upd("title", e.target.value)} className="rounded-xl" placeholder="Pearl Marina Signature Villa" />
                 </Field>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <Field label="Category">
                     <Select value={p.category} onValueChange={(v) => upd("category", v as PropertyCategory)}>
                       <SelectTrigger className="rounded-xl" ><SelectValue /></SelectTrigger>
@@ -31,6 +31,16 @@ function Overview({p, upd}: {p: any, upd: any}) {
                       </SelectContent>
                     </Select>
                   </Field>
+
+                    <Field label="Property Type">
+                    <Select value={p.propertyType || "BUILDING"} onValueChange={(v) => upd("propertyType", v as Property["propertyType"])}>
+                      <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {["BUILDING","APARTMENT","PLOT"].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+
                 </div>
                 <Field label="Description">
                   <Textarea value={p.description} onChange={(e) => upd("description", e.target.value)} className="rounded-xl min-h-32" />

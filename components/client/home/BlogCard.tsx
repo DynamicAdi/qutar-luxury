@@ -38,7 +38,7 @@ export function BlogCard({ blog }: { blog: Blog }) {
       whileInView="show"
       viewport={{ once: true, amount: 0.2 }}
       whileHover="hover"
-      className="flex max-h-[400px] gap-10 border-t border-black/10 pt-8 max-md:flex-col-reverse lg:gap-20"
+      className="flex max-h-none flex-col-reverse gap-8 border-t border-black/10 pt-8 md:max-h-[400px] md:gap-10 lg:flex-row lg:gap-20"
     >
       {/* Left */}
       <motion.div
@@ -54,7 +54,7 @@ export function BlogCard({ blog }: { blog: Blog }) {
             },
           },
         }}
-        className="flex w-md flex-col justify-between gap-10"
+        className="flex w-full flex-col justify-between gap-8 lg:w-md lg:gap-10"
       >
         <div>
           <p className="text-sm font-medium text-black/70">{blog.date}</p>
@@ -68,29 +68,23 @@ export function BlogCard({ blog }: { blog: Blog }) {
                 transition: { delay: 0.2, duration: 0.75 },
               },
             }}
-            className="mt-16 text-3xl font-medium tracking-tight md:text-3xl"
+            className="mt-8 text-2xl font-medium tracking-tight sm:text-3xl md:mt-12 md:text-3xl lg:mt-16"
           >
             {blog.title}
           </motion.h3>
 
-          <p className="mt-6 max-w-xl text-base font-medium leading-relaxed md:text-md">
+          <p className="mt-4 max-w-xl text-sm font-medium leading-relaxed sm:text-base md:mt-6">
             {blog.description}
           </p>
         </div>
 
-        <motion.div
-          whileHover={{ x: 6 }}
-          transition={{ duration: 0.25 }}
-        >
+        <motion.div whileHover={{ x: 6 }} transition={{ duration: 0.25 }}>
           <Button
-            asChild
             variant="outline"
-            className="h-14 w-fit rounded-full border-black/20 bg-transparent px-8 text-base"
+            className="h-12 w-fit rounded-full border-black/20 bg-transparent px-6 text-sm sm:h-14 sm:px-8 sm:text-base"
           >
-            <Link href={blog.href}>
-              Read More
-              <ArrowRight className="ml-3 h-5 w-5" />
-            </Link>
+            Read More
+            <ArrowRight className="ml-3 h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </motion.div>
       </motion.div>
@@ -110,7 +104,7 @@ export function BlogCard({ blog }: { blog: Blog }) {
             },
           },
         }}
-        className="relative aspect-[16/10] w-full flex-1 overflow-hidden rounded-sm max-md:min-h-[200px]"
+        className="relative aspect-[16/10] w-full overflow-hidden rounded-sm min-h-[220px] sm:min-h-[280px] md:min-h-[340px] lg:flex-1"
       >
         <motion.div
           variants={{
