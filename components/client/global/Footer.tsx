@@ -7,7 +7,7 @@ import HoverSlideText from "@/components/HoverSlideText";
 
 export default function Footer() {
   return (
-    <footer className="bg-[var(--secondary-foreground)] min-h-screen text-white">
+    <footer className="bg-card-foreground h-auto pb-10 text-white">
       <div className="mx-auto max-w-[1400px] px-6 max-md:pb-5 md:pb-0 h-full pt-15">
         {/* Top */}
         <div className="flex max-md:flex-col w-full justify-between gap-16 items-stretch">
