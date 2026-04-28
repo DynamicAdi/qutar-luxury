@@ -1,8 +1,5 @@
-import building1 from "@/assets/building-1.png";
-import building2 from "@/assets/building-2.png";
+import building1 from "@/assets/building-2.png";
 import building3 from "@/assets/building-3.png";
-import building4 from "@/assets/building-4.png";
-import building5 from "@/assets/building-5.png";
 import building6 from "@/assets/building-6.png";
 import apartment1 from "@/assets/apartment-1.png";
 import apartment2 from "@/assets/apartment-2.png";
@@ -10,8 +7,6 @@ import plot1 from "@/assets/plot-1.png";
 import interior1 from "@/assets/interior-1.jpg";
 import interior2 from "@/assets/interior-2.jpg";
 import interior3 from "@/assets/interior-3.jpg";
-import { StaticImageData } from "next/image";
-
 export type PropertyCategory =
   | "BUY" | "RENT" | "SELL" | "PLOTS" | "RESIDENTIAL" | "COMMERCIAL";
 

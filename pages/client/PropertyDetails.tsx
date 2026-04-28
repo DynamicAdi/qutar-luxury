@@ -29,9 +29,9 @@ import {
 
 
 import ImageLightbox from "@/components/client/properties/ImageLightbox";
-import { formatQAR } from "@/lib/properties";
+
 import Link from "next/link";
-import { Property } from "@/store/cms";
+import { formatPrice, Property } from "@/store/cms";
 import axios from "axios";
 import LoaderScreen from "@/misc/LoaderScreen";
 import StickySidebar from "./EnquireSide";
@@ -170,7 +170,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
                 </p>
                 <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2 mt-6">
                   <span className="font-display text-4xl md:text-5xl text-gold font-bold">
-                    {formatQAR(property.price)}
+                    {formatPrice(property.price)}
                     {property.category === "RENT" && (
                       <span className="text-lg text-primary-foreground/60 font-normal">
                         /month
@@ -362,7 +362,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
                 {
                   icon: Wallet,
                   label: "Asking price",
-                  value: formatQAR(property.price),
+                  value: formatPrice(property.price),
                   sub: property.category === "RENT" ? "per month" : "freehold",
                 },
                 {
@@ -468,17 +468,17 @@ const PropertyDetails = ({ id }: { id: string }) => {
                   {[
                     {
                       label: "Down payment (20%)",
-                      value: formatQAR(downPayment),
+                      value: formatPrice(downPayment),
                       sub: "Paid at closing",
                     },
                     {
                       label: "Loan amount",
-                      value: formatQAR(loanAmount),
+                      value: formatPrice(loanAmount),
                       sub: "Financed over 25 yrs",
                     },
                     {
                       label: "Monthly est.",
-                      value: formatQAR(monthlyEstimate),
+                      value: formatPrice(monthlyEstimate),
                       sub: "Indicative only",
                     },
                   ].map((s) => (
