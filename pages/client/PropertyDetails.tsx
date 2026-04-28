@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import {
   BedDouble,
   Bath,
@@ -12,8 +12,6 @@ import {
   ZoomIn,
   Home,
   Building2,
-  Phone,
-  Mail,
   Share2,
   Heart,
   ChevronRight,
@@ -29,7 +27,7 @@ import {
   CircleCheckBig,
 } from "lucide-react";
 
-import EnquiryForm from "@/components/client/properties/EnquiryForm";
+
 import ImageLightbox from "@/components/client/properties/ImageLightbox";
 import { formatQAR } from "@/lib/properties";
 import Link from "next/link";
@@ -83,7 +81,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
   if (!property) {
     return (
       <>
-        <div className="px-24 mx-auto py-32 text-center">
+        <div className="px-4 md:md:px-24 px-4 mx-auto py-32 text-center">
           <h1 className="text-giant font-display">Property not found</h1>
           <Link
             href="/properties"
@@ -107,7 +105,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
     <>
       <main className="animate-fade-in mt-12">
         {/* Breadcrumb */}
-        <div className="px-24 mx-auto pt-6 pb-4">
+        <div className="md:px-24 px-4 mx-auto pt-6 pb-4">
           <nav className="flex items-center gap-2 text-xs font-body text-muted-foreground">
             <Link
               href="/properties"
@@ -127,11 +125,11 @@ const PropertyDetails = ({ id }: { id: string }) => {
         </div>
 
         {/* HERO — title block with large interactive floating building */}
-        <section className="px-24 mx-auto pb-10">
+        <section className="md:px-24 px-4 mx-auto pb-10">
           <div
-            ref={heroRef}
-            onMouseMove={onHeroMove}
-            onMouseLeave={onHeroLeave}
+            // ref={heroRef}
+            // onMouseMove={onHeroMove}
+            // onMouseLeave={onHeroLeave}
             className="relative bg-gradient-to-br from-emerald-deep via-emerald to-emerald-deep text-primary-foreground overflow-hidden p-8 md:p-14 min-h-[520px]"
             style={{ perspective: "1400px" }}
           >
@@ -150,7 +148,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
                   "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
               }}
             />
-            <div className="relative flex justify-between items-center gap-8">
+            <div className="relative flex justify-between items-center gap-8 flex-col-reverse md:flex-row">
               <div>
                 <div className="flex flex-wrap items-center gap-2 mb-4">
                   <span className="px-3 py-1 bg-gold text-gold-foreground font-display text-xs tracking-[0.25em] uppercase">
@@ -185,7 +183,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
                 </div>
               </div>
               <div
-                className="hidden md:block w-[600px] h-[380px] max-h-[380px] relative"
+                className="w-[600px] h-[380px] max-h-[380px] relative"
                 style={{ transformStyle: "preserve-3d" }}
               >
                 <img
@@ -205,12 +203,12 @@ const PropertyDetails = ({ id }: { id: string }) => {
           </div>
         </section>
 
-        {/* <div className="px-24 mx-auto pb-10">
+        {/* <div className="md:px-24 px-4 mx-auto pb-10">
 
         </div> */}
 
         {/* Body — 60/40 layout */}
-        <section className="px-24 mx-auto grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-8 lg:gap-12 pb-24">
+        <section className="md:px-24 px-4 mx-auto grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-8 lg:gap-12 pb-24">
           {/* MAIN — 60% */}
           <div className="space-y-16 min-w-0">
             {/* Image gallery — proper aspect ratios so nothing stretches */}

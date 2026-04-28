@@ -179,25 +179,6 @@ const Properties = () => {
         )}
       </section>
 
-      {/* Footer */}
-      <footer className="bg-emerald-deep py-16 text-primary-foreground">
-        <div className="mx-auto px-6 md:px-12 lg:px-24">
-          <p className="mb-4 text-xs tracking-[0.4em] text-gold">
-            QATAR · ESTATE
-          </p>
-
-          <h2 className="text-5xl font-bold leading-none md:text-7xl">
-            BUILT FOR
-            <br />
-            THE BOLD.
-          </h2>
-
-          <p className="mt-6 max-w-xl text-primary-foreground/70">
-            Curated luxury properties across Doha, Lusail and the Pearl. Speak
-            to an agent today.
-          </p>
-        </div>
-      </footer>
     </main>
   );
 };

@@ -645,11 +645,11 @@ function PropertySelect({
       {/* SELECT BUTTON */}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button
-            variant="outline"
+          <button
+            // variant="outline"
             role="combobox"
             disabled={search}
-            className="w-full justify-between my-3 rounded-xl py-4 h-auto"
+            className="w-full justify-between my-3 rounded-xl py-2 px-4 h-auto"
           >
             {search ? (
               "Loading Properties..."
@@ -681,11 +681,13 @@ function PropertySelect({
                 </div>
               </div>
             ) : (
-              "Select properties to link"
+              <div className="">
+              Select properties to link
+              </div>
             )}
 
-            <ChevronsUpDown className="ml-auto h-4 w-4 opacity-50" />
-          </Button>
+            {/* <ChevronsUpDown className="ml-auto h-4 w-4 opacity-50" /> */}
+          </button>
         </PopoverTrigger>
 
         {/* DROPDOWN */}
