@@ -61,7 +61,7 @@ function ServiceCard({ item }: { item: ServiceItem }) {
           {/* Description Reveal */}{" "}
           <div className="overflow-hidden">
             {" "}
-            <p className="max-w-sm opacity-0 line-clamp-3 text-base leading-relaxed text-white/90 transition-all duration-500 group-hover:opacity-100">
+            <p className="max-w-sm opacity-0 line-clamp-3 text-base leading-relaxed text-white/90 transition-all duration-500 max-md:opacity-100 group-hover:opacity-100">
               {" "}
               {item.description}{" "}
             </p>{" "}

@@ -2,7 +2,7 @@ import { PROPERTY_STATUS, PROPERTY_TYPE } from "@/generated/prisma/enums";
 import { db } from "@/lib/client";
 import { NextResponse, NextRequest } from "next/server";
 
-
+ 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);

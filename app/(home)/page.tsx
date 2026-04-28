@@ -12,7 +12,6 @@ import CTA from "@/components/client/home/CTA";
 export default function Home() {
   return (
    <div className="grid">
-    {/* <Navbar/> */}
     <Hero/>
     <WhyFind/>
     <RealEstateRewired/>
@@ -21,7 +20,6 @@ export default function Home() {
     <Services/>
     <BlogsAndResourcesSection/>
     <CTA />
-    {/* <Footer/> */}
    </div>
   );
 }

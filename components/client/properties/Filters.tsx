@@ -1,5 +1,6 @@
-import { useMemo } from "react";
-import { PropertyCategory, properties, formatQAR } from "@/lib/properties";
+import { useEffect, useMemo, useState } from "react";
+import { Property, PropertyCategory, formatQAR } from "@/lib/properties";
+import axios from "axios";
 
 export interface FilterState {
   category: PropertyCategory | "ALL";
@@ -29,27 +30,37 @@ export const PRICE_FLOOR = 0;
 export const PRICE_CEIL = 50_000_000;
 
 const Filters = ({ value, onChange }: Props) => {
-  const { states, cities, streets } = useMemo(() => {
-    const s = new Set<string>();
-    const c = new Set<string>();
-    const st = new Set<string>();
-    properties.forEach((p) => {
-      s.add(p.address.state);
-      if (!value.state || p.address.state === value.state)
-        c.add(p.address.city);
-      if (
-        (!value.state || p.address.state === value.state) &&
-        (!value.city || p.address.city === value.city)
-      )
-        st.add(p.address.street);
-    });
-    return {
-      states: Array.from(s).sort(),
-      cities: Array.from(c).sort(),
-      streets: Array.from(st).sort(),
-    };
-  }, [value.state, value.city]);
+  const [states, setStates] = useState<string[]>([]);
+  const [cities, setCities] = useState<string[]>([]);
+  const [streets, setStreets] = useState<string[]>([]);
+  const [loadingPlaces, setLoadingPlaces] = useState(false);
 
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      try {
+        setLoadingPlaces(true);
+
+        const params = new URLSearchParams();
+
+        if (value.state) params.append("state", value.state);
+        if (value.city) params.append("city", value.city);
+
+        const res = await axios.get(`/api/fetch-locations?${params.toString()}`);
+
+        if (res.status === 200) {
+          setStates(res.data.states || []);
+          setCities(res.data.cities || []);
+          setStreets(res.data.streets || []);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoadingPlaces(false);
+      }
+    };
+
+    fetchPlaces();
+  }, [value.state, value.city]);
   const pct = (v: number) =>
     ((v - PRICE_FLOOR) / (PRICE_CEIL - PRICE_FLOOR)) * 100;
 
@@ -87,6 +98,7 @@ const Filters = ({ value, onChange }: Props) => {
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 flex-1">
           <select
+            disabled={loadingPlaces}
             value={value.state}
             onChange={(e) =>
               onChange({
@@ -107,6 +119,7 @@ const Filters = ({ value, onChange }: Props) => {
           </select>
           <select
             value={value.city}
+            disabled={loadingPlaces}
             onChange={(e) =>
               onChange({ ...value, city: e.target.value, street: "" })
             }
@@ -120,6 +133,7 @@ const Filters = ({ value, onChange }: Props) => {
             ))}
           </select>
           <select
+            disabled={loadingPlaces}
             value={value.street}
             onChange={(e) => onChange({ ...value, street: e.target.value })}
             className="h-11 px-3 bg-card border border-border font-body text-sm text-foreground hover:border-emerald focus:border-emerald outline-none cursor-pointer"
@@ -173,7 +187,7 @@ const Filters = ({ value, onChange }: Props) => {
               onChange={(e) => {
                 const v = Math.min(
                   Number(e.target.value),
-                  value.priceMax - 100000,
+                  value.priceMax - 100000
                 );
                 onChange({ ...value, priceMin: v });
               }}
@@ -188,7 +202,7 @@ const Filters = ({ value, onChange }: Props) => {
               onChange={(e) => {
                 const v = Math.max(
                   Number(e.target.value),
-                  value.priceMin + 100000,
+                  value.priceMin + 100000
                 );
                 onChange({ ...value, priceMax: v });
               }}

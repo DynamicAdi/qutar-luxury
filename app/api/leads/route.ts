@@ -87,6 +87,7 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
 export async function DELETE(req: NextRequest) {
   const params = req.nextUrl.searchParams
   const id = params.get("id")

@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { Field } from "@/components/ui/field";
 import LoaderScreen from "@/misc/LoaderScreen";
+import { usePaginatedFetch } from "@/components/usePaginationFetch";
 
 const statusStyle: Record<Lead["status"], string> = {
   NEW: "bg-primary/10 text-primary-deep border-primary/30",
@@ -46,90 +47,78 @@ const statusStyle: Record<Lead["status"], string> = {
 };
 
 export default function Leads() {
-  const [q, setQ] = useState("");
-  const [filter, setFilter] = useState<string>("All");
   const [convertLead, setConvertLead] = useState<Lead | null>(null);
-  const [getter, startGetter] = useTransition();
-  const [deleteThread, StartdeleteThread] = useTransition();
 
-  const [data, setData] = useState<Lead[]>([]);
   const [isPending, startTransition] = useTransition();
+  const [deleteThread, startDeleteThread] = useTransition();
+
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const {
+    rows: leads,
+    loading,
+    search,
+    setSearch,
+    filters,
+    setFilters,
+
+    pagination,
+    page,
+    pageNumbers,
+    nextPage,
+    prevPage,
+    goToPage,
+    refresh,
+  } = usePaginatedFetch<Lead>({
+    url: "/api/leads",
+    limit: 10,
+    initialFilters: {
+      status: "",
+    },
+  });
 
   async function updateLeadStatus(id: string, status: string) {
-    const res = await axios.put("/api/leads", {
-      id,
-      status,
-    });
+    const res = await axios.put("/api/leads", { id, status });
+
     if (res.status === 200) {
       return res.data;
     }
   }
 
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   const handleUpdate = (id: string, status: string) => {
-    // clear previous timer → this is the key to debouncing
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
     timeoutRef.current = setTimeout(() => {
       startTransition(async () => {
         try {
           await updateLeadStatus(id, status);
-          getData();
-        } catch (err) {
-          console.error("Update failed", err);
+          refresh();
+        } catch (error) {
+          console.error(error);
         }
       });
-    }, 500); // debounce delay (adjust as needed)
-  };
-
-  const getData = () => {
-    startGetter(async () => {
-      const req = await axios.get("/api/leads");
-      if (req.status === 200) {
-        console.log(req.data.data);
-        setData(req.data.data);
-      }
-    });
+    }, 500);
   };
 
   const deleteRow = (id: string) => {
-    StartdeleteThread(async () => {
+    startDeleteThread(async () => {
       const req = await axios.delete(`/api/leads?id=${id}`);
+
       if (req.status === 200) {
         toast.success("Deleted!");
-        getData();
+        refresh();
       }
     });
   };
 
   const askToDelete = (id: string, name: string) => {
-    const ask = window.confirm(`Are you sure want to delete this ${name}?`);
-    if (ask) {
-      deleteRow(id);
-    }
+    const ask = window.confirm(`Are you sure want to delete ${name}?`);
+
+    if (ask) deleteRow(id);
   };
 
-  const filtered = data
-    .filter((l) => filter === "All" || l.status === filter)
-    .filter(
-      (l) =>
-        l.name.toLowerCase().includes(q.toLowerCase()) ||
-        l.email.toLowerCase().includes(q.toLowerCase()) ||
-        l.phone.toLowerCase().includes(q.toLowerCase()),
-    );
+  if (loading) return <LoaderScreen />;
 
-  useEffect(() => {
-    getData();
-  }, []);
-
-  if (getter) {
-    return (
-      <LoaderScreen />
-    )
-  }
   return (
     <>
       <PageHeader
@@ -138,21 +127,32 @@ export default function Leads() {
         subtitle="Track, qualify and convert enquiries from your luxury portfolio."
       />
 
+      {/* Filters */}
       <Card className="rounded-2xl p-3 py-0 md:p-4 shadow-card border-0 mb-4">
         <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+
             <Input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search name or email"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search name, email, phone"
               className="pl-9 h-10 rounded-xl"
             />
           </div>
-          <Select value={filter} onValueChange={setFilter}>
+
+          <Select
+            value={filters.status || "ALL"}
+            onValueChange={(v) =>
+              setFilters({
+                status: v === "ALL" ? "" : v,
+              })
+            }
+          >
             <SelectTrigger className="h-10 rounded-xl sm:w-44">
               <SelectValue />
             </SelectTrigger>
+
             <SelectContent>
               {[
                 "ALL",
@@ -171,6 +171,7 @@ export default function Leads() {
         </div>
       </Card>
 
+      {/* Table */}
       <Card className="rounded-2xl shadow-card border-0 py-0 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -190,8 +191,9 @@ export default function Leads() {
                 <th className="text-right px-4 py-3.5">Actions</th>
               </tr>
             </thead>
+
             <tbody>
-              {filtered.map((l, i) => (
+              {leads.map((l, i) => (
                 <tr
                   key={l.id}
                   className="border-t border-border hover:bg-secondary/30 transition-colors animate-fade-in-up"
@@ -206,14 +208,17 @@ export default function Leads() {
                           .slice(0, 2)
                           .join("")}
                       </div>
+
                       <div>
                         <div className="font-medium">{l.name}</div>
+
                         <div className="text-xs text-muted-foreground line-clamp-1 max-w-xs">
                           {l.message}
                         </div>
                       </div>
                     </div>
                   </td>
+
                   <td className="px-4 py-3.5 hidden md:table-cell">
                     <div className="flex flex-col gap-0.5 text-xs">
                       <a
@@ -222,6 +227,7 @@ export default function Leads() {
                       >
                         <Mail className="h-3 w-3" /> {l.email}
                       </a>
+
                       <a
                         href={`tel:${l.phone}`}
                         className="flex items-center gap-1 text-muted-foreground hover:text-primary"
@@ -230,9 +236,11 @@ export default function Leads() {
                       </a>
                     </div>
                   </td>
+
                   <td className="px-4 py-3.5 hidden lg:table-cell text-muted-foreground">
-                    {l.property ? l.property.title : "—"}
+                    {l.property?.title || "—"}
                   </td>
+
                   <td className="px-4 py-3.5 hidden sm:table-cell">
                     <Badge
                       variant="outline"
@@ -241,26 +249,28 @@ export default function Leads() {
                       {l.budget}
                     </Badge>
                   </td>
+
                   <td className="px-4 py-3.5">
                     <Select
-                      value={l.status.toUpperCase()}
+                      value={l.status}
                       onValueChange={(v) => handleUpdate(l.id, v)}
                     >
                       <SelectTrigger
-                        className={`rounded-lg h-8 text-xs border w-32 ${statusStyle[l.status]}`}
+                        className={`rounded-lg h-8 text-xs border w-32 ${
+                          statusStyle[l.status]
+                        }`}
                       >
                         <SelectValue />
                       </SelectTrigger>
+
                       <SelectContent>
-                        {(
-                          [
-                            "NEW",
-                            "CONTACTED",
-                            "QUALIFIED",
-                            "CONVERTED",
-                            "LOST",
-                          ] as Lead["status"][]
-                        ).map((s) => (
+                        {[
+                          "NEW",
+                          "CONTACTED",
+                          "QUALIFIED",
+                          "CONVERTED",
+                          "LOST",
+                        ].map((s) => (
                           <SelectItem key={s} value={s}>
                             {isPending ? "Updating..." : s}
                           </SelectItem>
@@ -268,54 +278,90 @@ export default function Leads() {
                       </SelectContent>
                     </Select>
                   </td>
+
                   <td className="px-4 py-3.5">
                     <div className="flex justify-end gap-1 items-center">
                       {l.status === "QUALIFIED" && (
                         <Button
                           size="sm"
                           onClick={() => setConvertLead(l)}
-                          className="h-8 rounded-lg bg-emerald text-primary-foreground shadow-gold hover:opacity-90 text-xs ml-2"
+                          className="h-8 rounded-lg bg-emerald text-white text-xs"
                         >
-                          <UserCheck className="h-3.5 w-3.5 mr-1" /> Convert to
-                          Client
+                          <UserCheck className="h-3.5 w-3.5 mr-1" />
+                          Convert
                         </Button>
                       )}
+
                       <a
                         href={`mailto:${l.email}`}
-                        className="rounded-lg p-2 hover:bg-secondary text-muted-foreground hover:text-foreground"
-                        title="Reply"
+                        className="rounded-lg p-2 hover:bg-secondary"
                       >
                         <ArrowUpRight className="h-4 w-4" />
                       </a>
+
                       <button
-                        onClick={() => {
-                          askToDelete(l.id, l.name);
-                          toast.success("Lead removed");
-                        }}
+                        onClick={() => askToDelete(l.id, l.name)}
                         className="rounded-lg p-2 hover:bg-destructive/10 hover:text-destructive"
                       >
-                        {
-                          deleteThread ? <LucideLoader2 size={12} className="animate-spin" /> :
-                        <Trash2 className="h-4 w-4" />
-                        }
+                        {deleteThread ? (
+                          <LucideLoader2 size={14} className="animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
                       </button>
                     </div>
                   </td>
                 </tr>
               ))}
-              {filtered.length === 0 && (
+
+              {leads.length === 0 && (
                 <tr>
                   <td
                     colSpan={6}
                     className="px-4 py-12 text-center text-muted-foreground"
                   >
-                    No leads match your filters.
+                    No leads found.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {pagination && pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-4 border-t">
+            <button
+              onClick={prevPage}
+              disabled={!pagination.hasPrevPage}
+              className="px-3 py-1 rounded-md border disabled:opacity-40"
+            >
+              Prev
+            </button>
+
+            <div className="flex items-center gap-2">
+              {pageNumbers.map((num) => (
+                <button
+                  key={num}
+                  onClick={() => goToPage(num)}
+                  className={`h-9 w-9 rounded-md border text-sm ${
+                    page === num ? "bg-primary text-white" : "hover:bg-muted"
+                  }`}
+                >
+                  {num}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={nextPage}
+              disabled={!pagination.hasNextPage}
+              className="px-3 py-1 rounded-md border disabled:opacity-40"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </Card>
 
       <ConvertDialog lead={convertLead} onClose={() => setConvertLead(null)} />
@@ -330,13 +376,13 @@ function ConvertDialog({
   lead: Lead | null;
   onClose: () => void;
 }) {
-
-
   const [nationality, setNationality] = useState("Qatari");
-  const [dealAmount, setDealAmount] = useState<number>(Number(lead?.property?.price ) ?? 0);
+  const [dealAmount, setDealAmount] = useState<number>(
+    Number(lead?.property?.price) ?? 0
+  );
   const [paymentMethod, setPaymentMethod] = useState("Bank Transfer");
   const [closingDate, setClosingDate] = useState(
-    new Date().toISOString().slice(0, 10),
+    new Date().toISOString().slice(0, 10)
   );
   const [notes, setNotes] = useState("");
   const [saveProcess, startSaveProcess] = useTransition();

@@ -1,22 +1,63 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MapPin, Search } from "lucide-react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import LineRevealOnScroll from "@/components/LineReveal";
 import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Input } from "@/components/ui/input";
+import axios from "axios";
+import { Card } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const houseWrapRef = useRef<HTMLDivElement>(null);
   const houseRef = useRef<HTMLDivElement>(null);
-
   const textWrapRef = useRef<HTMLDivElement>(null);
   const strokeTextRef = useRef<HTMLHeadingElement>(null);
   const fillTextRef = useRef<HTMLHeadingElement>(null);
   const smokeRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const filters = [
+    "ALL",
+    "BUY",
+    "RENT",
+    "SELL",
+    "PLOTS",
+    "RESIDENTIAL",
+    "COMMERCIAL",
+  ];
+  const [type, setType] = useState("ALL");
+  const [location, setLocation] = useState("");
+  const [placeData, setPlaceData] = useState<
+    Record<string, Record<string, string[]>>
+  >({});
+
+  const [loadingPlaces, setLoadingPlaces] = useState(false);
+
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      try {
+        setLoadingPlaces(true);
+
+        const res = await axios.get("/api/location-filters");
+
+        if (res.status === 200) {
+          setPlaceData(res.data.data || {});
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoadingPlaces(false);
+      }
+    };
+
+    fetchPlaces();
+  }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -152,7 +193,39 @@ export default function Hero() {
 
     return () => ctx.revert();
   }, []);
+  const results = useMemo(() => {
+    if (!location.trim()) return [];
 
+    const query = location.toLowerCase().trim();
+
+    const matched: string[] = [];
+
+    Object.entries(placeData).forEach(([state, cities]) => {
+      // Match state
+      if (state.toLowerCase().includes(query)) {
+        matched.push(state);
+      }
+
+      Object.entries(cities).forEach(([city, streets]) => {
+        // Match city
+        if (city.toLowerCase().includes(query)) {
+          matched.push(`${city}, ${state}`);
+        }
+
+        streets.forEach((street) => {
+          // Match street
+          if (street.toLowerCase().includes(query)) {
+            matched.push(`${street}, ${city}, ${state}`);
+          }
+        });
+      });
+    });
+
+    return [...new Set(matched)].slice(0, 6);
+  }, [location, placeData]);
+  const handleSearch = () => {
+    router.push(`/properties?type=${type}&location=${location}`);
+  };
   return (
     <section
       ref={sectionRef}
@@ -173,26 +246,100 @@ export default function Hero() {
         className="relative z-20 mx-auto flex max-w-[1600px] flex-col items-center px-6 pt-32 text-center md:px-10"
       >
         <h1 className="max-w-[1500px] text-[3.3rem] font-bold leading-[0.9] tracking-tight text-black sm:text-[5rem] md:text-[7rem] lg:text-8xl">
-          <LineRevealOnScroll text={`Find What Moves You.`}/>
+          <LineRevealOnScroll text={`Find What Moves You.`} />
         </h1>
 
         <p className="mt-6 max-w-4xl flex max-md:flex-col text-lg font-medium text-black/80 sm:text-2xl md:text-2xl">
-          <span className="text-black"><LineRevealOnScroll text={`Expert agents. Real guidance.`}/></span>{" "}
+          <span className="text-black">
+            <LineRevealOnScroll text={`Expert agents. Real guidance.`} />
+          </span>{" "}
           <span className="text-black/45">
             <LineRevealOnScroll text={`A clear path to find what’s next.`} />
           </span>
         </p>
 
-        <Button className="mt-8 inline-flex items-center gap-4 rounded-full bg-[#161819] px-6 py-5 text-md font-medium text-white">
+        {/* <Button className="mt-8 inline-flex items-center gap-4 rounded-full bg-[#161819] px-6 py-5 text-md font-medium text-white">
           Find Properties <ArrowRight size={20} />
-        </Button>
+        </Button> */}
+        <div className="w-full space-y-4 max-w-2xl mt-8">
+          {/* Tabs */}
+          <ToggleGroup
+            type="single"
+            value={type}
+            onValueChange={(val) => val && setType(val)}
+            className="flex flex-wrap gap-2 bg-white p-2 rounded-xl"
+          >
+            {filters.map((item) => (
+              <ToggleGroupItem
+                key={item}
+                value={item}
+                className="flex-1 min-w-[110px] bg-white"
+              >
+                {item}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+
+          {/* Search */}
+          <div className="relative">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+
+                <Input
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="Search by location..."
+                  className="pl-9 py-6 bg-white border-none"
+                />
+              </div>
+
+              <Button onClick={handleSearch} className="px-8 py-6">
+                Search
+              </Button>
+            </div>
+
+            {/* Suggestions */}
+            {(location.trim()) && (
+              <Card className="absolute top-full mt-2 w-full z-50 bg-white shadow-xl border rounded-xl p-2">
+                {loadingPlaces ? (
+                  <div className="space-y-2">
+                    {[1, 2, 3].map((item) => (
+                      <div
+                        key={item}
+                        className="h-10 w-full rounded-lg animate-pulse bg-muted"
+                      />
+                    ))}
+                  </div>
+                ) : results.length > 0 ? (
+                  <div className="space-y-1">
+                    {results.map((item) => (
+                      <button
+                        key={item}
+                        onClick={() => setLocation(item)}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted text-left"
+                      >
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <span>{item}</span>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="px-3 py-3 text-sm text-muted-foreground text-center">
+                    No locations found
+                  </div>
+                )}
+              </Card>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* House */}
       <div ref={houseWrapRef} className="absolute inset-0 z-10">
         <div
           ref={houseRef}
-          className="absolute inset-x-0 bottom-0 h-[100%] w-[140%] left-1/2 -translate-x-1/2"
+          className="absolute inset-x-0 bottom-0 md:-bottom-20 h-[100%] w-[140%] left-1/2 -translate-x-1/2"
         >
           <Image
             src="/house.png"
@@ -213,7 +360,7 @@ export default function Hero() {
           {/* Stroke */}
           <h2
             ref={strokeTextRef}
-            className="block text-center text-[4rem] font-black leading-none tracking-tight text-transparent sm:text-[6rem] md:text-[8rem]"
+            className="block text-center text-[2.5rem] font-black leading-none tracking-tight text-transparent sm:text-[6rem] md:text-[8rem]"
             style={{
               WebkitTextStroke: "2px #111",
             }}
@@ -224,7 +371,7 @@ export default function Hero() {
           {/* Fill */}
           <h2
             ref={fillTextRef}
-            className="absolute inset-0 block text-center text-[4rem] font-black leading-none tracking-tight text-transparent sm:text-[6rem] md:text-[8rem]"
+            className="absolute inset-0 block text-center text-[2.5rem] font-black leading-none tracking-tight text-transparent sm:text-[6rem] md:text-[8rem]"
             style={{
               WebkitBackgroundClip: "text",
               backgroundClip: "text",

@@ -54,6 +54,7 @@ import axios from "axios";
 import { handleKeyDown } from "@/lib/InputKeyDown";
 import { CUSTOMER_STATUS } from "@/generated/prisma/enums";
 import LoaderScreen from "@/misc/LoaderScreen";
+import { usePaginatedFetch } from "@/components/usePaginationFetch";
 
 export default function Customers() {
   const [openLink, setOpenLink] = useState(false);
@@ -76,15 +77,15 @@ export default function Customers() {
   const [avaprop, setAvaprop] = useState([]);
   const [search, startSearch] = useTransition();
   const [saveProcess, startSaveProcess] = useTransition();
-  const [customerSearch, startcustomerSearch] = useTransition();
+  // const [customerSearch, startcustomerSearch] = useTransition();
   const [deleteThread, startDeleteThread] = useTransition();
   const [panigation, setPanigation] = useState([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  // const [customers, setCustomers] = useState<Customer[]>([]);
 
   const availableProperties = () => {
     startSearch(async () => {
       const req = await axios.get(
-        `/api/properties?customers=${Boolean("true")}`,
+        `/api/properties?customers=${Boolean("true")}`
       );
       if (req.status === 200) {
         setAvaprop(req.data.data);
@@ -92,21 +93,36 @@ export default function Customers() {
     });
   };
 
-  const getCustomers = () =>
-    startcustomerSearch(async () => {
-      const req = await axios.get(`/api/customers`);
-      if (req.status === 200) {
-        setCustomers(req.data.data);
-        setPanigation(req.data.panigation);
-        console.log(req.data);
-      }
-    });
+  // const getCustomers = () =>
+  //   startcustomerSearch(async () => {
+  //     const req = await axios.get(`/api/customers`);
+  //     if (req.status === 200) {
+  //       setCustomers(req.data.data);
+  //       setPanigation(req.data.panigation);
+  //       console.log(req.data);
+  //     }
+  //   });
+  const {
+    rows: customers,
+    pagination,
+    loading: customerSearch,
+    page,
+    pageNumbers,
 
+    nextPage,
+    prevPage,
+    goToPage,
+    refresh,
+  } = usePaginatedFetch<Customer>({
+    url: "/api/customers",
+    limit: 10,
+  });
   const deleteCustomer = (id: string) =>
     startDeleteThread(async () => {
       const del = await axios.delete(`/api/customers?id=${id}`);
       if (del.status === 200) {
-        getCustomers();
+        // getCustomers();
+        refresh();
       }
     });
 
@@ -142,6 +158,7 @@ export default function Customers() {
           note: "",
         });
         setOpen(false);
+        refresh();
       }
     });
   };
@@ -177,6 +194,7 @@ export default function Customers() {
           note: "",
         });
         setOpen(false);
+        refresh();
       }
     });
 
@@ -195,9 +213,9 @@ export default function Customers() {
     }
   }, [open, openLink]);
 
-  useEffect(() => {
-    getCustomers();
-  }, []);
+  // useEffect(() => {
+  //   getCustomers();
+  // }, []);
 
   if (customerSearch) {
     return <LoaderScreen />;
@@ -393,7 +411,6 @@ export default function Customers() {
                   Deal Amount
                 </th>
                 <th className="text-left px-4 py-3.5">Closing Date</th>
-
                 <th className="text-left px-4 py-3.5">Status</th>
                 <th className="text-left px-4 py-3.5">Linked Properties</th>
                 <th className="text-left px-4 py-3.5">Nationality</th>
@@ -401,6 +418,7 @@ export default function Customers() {
                 <th className="text-right px-4 py-3.5">Actions</th>
               </tr>
             </thead>
+
             <tbody>
               {customers.map((c, i) => (
                 <tr
@@ -417,6 +435,7 @@ export default function Customers() {
                           .slice(0, 2)
                           .join("")}
                       </div>
+
                       <div>
                         <div className="font-medium">{c.name}</div>
                         <div className="text-xs text-muted-foreground">
@@ -425,6 +444,7 @@ export default function Customers() {
                       </div>
                     </div>
                   </td>
+
                   <td className="px-4 py-3.5 hidden md:table-cell">
                     <div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
@@ -435,6 +455,7 @@ export default function Customers() {
                       </span>
                     </div>
                   </td>
+
                   <td className="px-4 py-3.5 hidden sm:table-cell text-muted-foreground">
                     <div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
@@ -445,13 +466,15 @@ export default function Customers() {
                       </span>
                     </div>
                   </td>
-                   <td className="px-4 py-3.5 hidden sm:table-cell text-muted-foreground">
+
+                  <td className="px-4 py-3.5 hidden sm:table-cell text-muted-foreground">
                     {c.closingDate?.split("T")[0]}
                   </td>
 
                   <td className="px-4 py-3.5 hidden sm:table-cell text-muted-foreground">
                     {c.status.charAt(0) + c.status.slice(1).toLowerCase()}
                   </td>
+
                   <td className="px-4 py-3.5">
                     <div className="flex flex-wrap gap-1">
                       {c.properties.length === 0 && (
@@ -459,30 +482,33 @@ export default function Customers() {
                           None linked
                         </span>
                       )}
-                      {c.properties.map((pr, idx: number) => {
-                        return (
-                          <Badge
-                            key={pr.id}
-                            className="rounded-md gap-1 bg-green-400/15 text-[hsl(142_55%_28%)] hover:bg-success/15 border border-green-400/30 pr-1"
-                          >
-                            {pr.title.slice(0, 24)}
-                          </Badge>
-                        );
-                      })}
+
+                      {c.properties.map((pr) => (
+                        <Badge
+                          key={pr.id}
+                          className="rounded-md gap-1 bg-green-400/15 text-[hsl(142_55%_28%)] hover:bg-success/15 border border-green-400/30 pr-1"
+                        >
+                          {pr.title.slice(0, 24)}
+                        </Badge>
+                      ))}
                     </div>
                   </td>
-                                    <td className="px-4 py-3.5 hidden sm:table-cell text-muted-foreground">
+
+                  <td className="px-4 py-3.5 hidden sm:table-cell text-muted-foreground">
                     {c.nationality}
                   </td>
+
                   <td className="px-4 py-3.5 hidden sm:table-cell text-muted-foreground">
-                    {c?.note ? c.note : "-"}
+                    {c.note || "-"}
                   </td>
+
                   <td className="px-4 py-3.5">
                     <div className="flex justify-end gap-1">
                       <button
                         onClick={() => {
                           setFormType("EDIT");
                           setOpen(true);
+
                           setForm({
                             customId: c.id,
                             name: c.name,
@@ -491,10 +517,10 @@ export default function Customers() {
                             phone: c.phone,
                             status: c.status,
                             propertyIds: c.properties?.map((p) => p.id) ?? [],
-                            dealAmount: c?.dealAmount as number,
-                            paymentMethod: c?.paymentMethod as string,
-                            closingDate: c?.closingDate as string,
-                            note: c?.note as string,
+                            dealAmount: c.dealAmount as number,
+                            paymentMethod: c.paymentMethod as string,
+                            closingDate: c.closingDate?.split("T")[0] as string,
+                            note: c.note as string,
                           });
                         }}
                         className="rounded-lg p-2 hover:text-yellow-600"
@@ -503,10 +529,7 @@ export default function Customers() {
                       </button>
 
                       <button
-                        onClick={() => {
-                          deleteCustomer(c.id);
-                          toast.success("Customer removed");
-                        }}
+                        onClick={() => deleteCustomer(c.id)}
                         className="rounded-lg p-2 hover:bg-destructive/10 hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -515,10 +538,11 @@ export default function Customers() {
                   </td>
                 </tr>
               ))}
+
               {customers.length === 0 && (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={9}
                     className="px-4 py-12 text-center text-muted-foreground"
                   >
                     No customers yet. Add your first.
@@ -528,61 +552,44 @@ export default function Customers() {
             </tbody>
           </table>
         </div>
+
+        {/* pagination */}
+        {pagination && pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-4 border-t">
+            <button
+              onClick={prevPage}
+              disabled={!pagination?.hasPrevPage}
+              className="px-3 py-1 rounded-md border disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Prev
+            </button>
+
+            <div className="flex items-center gap-2">
+              {pageNumbers.map((num) => (
+                <button
+                  key={num}
+                  onClick={() => goToPage(num)}
+                  className={`h-9 w-9 rounded-md border text-sm transition ${
+                    page === num
+                      ? "bg-primary text-white border-primary"
+                      : "hover:bg-muted"
+                  }`}
+                >
+                  {num}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={nextPage}
+              disabled={!pagination?.hasNextPage}
+              className="px-3 py-1 rounded-md border disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </Card>
-
-      {/* Link property dialog */}
-      {/* <Dialog
-        open={openLink}
-        onOpenChange={() => {
-          (setOpenLink(!openLink), setLinkFor(null));
-        }}
-      >
-        <DialogContent className="rounded-2xl max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Link property to {linkFor?.name}</DialogTitle>
-          </DialogHeader>
-          <div className="text-xs text-muted-foreground mb-2">
-            Linking marks the property as Sold automatically.
-          </div>
-          <div className="max-h-80 overflow-y-auto space-y-2">
-            {search ? (
-              <div className="grid place-items-center">
-                <Loader size={16} className="animate-spin" />{" "}
-              </div>
-            ) : (
-              avaprop.length === 0 && (
-                <p className="text-sm text-muted-foreground py-6 text-center">
-                  No available properties to link.
-                </p>
-              )
-            )}
-            {avaprop.map((p: Property) => (
-              <button
-                key={p.id}
-                onClick={() => {
-                  toast.success(`${p.title} linked & marked Sold`);
-                  setLinkFor(null);
-                }}
-                className="w-full flex items-center gap-3 rounded-xl border border-border p-2.5 hover:border-primary hover:bg-gold-soft transition-colors text-left"
-              >
-
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-sm truncate">
-                    {p.title} · {formatPrice(p.price)}
-                  </div>
-
-                  <div className="text-xs text-muted-foreground">
-                    <span className="text-xs text-muted-foreground">
-                      {p.address.street}, {p.address.city}, {p.address.state},{" "}
-                      {p.address.zipCode}
-                    </span>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog> */}
     </>
   );
 }
@@ -633,7 +640,7 @@ function PropertySelect({
   };
 
   const selectedProperties = avaprop.filter((p) =>
-    form.propertyIds.includes(p.id),
+    form.propertyIds.includes(p.id)
   );
 
   return (
@@ -681,9 +688,7 @@ function PropertySelect({
                 </div>
               </div>
             ) : (
-              <div className="">
-              Select properties to link
-              </div>
+              <div className="">Select properties to link</div>
             )}
 
             {/* <ChevronsUpDown className="ml-auto h-4 w-4 opacity-50" /> */}
@@ -711,7 +716,7 @@ function PropertySelect({
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          isSelected ? "opacity-100" : "opacity-0",
+                          isSelected ? "opacity-100" : "opacity-0"
                         )}
                       />
 

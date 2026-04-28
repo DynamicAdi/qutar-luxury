@@ -91,6 +91,7 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
 export async function DELETE(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const id = searchParams.get("id");

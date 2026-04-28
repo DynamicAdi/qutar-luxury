@@ -55,7 +55,7 @@ export default function Footer() {
           </div>
 
           {/* Right Side */}
-          <div className="flex h-full w-full md:max-w-3xl md:justify-end gap-20">
+          <div className="flex max-md:flex-col h-full w-full md:max-w-3xl md:justify-end gap-20">
             <div className="space-y-5 text-4xl md:text-2xl font-medium">
               <Link href="#" className="block hover:text-white/70">
                 <HoverSlideText text="Search" />
@@ -78,7 +78,7 @@ export default function Footer() {
               </Link>
             </div>
 
-            <div className="space-y-5 text-xl md:text-md font-medium text-right">
+            <div className="space-y-5 text-xl md:text-md font-medium md:text-right">
               <Link href="#" className="block hover:text-white/70">
                 Facebook
               </Link>

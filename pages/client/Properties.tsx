@@ -12,22 +12,52 @@ import Filters, {
 import PropertyCard from "@/components/client/properties/PropertyCard";
 import { Property } from "@/store/cms";
 import { useDebounce } from "@/components/useDebounce";
+import { useSearchParams } from "next/navigation";
 
 const LIMIT = 9;
-
 const Properties = () => {
+  const searchParams = useSearchParams();
+
+  const location = searchParams?.get("location")?.trim() ?? "";
+
+  const category = searchParams?.get("type") ?? "ALL";
+
+  const parts = location
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  let state = "";
+  let city = "";
+  let street = "";
+
+  if (parts.length === 1) state = parts[0];
+  if (parts.length === 2) {
+    state = parts[0];
+    city = parts[1];
+  }
+
+  if (parts.length >= 3) {
+    state = parts[0];
+    city = parts[1];
+    street = parts[2];
+  }
+
   const [filters, setFilters] = useState<FilterState>({
-    category: "ALL",
-    state: "",
-    city: "",
-    street: "",
+    category: category as any,
+    state,
+    city,
+    street,
     priceMin: PRICE_FLOOR,
     priceMax: PRICE_CEIL,
   });
 
   const [data, setData] = useState<Property[]>([]);
+
   const [page, setPage] = useState(1);
+
   const debouncedFilters = useDebounce(filters, 500);
+
   const [pagination, setPagination] = useState({
     total: 0,
     page: 1,
@@ -39,42 +69,49 @@ const Properties = () => {
 
   const [isPending, startTransition] = useTransition();
 
+  /* fetch filtered properties directly */
   const fetchProperties = () => {
     startTransition(async () => {
       try {
-        const params: any = {
+        const params: Record<string, string | number> = {
           page,
           limit: LIMIT,
         };
 
-        // use debounced filters
-        if (debouncedFilters.category !== "ALL") {
+        /* category */
+        if (debouncedFilters.category && debouncedFilters.category !== "ALL") {
           params.category = debouncedFilters.category;
         }
 
-        if (debouncedFilters.state) {
-          params.state = debouncedFilters.state;
-        }
-
-        if (debouncedFilters.city) {
-          params.city = debouncedFilters.city;
-        }
-
-        if (debouncedFilters.street) {
-          params.street = debouncedFilters.street;
-        }
-
+        /* call current api */
         const req = await axios.get("/api/properties", { params });
 
         if (req.status === 200) {
-          let rows = req.data.data;
+          let rows: Property[] = req.data.data || [];
 
-          // price filter after debounce
-          rows = rows.filter(
-            (item: Property) =>
-              item.price >= debouncedFilters.priceMin &&
-              item.price <= debouncedFilters.priceMax
-          );
+          /* frontend filters because api doesn't support these yet */
+          rows = rows.filter((item) => {
+            const address: any = item.address || {};
+
+            const stateOk =
+              !debouncedFilters.state ||
+              address.state === debouncedFilters.state;
+
+            const cityOk =
+              !debouncedFilters.city || address.city === debouncedFilters.city;
+
+            const streetOk =
+              !debouncedFilters.street ||
+              address.street === debouncedFilters.street;
+
+            const price = Number(item.price) || 0;
+
+            const priceOk =
+              price >= debouncedFilters.priceMin &&
+              price <= debouncedFilters.priceMax;
+
+            return stateOk && cityOk && streetOk && priceOk;
+          });
 
           setData(rows);
           setPagination(req.data.pagination);
@@ -89,12 +126,24 @@ const Properties = () => {
     fetchProperties();
   }, [page, debouncedFilters]);
 
+  /* reset page when filters change */
   useEffect(() => {
     setPage(1);
-  }, [filters.category, filters.state, filters.city, filters.street]);
+  }, [
+    filters.category,
+    filters.state,
+    filters.city,
+    filters.street,
+    filters.priceMin,
+    filters.priceMax,
+  ]);
 
   return (
-    <main style={{ background: `hsl(44 38% 96%)` }}>
+    <main
+      style={{
+        background: "hsl(44 38% 96%)",
+      }}
+    >
       {/* Header */}
       <section className="mx-auto px-6 pt-10 pb-6 md:px-12 lg:px-24 md:pt-14 md:pb-8">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
@@ -131,19 +180,15 @@ const Properties = () => {
         </div>
       </section>
 
-      {/* Grid */}
+      {/* Cards */}
       <section className="mx-auto px-6 pb-20 md:px-12 lg:px-24 lg:pb-32">
         {isPending ? (
-          <div className="py-32 text-center">
-            <p className="text-xl text-muted-foreground">
-              Loading properties...
-            </p>
+          <div className="py-32 text-center text-muted-foreground">
+            Loading properties...
           </div>
         ) : data.length === 0 ? (
-          <div className="border border-dashed border-border py-32 text-center">
-            <p className="text-3xl text-muted-foreground">
-              No properties match your filters.
-            </p>
+          <div className="border border-dashed border-border py-32 text-center text-muted-foreground">
+            No properties match your filters.
           </div>
         ) : (
           <>
@@ -178,9 +223,7 @@ const Properties = () => {
           </>
         )}
       </section>
-
     </main>
   );
 };
-
 export default Properties;

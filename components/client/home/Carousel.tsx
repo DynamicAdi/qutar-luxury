@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, Variants } from "framer-motion";
-import { fadeUp,staggerWrap,imageReveal } from "@/animations";
+import { fadeUp, staggerWrap, imageReveal } from "@/animations";
 type Testimonial = {
   id: number;
   name: string;
@@ -58,66 +58,69 @@ export default function TestimonialsSection() {
   const [active, setActive] = useState(0);
 
   return (
-    <section className="bg-[#ececec] text-black overflow-hidden">
+    <section className="bg-[#ececec] text-black overflow-x-hidden">
       <motion.div
         variants={staggerWrap}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, amount: 0.18 }}
-        className="mx-auto md:max-w-[1400px] space-y-10 px-6 py-24 md:px-10"
+        className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 md:px-10 py-16 md:py-24 space-y-10 overflow-hidden"
       >
         {/* Heading */}
         <motion.h2
           variants={fadeUp}
-          className="text-4xl font-medium tracking-tight md:text-6xl"
+          className="max-w-full break-words text-3xl sm:text-4xl md:text-6xl font-medium tracking-tight leading-tight"
         >
           Don’t Take <span className="text-black/25">Our Word for It.</span>
         </motion.h2>
 
-        <div className="grid gap-10 md:grid-cols-2">
+        {/* Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-start w-full overflow-hidden">
           {/* Image */}
           <motion.div
             variants={imageReveal}
             whileHover={{ scale: 1.015 }}
             transition={{ duration: 0.5 }}
-            className="relative max-md:max-w-sm h-[520px] overflow-hidden"
+            className="relative w-full min-w-0 h-[260px] sm:h-[360px] md:h-[520px] rounded-xl overflow-hidden"
           >
             <Image
               src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1600&auto=format&fit=crop"
               alt="Happy Clients"
               fill
-              className="object-cover transition duration-700 hover:scale-105"
+              className="object-cover"
             />
           </motion.div>
 
           {/* Right */}
           <motion.div
             variants={fadeUp}
-            className="max-w-sm md:max-w-lg justify-self-end"
+            className="w-full min-w-0 overflow-hidden"
           >
-            <div className="border-t border-black/30 pt-10" />
+            <div className="border-t border-black/30 pt-6 md:pt-10" />
 
             {/* Controls */}
-            <div className="mb-10 flex items-center gap-4 flex-wrap">
+            <div className="mb-6 md:mb-10 flex flex-wrap items-center gap-2 w-full">
               {TESTIMONIALS.map((t, index) => (
                 <button
                   key={t.id}
                   onClick={() => setActive(index)}
-                  className={`flex h-11 w-11 items-center justify-center rounded-full border text-sm transition-all duration-300 ${
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-sm transition-all ${
                     active === index
-                      ? "border-black bg-black text-white scale-105"
-                      : "border-black/20 text-black/35 hover:border-black/40 hover:text-black"
+                      ? "border-black bg-black text-white"
+                      : "border-black/20 text-black/40"
                   }`}
                 >
                   {index + 1}
                 </button>
               ))}
 
-              <span className="ml-auto text-5xl leading-none">”</span>
+              <span className="ml-auto shrink-0 text-3xl sm:text-4xl md:text-5xl leading-none">
+                ”
+              </span>
             </div>
 
-            {/* Carousel */}
-            <div className="relative overflow-hidden min-h-[260px]">
+            {/* Slider */}
+            <div className="relative w-full overflow-hidden min-h-[250px]">
               <motion.div
                 animate={{ x: `-${active * 100}%` }}
                 transition={{
@@ -130,13 +133,13 @@ export default function TestimonialsSection() {
                 {TESTIMONIALS.map((item) => (
                   <div
                     key={item.id}
-                    className="w-full shrink-0 pr-2"
+                    className="w-full min-w-full shrink-0 pr-1"
                   >
-                    <p className="max-w-xl text-xl leading-relaxed md:text-2xl">
+                    <p className="w-full break-words text-base sm:text-lg md:text-2xl leading-relaxed">
                       “{item.review}”
                     </p>
 
-                    <div className="mt-8 flex flex-wrap items-center gap-4 text-xs uppercase tracking-[0.25em] text-black/75">
+                    <div className="mt-6 flex flex-wrap gap-2 text-[10px] sm:text-xs uppercase tracking-[0.18em] text-black/75">
                       <span>{item.name}</span>
                       <span>/</span>
                       <span>{item.role}</span>
