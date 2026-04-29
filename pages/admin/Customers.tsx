@@ -55,6 +55,7 @@ import { handleKeyDown } from "@/lib/InputKeyDown";
 import { CUSTOMER_STATUS } from "@/generated/prisma/enums";
 import LoaderScreen from "@/misc/LoaderScreen";
 import { usePaginatedFetch } from "@/components/usePaginationFetch";
+import Pagination from "@/components/Pagination";
 
 export default function Customers() {
   const [openLink, setOpenLink] = useState(false);
@@ -229,7 +230,7 @@ export default function Customers() {
         actions={
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="rounded-xl bg-gradient-gold text-primary-foreground shadow-gold">
+              <Button className="rounded-xl py-5 bg-gradient-gold text-primary-foreground shadow-gold">
                 <Plus className="h-4 w-4 mr-1.5" /> Add Customer
               </Button>
             </DialogTrigger>
@@ -554,7 +555,7 @@ export default function Customers() {
         </div>
 
         {/* pagination */}
-        {pagination && pagination.totalPages > 1 && (
+        {/* {pagination && pagination.totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-4 border-t">
             <button
               onClick={prevPage}
@@ -588,7 +589,16 @@ export default function Customers() {
               Next
             </button>
           </div>
-        )}
+        )} */}
+        <Pagination
+          page={page}
+          totalPages={pagination?.totalPages ?? 0}
+          hasPrevPage={pagination?.hasPrevPage ?? false}
+          hasNextPage={pagination?.hasNextPage ?? false}
+          onPrev={prevPage}
+          onNext={nextPage}
+          onPageChange={goToPage}
+        />
       </Card>
     </>
   );

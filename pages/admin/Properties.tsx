@@ -17,6 +17,7 @@ import { PropertyCard } from "@/misc/properties/PropertiesCard";
 import { Property, PropertyCategory } from "@/store/cms";
 
 import { usePaginatedFetch } from "@/components/usePaginationFetch";
+import Pagination from "@/components/Pagination";
 
 /* ------------------------------------ */
 
@@ -159,7 +160,7 @@ export default function Properties({
             <Button
               onClick={newProperty}
               size="sm"
-              className="rounded-xl bg-primary text-primary-foreground hover:opacity-90 shadow-gold"
+              className="rounded-xl px-3 py-5 bg-primary text-primary-foreground hover:opacity-90 shadow-gold"
             >
               <Plus className="h-4 w-4 mr-1" />
               New
@@ -195,7 +196,7 @@ export default function Properties({
           >
             {data.map((item, i) => (
               <PropertyCard
-                key={item.id} 
+                key={item.id}
                 index={i}
                 p={item}
                 onEdit={() =>
@@ -208,7 +209,7 @@ export default function Properties({
           </div>
 
           {/* PAGINATION */}
-          {pagination && pagination.totalPages > 1 && (
+          {/* {pagination && pagination.totalPages > 1 && (
             <Card className="mt-4 border-0 py-0">
               <div className="flex items-center justify-between px-4 py-4">
                 <button
@@ -244,7 +245,16 @@ export default function Properties({
                 </button>
               </div>
             </Card>
-          )}
+          )} */}
+          <Pagination
+            page={page}
+            totalPages={pagination?.totalPages ?? 0}
+            hasPrevPage={pagination?.hasPrevPage ?? false}
+            hasNextPage={pagination?.hasNextPage ?? false}
+            onPrev={prevPage}
+            onNext={nextPage}
+            onPageChange={goToPage}
+          />
         </>
       )}
     </>

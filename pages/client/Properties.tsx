@@ -22,6 +22,19 @@ const Properties = () => {
 
   const category = searchParams?.get("type") ?? "ALL";
 
+  const priceMinParam = searchParams?.get("priceMin");
+  const priceMaxParam = searchParams?.get("priceMax");
+
+  const priceMin =
+    priceMinParam && Number.isInteger(Number(priceMinParam))
+      ? Number(priceMinParam)
+      : PRICE_FLOOR;
+
+  const priceMax =
+    priceMaxParam && Number.isInteger(Number(priceMaxParam))
+      ? Number(priceMaxParam)
+      : PRICE_CEIL;
+
   const parts = location
     .split(",")
     .map((item) => item.trim())
@@ -48,8 +61,8 @@ const Properties = () => {
     state,
     city,
     street,
-    priceMin: PRICE_FLOOR,
-    priceMax: PRICE_CEIL,
+    priceMin: priceMin,
+    priceMax: priceMax,
   });
 
   const [data, setData] = useState<Property[]>([]);

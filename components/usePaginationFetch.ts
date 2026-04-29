@@ -30,7 +30,7 @@ type UsePaginatedFetchOptions<T> = {
   transform?: (data: any) => T[];
 };
 
-export function usePaginatedFetch<T = any>({
+export function usePaginatedFetch<T>({
   url,
   limit = 10,
   initialPage = 1,

@@ -16,6 +16,7 @@ import axios from "axios";
 import AddressDialog from "@/misc/AddressDialog";
 import LoaderScreen from "@/misc/LoaderScreen";
 import { usePaginatedFetch } from "@/components/usePaginationFetch";
+import Pagination from "@/components/Pagination";
 
 export default function Addresses() {
   const navigate = useRouter();
@@ -140,7 +141,7 @@ export default function Addresses() {
             <Button
               onClick={openNew}
               size="default"
-              className="rounded-lg px-4 pb-0.5 bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold"
+              className="rounded-lg px-4 pb-0.5 py-5 bg-gradient-gold text-primary-foreground hover:opacity-90 shadow-gold"
             >
               <Plus className="h-4 w-4 mr-1" />
               New Address
@@ -230,8 +231,16 @@ export default function Addresses() {
         </div>
 
         {/* pagination */}
-
-        {pagination && pagination.totalPages > 1 && (
+        <Pagination
+          page={page}
+          totalPages={pagination?.totalPages ?? 0}
+          hasPrevPage={pagination?.hasPrevPage ?? false}
+          hasNextPage={pagination?.hasNextPage ?? false}
+          onPrev={prevPage}
+          onNext={nextPage}
+          onPageChange={goToPage}
+        />
+        {/* {pagination && pagination.totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-4 border-t">
             <button
               onClick={prevPage}
@@ -263,7 +272,7 @@ export default function Addresses() {
               Next
             </button>
           </div>
-        )}
+        )} */}
       </Card>
 
       <AddressDialog

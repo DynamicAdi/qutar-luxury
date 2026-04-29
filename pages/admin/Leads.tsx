@@ -37,6 +37,7 @@ import axios from "axios";
 import { Field } from "@/components/ui/field";
 import LoaderScreen from "@/misc/LoaderScreen";
 import { usePaginatedFetch } from "@/components/usePaginationFetch";
+import Pagination from "@/components/Pagination";
 
 const statusStyle: Record<Lead["status"], string> = {
   NEW: "bg-primary/10 text-primary-deep border-primary/30",
@@ -329,7 +330,7 @@ export default function Leads() {
         </div>
 
         {/* Pagination */}
-        {pagination && pagination.totalPages > 1 && (
+        {/* {pagination && pagination.totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-4 border-t">
             <button
               onClick={prevPage}
@@ -361,7 +362,16 @@ export default function Leads() {
               Next
             </button>
           </div>
-        )}
+        )} */}
+        <Pagination
+          page={page}
+          totalPages={pagination?.totalPages ?? 0}
+          hasPrevPage={pagination?.hasPrevPage ?? false}
+          hasNextPage={pagination?.hasNextPage ?? false}
+          onPrev={prevPage}
+          onNext={nextPage}
+          onPageChange={goToPage}
+        />
       </Card>
 
       <ConvertDialog lead={convertLead} onClose={() => setConvertLead(null)} />

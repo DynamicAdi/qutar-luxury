@@ -11,7 +11,9 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-
+import { formatQAR } from "@/lib/properties";
+const PRICE_FLOOR = 0;
+const PRICE_CEIL = 50_000_000;
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -22,16 +24,15 @@ export default function Hero() {
   const fillTextRef = useRef<HTMLHeadingElement>(null);
   const smokeRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const filters = [
-    "ALL",
-    "BUY",
-    "RENT",
-    "SELL",
-    "PLOTS",
-    "RESIDENTIAL",
-    "COMMERCIAL",
-  ];
-  const [type, setType] = useState("ALL");
+  const filters = ["BUY", "RENT", "SELL"];
+  const [type, setType] = useState("BUY");
+  const [priceRange, setPriceRange] = useState({
+    priceMin: PRICE_FLOOR,
+    priceMax: PRICE_CEIL,
+  });
+
+  const pct = (value: number) =>
+    ((value - PRICE_FLOOR) / (PRICE_CEIL - PRICE_FLOOR)) * 100;
   const [location, setLocation] = useState("");
   const [placeData, setPlaceData] = useState<
     Record<string, Record<string, string[]>>
@@ -199,9 +200,8 @@ export default function Hero() {
     const query = location.toLowerCase().trim();
 
     const matched: string[] = [];
-
     Object.entries(placeData).forEach(([state, cities]) => {
-      // Match state
+
       if (state.toLowerCase().includes(query)) {
         matched.push(state);
       }
@@ -224,7 +224,7 @@ export default function Hero() {
     return [...new Set(matched)].slice(0, 6);
   }, [location, placeData]);
   const handleSearch = () => {
-    router.push(`/properties?type=${type}&location=${location}`);
+    router.push(`/properties?type=${type}&location=${location}&priceMin=${priceRange.priceMin}&priceMax=${priceRange.priceMax}`);
   };
   return (
     <section
@@ -267,47 +267,158 @@ export default function Hero() {
             type="single"
             value={type}
             onValueChange={(val) => val && setType(val)}
-            className="flex flex-wrap gap-2 bg-white p-2 rounded-xl"
+            className="flex w-full gap-2 bg-white p-2 rounded-full"
           >
             {filters.map((item) => (
               <ToggleGroupItem
                 key={item}
                 value={item}
-                className="flex-1 min-w-[110px] bg-white"
+                className="flex-1 min-w-[130px] bg-white first:rounded-l-full! last:rounded-r-full!"
               >
                 {item}
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
+          <div className="w-full rounded-3xl border border-white/40 bg-white p-5 backdrop-blur-xl shadow-xl">
+            <div className="flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-muted-foreground">
+                    Price Range
+                  </p>
+                  <h3 className="text-lg font-semibold tracking-tight">
+                    Find within budget
+                  </h3>
+                </div>
 
-          {/* Search */}
-          <div className="relative">
-            <div className="flex flex-col sm:flex-row gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-
-                <Input
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Search by location..."
-                  className="pl-9 py-6 bg-white border-none"
-                />
+                <div className="rounded-2xl px-3 py-2 text-right">
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                    Selected
+                  </p>
+                  <p className="text-sm font-semibold text-emerald-800">
+                    {formatQAR(priceRange.priceMin)} —{" "}
+                    {priceRange.priceMax >= PRICE_CEIL
+                      ? `${formatQAR(PRICE_CEIL)}+`
+                      : formatQAR(priceRange.priceMax)}
+                  </p>
+                </div>
               </div>
 
-              <Button onClick={handleSearch} className="px-8 py-6">
+              {/* Slider */}
+              <div className="pt-1">
+                <div className="relative h-10">
+                  {/* base track */}
+                  <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1.5 rounded-full bg-secondary" />
+
+                  {/* active track */}
+                  <div
+                    className="absolute top-1/2 -translate-y-1/2 h-1.5 rounded-full bg-emerald-800"
+                    style={{
+                      left: `${pct(priceRange.priceMin)}%`,
+                      right: `${100 - pct(priceRange.priceMax)}%`,
+                    }}
+                  />
+
+                  {/* Min slider */}
+                  <input
+                    type="range"
+                    min={PRICE_FLOOR}
+                    max={PRICE_CEIL}
+                    step={100000}
+                    value={priceRange.priceMin}
+                    onChange={(e) => {
+                      const v = Math.min(
+                        Number(e.target.value),
+                        priceRange.priceMax - 100000
+                      );
+
+                      setPriceRange((prev) => ({
+                        ...prev,
+                        priceMin: v,
+                      }));
+                    }}
+                    className="absolute inset-0 w-full appearance-none bg-transparent pointer-events-none
+          [&::-webkit-slider-thumb]:pointer-events-auto
+          [&::-webkit-slider-thumb]:appearance-none
+          [&::-webkit-slider-thumb]:h-5
+          [&::-webkit-slider-thumb]:w-5
+          [&::-webkit-slider-thumb]:rounded-full
+          [&::-webkit-slider-thumb]:bg-emerald-800
+          [&::-webkit-slider-thumb]:border-2
+          [&::-webkit-slider-thumb]:border-white
+          [&::-webkit-slider-thumb]:shadow-lg
+          [&::-webkit-slider-thumb]:cursor-pointer"
+                  />
+
+                  {/* Max slider */}
+                  <input
+                    type="range"
+                    min={PRICE_FLOOR}
+                    max={PRICE_CEIL}
+                    step={100000}
+                    value={priceRange.priceMax}
+                    onChange={(e) => {
+                      const v = Math.max(
+                        Number(e.target.value),
+                        priceRange.priceMin + 100000
+                      );
+
+                      setPriceRange((prev) => ({
+                        ...prev,
+                        priceMax: v,
+                      }));
+                    }}
+                    className="absolute inset-0 w-full appearance-none bg-transparent pointer-events-none
+          [&::-webkit-slider-thumb]:pointer-events-auto
+          [&::-webkit-slider-thumb]:appearance-none
+          [&::-webkit-slider-thumb]:h-5
+          [&::-webkit-slider-thumb]:w-5
+          [&::-webkit-slider-thumb]:rounded-full
+          [&::-webkit-slider-thumb]:bg-amber-400
+          [&::-webkit-slider-thumb]:border-2
+          [&::-webkit-slider-thumb]:border-white
+          [&::-webkit-slider-thumb]:shadow-lg
+          [&::-webkit-slider-thumb]:cursor-pointer"
+                  />
+                </div>
+
+                {/* Bottom labels */}
+                <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{formatQAR(PRICE_FLOOR)}</span>
+                  <span>{formatQAR(PRICE_CEIL)}+</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Search */}
+          <div className="relative">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+
+              <Input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Search by location..."
+                className="h-14 w-full rounded-full border border-gray-200 bg-white pl-11 pr-32 shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20"
+              />
+
+              <Button
+                onClick={handleSearch}
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-10 rounded-xl px-5 shadow-sm"
+              >
                 Search
               </Button>
             </div>
 
-            {/* Suggestions */}
-            {(location.trim()) && (
-              <Card className="absolute top-full mt-2 w-full z-50 bg-white shadow-xl border rounded-xl p-2">
+            {location.trim() && (
+              <Card className="absolute top-full mt-2 w-full z-50 overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-xl">
                 {loadingPlaces ? (
                   <div className="space-y-2">
                     {[1, 2, 3].map((item) => (
                       <div
                         key={item}
-                        className="h-10 w-full rounded-lg animate-pulse bg-muted"
+                        className="h-11 w-full animate-pulse rounded-xl bg-muted"
                       />
                     ))}
                   </div>
@@ -317,15 +428,20 @@ export default function Hero() {
                       <button
                         key={item}
                         onClick={() => setLocation(item)}
-                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted text-left"
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors hover:bg-muted"
                       >
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span>{item}</span>
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                        </div>
+
+                        <span className="text-sm font-medium text-foreground">
+                          {item}
+                        </span>
                       </button>
                     ))}
                   </div>
                 ) : (
-                  <div className="px-3 py-3 text-sm text-muted-foreground text-center">
+                  <div className="px-3 py-4 text-center text-sm text-muted-foreground">
                     No locations found
                   </div>
                 )}

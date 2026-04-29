@@ -12,16 +12,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-import {
-  Search,
-  Plus,
-  ChevronRight,
-} from "lucide-react";
+import { Search, Plus, ChevronRight } from "lucide-react";
 
 import { toast } from "sonner";
 import { AgentEntry } from "@/store/cms";
 import LoaderScreen from "@/misc/LoaderScreen";
 import AgentDialog from "@/misc/AgentDialog";
+import Pagination from "@/components/Pagination";
 
 export default function Agents() {
   const navigate = useRouter();
@@ -140,7 +137,7 @@ export default function Agents() {
             <Button
               onClick={openNew}
               size="sm"
-              className="rounded-lg bg-gradient-gold py-1 px-4 text-primary-foreground hover:opacity-90"
+              className="rounded-lg bg-gradient-gold py-5 px-4 text-primary-foreground hover:opacity-90"
             >
               <Plus className="h-4 w-4 mr-1" />
               New Agent
@@ -182,9 +179,7 @@ export default function Agents() {
               {data.map((a, i) => (
                 <tr
                   key={a.id}
-                  onClick={() =>
-                    navigate.push(`/dashboard/agents/${a.id}`)
-                  }
+                  onClick={() => navigate.push(`/dashboard/agents/${a.id}`)}
                   className="border-t border-border hover:bg-secondary/40 cursor-pointer transition-colors animate-fade-in-up"
                   style={{ animationDelay: `${i * 30}ms` }}
                 >
@@ -213,10 +208,7 @@ export default function Agents() {
                   </td>
 
                   <td className="px-4 py-3.5 text-right">
-                    <Badge
-                      variant="secondary"
-                      className="rounded-md"
-                    >
+                    <Badge variant="secondary" className="rounded-md">
                       {a._count?.properties}
                     </Badge>
                   </td>
@@ -231,7 +223,7 @@ export default function Agents() {
         </div>
 
         {/* PAGINATION */}
-        {pagination && pagination.totalPages > 1 && (
+        {/* {pagination && pagination.totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-4 border-t">
             <button
               onClick={prevPage}
@@ -265,7 +257,16 @@ export default function Agents() {
               Next
             </button>
           </div>
-        )}
+        )} */}
+        <Pagination
+          page={page}
+          totalPages={pagination?.totalPages ?? 0}
+          hasPrevPage={pagination?.hasPrevPage ?? false}
+          hasNextPage={pagination?.hasNextPage ?? false}
+          onPrev={prevPage}
+          onNext={nextPage}
+          onPageChange={goToPage}
+        />
       </Card>
 
       <AgentDialog
