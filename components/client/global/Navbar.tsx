@@ -69,7 +69,7 @@ export default function Navbar() {
           scrolled ? "bg-white dark:bg-black shadow-sm" : "bg-transparent"
         )}
       >
-        <div className="max-w-7xl mx-auto px-2 py-2">
+        <div className="max-w-9xl md:px-14 px-4 py-2">
           {/* TOP BAR */}
           <div className="flex items-center justify-between">
             {/* Logo */}
@@ -103,7 +103,7 @@ export default function Navbar() {
             </div>
 
             {/* Desktop CTA */}
-            <motion.div
+            {/* <motion.div
               initial={initial}
               animate={animated}
               transition={{ duration: 1, delay: 0.7 }}
@@ -118,7 +118,7 @@ export default function Navbar() {
               >
                 Sign in
               </Button>
-            </motion.div>
+            </motion.div> */}
 
             {/* Mobile Menu Button */}
             <button
@@ -154,7 +154,7 @@ export default function Navbar() {
                     ))}
                   </div>
 
-                  <div className="mt-auto pt-6">
+                  {/* <div className="mt-auto pt-6">
                     <Button
                       onClick={() => {
                         router.push("/login");
@@ -163,7 +163,7 @@ export default function Navbar() {
                     >
                       Sign in
                     </Button>
-                  </div>
+                  </div> */}
                 </div>
               </motion.div>
             )}
