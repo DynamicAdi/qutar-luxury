@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { ArrowRight, MapPin, Search } from "lucide-react";
+import { ArrowRight, LucideArrowRightCircle, MapPin, Search } from "lucide-react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import LineRevealOnScroll from "@/components/LineReveal";
 import { Button } from "@/components/ui/button";
@@ -261,7 +261,8 @@ export default function Hero() {
         {/* <Button className="mt-8 inline-flex items-center gap-4 rounded-full bg-[#161819] px-6 py-5 text-md font-medium text-white">
           Find Properties <ArrowRight size={20} />
         </Button> */}
-        <div className="w-full space-y-4 max-w-2xl mt-8">
+    
+        <div className="w-full space-y-4 max-w-2xl mt-14">
           {/* Tabs */}
           <ToggleGroup
             type="single"
@@ -273,24 +274,19 @@ export default function Hero() {
               <ToggleGroupItem
                 key={item}
                 value={item}
-                className="flex-1 min-w-[130px] bg-white first:rounded-l-full! last:rounded-r-full!"
+                className="flex-1 min-w-[130px] bg-white rounded-full!"
               >
                 {item}
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
-          <div className="w-full rounded-3xl border border-white/40 bg-white p-5 backdrop-blur-xl shadow-xl">
+          <div className="w-full rounded-3xl border border-white/40 bg-white p-5 py-2 pb-3 backdrop-blur-xl shadow-xl">
             <div className="flex flex-col">
               {/* Header */}
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-muted-foreground">
-                    Price Range
-                  </p>
+              <div className="flex items-end justify-between gap-3">
                   <h3 className="text-lg font-semibold tracking-tight">
                     Find within budget
                   </h3>
-                </div>
 
                 <div className="rounded-2xl px-3 py-2 text-right">
                   <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -405,9 +401,9 @@ export default function Hero() {
 
               <Button
                 onClick={handleSearch}
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-10 rounded-xl px-5 shadow-sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-10 rounded-full text-base px-5 shadow-sm"
               >
-                Search
+                Explore <LucideArrowRightCircle size={14} />
               </Button>
             </div>
 
