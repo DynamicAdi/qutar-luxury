@@ -24,7 +24,7 @@ import { uploadFile } from "@/lib/uploadImage";
 const blank = (id: string, category: PropertyCategory): Property => ({
   id,
   title: "",
-  category,
+  category: "BUY",
   price: 0,
   currency: "QAR",
   addressId: "",
@@ -47,6 +47,8 @@ const blank = (id: string, category: PropertyCategory): Property => ({
   status: "AVAILABLE",
   createdAt: new Date().toISOString(),
   propertyType: "BUILDING",
+  featured: false,
+  targetType: "PROPERTY"
 });
 
 export default function PropertyEdit({
@@ -58,16 +60,21 @@ export default function PropertyEdit({
 }>) {
   const navigate = useRouter();
   const existing = id !== "new" ? true : false;
-
   const [deleteProcess, startProcess] = useTransition();
   const [p, setP] = useState<Property>(blank(id, search));
   const [thread, startThread] = useTransition();
   const [load, startLoad] = useTransition();
 
+  const handleFeaturedToggle = (checked: boolean) => {
+    setP((prev) => ({
+      ...prev,
+      featured: checked,
+    }));
+  };
   const fetchData = (id: string) =>
     startLoad(async () => {
       const req = await axios.get(
-        `/api/properties?id=${id}&details=${Boolean("true")}`,
+        `/api/properties?id=${id}&details=${Boolean("true")}`
       );
       if (req.status === 200) {
         console.log(req.data);
@@ -119,6 +126,8 @@ export default function PropertyEdit({
     yearBuilt: p.yearBuilt,
     addressId: p.addressId,
     agentIds: p.agentIds,
+    featured: p.featured,
+    targetType: p.targetType
   };
 
   type ImageInput = string | File;
@@ -132,7 +141,7 @@ export default function PropertyEdit({
       (p.images || []).map(async (img) => {
         if (typeof img === "string") return img;
         return await uploadFile(img);
-      }),
+      })
     );
 
     // Process single PNG image
@@ -282,7 +291,7 @@ export default function PropertyEdit({
                   >
                     {t}
                   </TabsTrigger>
-                ),
+                )
               )}
             </TabsList>
 
@@ -355,19 +364,34 @@ export default function PropertyEdit({
             </div>
             <Switch checked={!p.isHidden} onCheckedChange={onToggleHide} />
           </div>
+          {/* Featured Toggle */}
+          <div className="flex px-4 items-center justify-between">
+            <div>
+              <div className="text-sm font-medium">Feature Property</div>
+              <div className="text-xs text-muted-foreground">
+                Highlight this property on homepage
+              </div>
+            </div>
+
+            <Switch
+              checked={p.featured}
+              onCheckedChange={handleFeaturedToggle}
+            />
+          </div>
           {existing && (
             <div className="flex items-center justify-between px-4 pt-4 border-t border-gray-300">
               <div>
                 <div className="font-medium text-sm">Delete the Project</div>
               </div>
-              {
-                deleteProcess ? <Loader size={16} className="animate-spin"/> : 
-              <Trash2
-              size={16}
-              className="text-red-400 cursor-pointer"
-              onClick={onDelete}
-              />
-            }
+              {deleteProcess ? (
+                <Loader size={16} className="animate-spin" />
+              ) : (
+                <Trash2
+                  size={16}
+                  className="text-red-400 cursor-pointer"
+                  onClick={onDelete}
+                />
+              )}
             </div>
           )}
         </div>

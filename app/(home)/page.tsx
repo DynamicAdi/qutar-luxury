@@ -8,11 +8,13 @@ import Carousel from "@/components/client/home/Carousel";
 import Services from "@/components/client/home/Services";
 import BlogsAndResourcesSection from "@/components/client/home/BlogsAndResources";
 import CTA from "@/components/client/home/CTA";
+import CTAToExplore from "@/components/CTAToExplore";
 
 export default function Home() {
   return (
    <div className="grid">
     <Hero/>
+    <CTAToExplore />
     <WhyFind/>
     <RealEstateRewired/>
     <ForAgents/>

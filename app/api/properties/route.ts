@@ -159,7 +159,7 @@ export async function POST(req: NextRequest) {
       status = "AVAILABLE",
       price,
       Area,
-
+      featured,
       pngImage,
       propertyType,
       BedRooms = 0,
@@ -169,6 +169,7 @@ export async function POST(req: NextRequest) {
       HoaFees = 0,
       yearBuilt,
       NearByLocations,
+      targetType,
       addressId,
       agentIds = [],
     } = body;
@@ -196,14 +197,14 @@ export async function POST(req: NextRequest) {
         propertyType,
         price,
         Area,
-
+        featured,
         BedRooms,
         Bathrooms,
         parking,
         furnishing,
         HoaFees,
         yearBuilt,
-
+        targetType,
         // connect address
         address: {
           connect: {
@@ -261,7 +262,7 @@ export async function PUT(req: NextRequest) {
       status,
       price,
       Area,
-
+      featured,
       pngImage,
       propertyType,
       NearByLocations,
@@ -271,7 +272,7 @@ export async function PUT(req: NextRequest) {
       furnishing,
       HoaFees,
       yearBuilt,
-
+      targetType,
       addressId,
       agentIds = [],
 
@@ -309,8 +310,7 @@ export async function PUT(req: NextRequest) {
         ...(youtubeLink !== undefined && { youtubeLink }),
         ...(amenities !== undefined && { amenities }),
         ...(features !== undefined && { features }),
-        ...(isHidden !== undefined && { isHidden }),
-
+        isHidden: isHidden ?? false,
         ...(category !== undefined && {
           category: category as PROPERTY_TYPE,
         }),
@@ -331,6 +331,7 @@ export async function PUT(req: NextRequest) {
         ...(HoaFees !== undefined && { HoaFees }),
         ...(yearBuilt !== undefined && { yearBuilt }),
         ...(NearByLocations !== undefined && {NearByLocations}),
+        ...(targetType !== undefined && {targetType}),
         // update address relation
         ...(addressId && {
           address: {
@@ -339,7 +340,7 @@ export async function PUT(req: NextRequest) {
             },
           },
         }),
-
+        ...(featured !== undefined && {featured}),
         ...(agentIds && {
           agent: {
             connect: agentIds.map((agentId: string) => ({

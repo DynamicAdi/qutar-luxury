@@ -3,6 +3,12 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import useZoomScroll, { fadeUp, stagger } from "@/animations";
+import { useEffect } from "react";
+import useSWR from "swr";
+import { fetcher } from "@/lib/fetcher";
+import PropertyCard from "@/components/client/properties/PropertyCard";
+import { Property } from "@/store/cms";
+import SimplePropertyCard from "../properties/SimplePropertyCard";
 const CONTENT = [
   {
     image:
@@ -17,12 +23,36 @@ const CONTENT = [
     desc: "Every next chapter begins with the right foundation.",
   },
 ];
+const options = {
+  revalidateOnFocus: false,
+  dedupingInterval: 15000,
+};
 export default function WhyFindSection() {
   const containerRef = useZoomScroll();
+  const {
+    data,
+    error,
+    isLoading: propertiesLoading,
+  } = useSWR<{ data: Property[] }>(
+    "/api/featured?targetType=PROPERTY",
+    fetcher,
+    options
+  );
+  const featuredProperties = data?.data ?? [];
+  const {
+    data: projectsData,
+    error: projectsError,
+    isLoading: projectsLoading,
+  } = useSWR<{ data: Property[] }>(
+    "/api/featured?targetType=PROJECT",
+    fetcher,
+    options
+  );
+  const featuredProjects = projectsData?.data ?? [];
   return (
     <div className="grid">
       {/* SECTION 1 */}
-      <section className="px-6 py-20 md:px-10 lg:px-16 xl:px-24 overflow-hidden">
+      <section className="overflow-hidden px-6 py-20 md:px-10 lg:px-16 xl:px-24">
         <div className="grid gap-12 lg:grid-cols-[0.42fr_1fr]">
           {/* Left Label */}
           <motion.div
@@ -31,8 +61,8 @@ export default function WhyFindSection() {
             whileInView="show"
             viewport={{ once: true, amount: 0.6 }}
           >
-            <p className="text-2xl md:text-sm font-semibold uppercase text-black">
-              Why QLP
+            <p className="text-2xl font-semibold uppercase text-black md:text-sm">
+              Featured Properties
             </p>
           </motion.div>
 
@@ -42,77 +72,110 @@ export default function WhyFindSection() {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true, amount: 0.35 }}
-            className="max-w-xl ml-auto"
+            className="ml-auto max-w-xl"
           >
-            <h2 className="text-4xl font-medium leading-[1.02] tracking-tight text-black md:text-6xl lg:text-4xl">
-              Your life’s changing. Don’t just find a place — find what’s next.{" "}
+            <h2 className="text-2xl font-medium leading-[1.02] tracking-tight text-black md:text-6xl lg:text-3xl">
+              Featured properties curated for your next chapter.{" "}
               <span className="text-black/22">
-                We help you move forward with clarity, confidence, and the right
-                agent by your side.
+                Explore premium homes, high-potential investments, and standout
+                listings carefully selected to help you buy, invest, or move
+                with confidence.
               </span>
             </h2>
           </motion.div>
         </div>
-
-        {/* Large Image */}
+        {/* Property Cards */}
         <motion.div
-          initial={{ opacity: 0, scale: 1.08, y: 60 }}
+          initial={{ opacity: 0, y: 60 }}
           whileInView={{
             opacity: 1,
-            scale: 1,
             y: 0,
             transition: {
-              duration: 1.3,
+              duration: 1,
               ease: [0.22, 1, 0.36, 1],
             },
           }}
-          viewport={{ once: true, amount: 0.3 }}
-          className="relative mt-16 h-[320px] overflow-hidden md:h-[520px] lg:h-[680px]"
+          viewport={{ once: true, amount: 0.2 }}
+          className="mt-16 grid gap-6 sm:grid-cols-2 xl:grid-cols-3"
         >
-          <Image
-            src="https://images.unsplash.com/photo-1499092346589-b9b6be3e94b2?q=80&w=1800&auto=format&fit=crop"
-            alt="New York skyline"
-            fill
-            className="object-cover"
-            priority
-          />
+          {/* Loading */}
+          {propertiesLoading &&
+            Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="overflow-hidden rounded-3xl border border-zinc-200 bg-white"
+              >
+                <div className="h-[240px] animate-pulse bg-zinc-100" />
+                <div className="space-y-3 p-5">
+                  <div className="h-5 w-2/3 animate-pulse rounded bg-zinc-100" />
+                  <div className="h-4 w-full animate-pulse rounded bg-zinc-100" />
+                  <div className="h-4 w-4/5 animate-pulse rounded bg-zinc-100" />
+                  <div className="mt-4 h-10 animate-pulse rounded-xl bg-zinc-100" />
+                </div>
+              </div>
+            ))}
+
+          {/* Error */}
+          {!propertiesLoading && error && (
+            <div className="col-span-full rounded-3xl border border-red-200 bg-red-50 px-6 py-12 text-center">
+              <p className="text-lg font-semibold text-red-700">
+                Failed to load featured properties
+              </p>
+              <p className="mt-2 text-sm text-red-500">
+                Please try again in a moment.
+              </p>
+            </div>
+          )}
+
+          {/* Empty */}
+          {!propertiesLoading && !error && featuredProperties.length === 0 && (
+            <div className="col-span-full rounded-3xl border border-zinc-200 bg-zinc-50 px-6 py-12 text-center">
+              <p className="text-lg font-semibold text-black">
+                No featured properties available
+              </p>
+              <p className="mt-2 text-sm text-zinc-500">
+                Check back soon for new listings.
+              </p>
+            </div>
+          )}
+
+          {/* Data */}
+          {!propertiesLoading &&
+            !error &&
+            featuredProperties.map((property, index) => (
+              <motion.div
+                key={property.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.55,
+                  delay: index * 0.06,
+                }}
+                viewport={{ once: true }}
+              >
+                <PropertyCard index={index} property={property} />
+              </motion.div>
+            ))}
         </motion.div>
       </section>
 
       {/* SECTION 2 */}
       <section ref={containerRef} className="bg-black">
-        {CONTENT.map((item, index) => (
-          <div
-            key={index}
-            className="zoom-card relative h-screen w-full overflow-hidden"
-          >
-            <div className="zoom-image absolute inset-0">
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                className="object-cover"
-                priority={index === 0}
-              />
-            </div>
+        <FirstSection
+          data={featuredProjects}
+          loading={projectsLoading}
+          error={projectsError}
+          index={1}
+          item={CONTENT[0]}
+        />
 
-            <div className="zoom-overlay absolute inset-0 z-10 flex items-center justify-center px-6">
-              <div className="max-w-3xl text-center text-white">
-                <p className="mb-4 text-sm uppercase tracking-[0.35em] text-white/70">
-                  Chapter {index + 1}
-                </p>
-
-                <h2 className="text-5xl font-semibold md:text-7xl">
-                  {item.title}
-                </h2>
-
-                <p className="mt-6 text-lg text-white/80 md:text-xl">
-                  {item.desc}
-                </p>
-              </div>
-            </div>
-          </div>
-        ))}
+        <SecondSection
+          data={featuredProjects}
+          loading={projectsLoading}
+          error={projectsError}
+          index={2}
+          item={CONTENT[1]}
+        />
       </section>
 
       {/* SECTION 3 */}
@@ -213,6 +276,133 @@ export default function WhyFindSection() {
           </p>
         </motion.div>
       </section>
+    </div>
+  );
+}
+
+interface Props {
+  index: number;
+  item: any;
+  data: Property[];
+  error: string;
+  loading: boolean;
+}
+function FirstSection({ index, item, data, error, loading }: Props) {
+  return (
+    <div
+      key={index}
+      className="zoom-card relative h-screen w-full overflow-hidden"
+    >
+      <div className="zoom-image absolute inset-0">
+        <Image
+          src={item.image}
+          alt={item.title}
+          fill
+          className="object-cover"
+          priority={index === 0}
+        />
+      </div>
+
+      <div className="zoom-overlay absolute inset-0 z-10 flex items-center justify-center px-6">
+        <section className="max-w-[1600px] px-6 md:px-10 lg:px-10 w-full">
+          <div className="mx-auto">
+            <div className="mb-12 text-center">
+              <p className="mb-3 text-sm font-medium uppercase tracking-[0.3em] text-zinc-400">
+                Featured Projects
+              </p>
+
+              <h2 className="text-4xl font-medium tracking-tight text-zinc-300 md:text-5xl">
+                Landmark developments worth your attention
+              </h2>
+            </div>
+
+            {loading ? (
+              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-[420px] animate-pulse rounded-3xl bg-zinc-100"
+                  />
+                ))}
+              </div>
+            ) : error ? (
+              <div className="rounded-3xl border border-red-200 bg-red-50 p-6 text-center text-red-600">
+                Failed to load featured projects.
+              </div>
+            ) : data.length === 0 ? (
+              <div className="rounded-3xl border border-zinc-200 bg-white p-10 text-center text-zinc-500">
+                No featured projects available right now.
+              </div>
+            ) : (
+              <div className="grid w-full gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {data.map((project: Property) => (
+                  <PropertyCard key={project.id} property={project} />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function SecondSection({ index, item, data, error, loading }: Props) {
+  return (
+    <div
+      key={index}
+      className="zoom-card relative h-screen w-full overflow-hidden"
+    >
+      <div className="zoom-image absolute inset-0">
+        <Image
+          src={item.image}
+          alt={item.title}
+          fill
+          className="object-cover"
+          priority={index === 0}
+        />
+      </div>
+
+      <div className="zoom-overlay absolute inset-0 z-10 flex items-center justify-center px-6">
+        <section className="max-w-[1600px] px-6 md:px-10 lg:px-10 w-full">
+          <div className="mx-auto">
+            <div className="mb-12 text-center">
+              <p className="mb-3 text-sm font-medium uppercase tracking-[0.3em] text-zinc-900">
+                Featured Listings
+              </p>
+
+              <h2 className="text-4xl font-medium tracking-tight text-zinc-800 md:text-5xl">
+                Landmark developments worth your attention
+              </h2>
+            </div>
+
+            {loading ? (
+              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-[420px] animate-pulse rounded-3xl bg-zinc-100"
+                  />
+                ))}
+              </div>
+            ) : error ? (
+              <div className="rounded-3xl border border-red-200 bg-red-50 p-6 text-center text-red-600">
+                Failed to load featured projects.
+              </div>
+            ) : data.length === 0 ? (
+              <div className="rounded-3xl border border-zinc-200 bg-white p-10 text-center text-zinc-500">
+                No featured projects available right now.
+              </div>
+            ) : (
+              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {data.map((project: Property) => (
+                  <SimplePropertyCard key={project.id} property={project} />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

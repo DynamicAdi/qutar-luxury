@@ -2,7 +2,12 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { ArrowRight, LucideArrowRightCircle, MapPin, Search } from "lucide-react";
+import {
+  ArrowRight,
+  LucideArrowRightCircle,
+  MapPin,
+  Search,
+} from "lucide-react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import LineRevealOnScroll from "@/components/LineReveal";
 import { Button } from "@/components/ui/button";
@@ -24,7 +29,7 @@ export default function Hero() {
   const fillTextRef = useRef<HTMLHeadingElement>(null);
   const smokeRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const filters = ["BUY", "RENT", "SELL"];
+  const filters = ["COMMERCIAL", "RESIDENTIAL", "BUY", "RENT", "SELL"];
   const [type, setType] = useState("BUY");
   const [priceRange, setPriceRange] = useState({
     priceMin: PRICE_FLOOR,
@@ -171,7 +176,7 @@ export default function Hero() {
           0.82
         )
         .to(smokeRef.current, {
-          height: 520, // grows taller slowly
+          height: 400, // grows taller slowly
           ease: "none",
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -201,7 +206,6 @@ export default function Hero() {
 
     const matched: string[] = [];
     Object.entries(placeData).forEach(([state, cities]) => {
-
       if (state.toLowerCase().includes(query)) {
         matched.push(state);
       }
@@ -224,7 +228,9 @@ export default function Hero() {
     return [...new Set(matched)].slice(0, 6);
   }, [location, placeData]);
   const handleSearch = () => {
-    router.push(`/properties?type=${type}&location=${location}&priceMin=${priceRange.priceMin}&priceMax=${priceRange.priceMax}`);
+    router.push(
+      `/properties?type=${type}&location=${location}&priceMin=${priceRange.priceMin}&priceMax=${priceRange.priceMax}`
+    );
   };
   return (
     <section
@@ -261,20 +267,30 @@ export default function Hero() {
         {/* <Button className="mt-8 inline-flex items-center gap-4 rounded-full bg-[#161819] px-6 py-5 text-md font-medium text-white">
           Find Properties <ArrowRight size={20} />
         </Button> */}
-    
+
         <div className="w-full space-y-4 max-w-2xl mt-14">
           {/* Tabs */}
           <ToggleGroup
             type="single"
             value={type}
             onValueChange={(val) => val && setType(val)}
-            className="flex w-full gap-2 bg-white p-2 rounded-full"
+            className="grid w-full grid-cols-2 md:grid-cols-6 gap-3 bg-background p-3 rounded-3xl shadow-sm"
           >
-            {filters.map((item) => (
+            {filters.map((item,index) => (
               <ToggleGroupItem
                 key={item}
                 value={item}
-                className="flex-1 min-w-[130px] bg-white rounded-full!"
+                className={`
+        h-10 w-full rounded-full! border border-transparent
+        bg-white text-sm font-medium text-zinc-700
+        transition-all duration-200
+        hover:bg-zinc-50 hover:border-zinc-200
+        data-[state=on]:bg-emerald-800
+        data-[state=on]:text-white
+        data-[state=on]:shadow-md
+        data-[state=on]:border-black
+        ${index<2 ? "col-span-3":"col-span-2"}        
+        `}
               >
                 {item}
               </ToggleGroupItem>
@@ -284,9 +300,9 @@ export default function Hero() {
             <div className="flex flex-col">
               {/* Header */}
               <div className="flex items-end justify-between gap-3">
-                  <h3 className="text-lg font-semibold tracking-tight">
-                    Find within budget
-                  </h3>
+                <h3 className="text-lg font-semibold tracking-tight">
+                  Find within budget
+                </h3>
 
                 <div className="rounded-2xl px-3 py-2 text-right">
                   <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -380,10 +396,10 @@ export default function Hero() {
                 </div>
 
                 {/* Bottom labels */}
-                <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                {/* <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
                   <span>{formatQAR(PRICE_FLOOR)}</span>
                   <span>{formatQAR(PRICE_CEIL)}+</span>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -477,7 +493,7 @@ export default function Hero() {
               WebkitTextStroke: "2px #111",
             }}
           >
-            LUXURY PROPERTY
+            QUATAR LUXURY PROPERTIES
           </h2>
 
           {/* Fill */}
@@ -493,7 +509,7 @@ export default function Hero() {
               backgroundPosition: "50% 0%",
             }}
           >
-            LUXURY PROPERTY
+            QUATAR LUXURY PROPERTIES
           </h2>
         </div>
       </div>

@@ -28,6 +28,7 @@ enum PROPERTY_STATUS {
   AVAILABLE
   SOLD
   RESERVED
+  IN_PROGRESS
 }
 
 enum PROPERTY_TYPE {
@@ -43,6 +44,12 @@ enum PROPERTY_CATEGORY {
   BUILDING
   APARTMENT
   PLOT
+}
+
+enum TARGET_TYPE{
+  PROJECT
+  PROPERTY
+  BOTH
 }
 
 model Agent {
@@ -101,7 +108,7 @@ model Property {
   pngImage     String?
   price        Int
   Area         Int
-
+  featured Boolean @default(false)
   NearByLocations Json[]
   // optional I d k what to keep what to not
   BedRooms        Int?    @default(0)
@@ -110,7 +117,7 @@ model Property {
   furnishing      String? @default("Unfurnished")
   HoaFees         Int?    @default(0)
   yearBuilt       Int?
-
+  targetType  TARGET_TYPE @default(PROPERTY)
   // Relations
   Leads      Leads[]
   agent      Agent[]

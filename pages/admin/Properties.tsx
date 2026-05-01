@@ -91,7 +91,7 @@ export default function Properties({
   /* ------------------------------------ */
 
   const newProperty = () => {
-    navigate.push(`/dashboard/properties/${category}/new`);
+    navigate.push(`/dashboard/properties/${category}/new/edit`);
   };
 
   const deleteProperty = (id: string) =>

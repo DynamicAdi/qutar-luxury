@@ -21,12 +21,13 @@ export type PropertyCategory =
   | "RENT"
   | "PLOTS"
   | "RESIDENTIAL";
-export type PropertyStatus = "AVAILABLE" | "SOLD" | "RESERVED";
+export type PropertyStatus = "AVAILABLE" | "SOLD" | "RESERVED" | "IN_PROGRESS";
 export type PropertyType = "BUILDING" | "APARTMENT" | "PLOT";
-
+export type TargetType = "PROJECT" | "PROPERTY" | "BOTH";
 export interface Property {
   id: string;
   title: string;
+  featured: boolean;
   category: PropertyCategory;
   propertyType: PropertyType;
   price: number;
@@ -37,6 +38,7 @@ export interface Property {
   city: string;
   state: string;
   lat?: number;
+  targetType: TargetType; 
   lng?: number;
   description: string;
   BedRooms: number;

@@ -94,7 +94,7 @@ export function AddressPicker({p, upd}: {p: Property, upd: any}) {
         <Label className="text-xs uppercase tracking-wider text-muted-foreground">Saved Address</Label>
       </div>
       <Select value={mode === "new" ? "new" : preview?.id ?? ""} onValueChange={(value) => handleSelect(value)}>
-        <SelectTrigger className="rounded-xl">
+        <SelectTrigger className="rounded-xl w-full">
           <SelectValue placeholder="Select an street…" />
         </SelectTrigger>    
         <SelectContent>
