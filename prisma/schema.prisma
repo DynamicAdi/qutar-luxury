@@ -36,8 +36,6 @@ enum PROPERTY_TYPE {
   RENT
   SELL
   PLOTS
-  RESIDENTIAL
-  COMMERCIAL
 }
 
 enum PROPERTY_CATEGORY {
@@ -50,6 +48,11 @@ enum TARGET_TYPE{
   PROJECT
   PROPERTY
   BOTH
+}
+
+enum PropertyUsageType {
+  RESIDENTIAL
+  COMMERCIAL
 }
 
 model Agent {
@@ -98,6 +101,7 @@ model Property {
   title        String
   description  String
   images       String[]
+  documents    Json?
   youtubeLink  String?
   amenities    String[]
   features     String[]
@@ -109,7 +113,9 @@ model Property {
   price        Int
   Area         Int
   featured Boolean @default(false)
+  usageType PropertyUsageType @default(RESIDENTIAL)
   NearByLocations Json[]
+
   // optional I d k what to keep what to not
   BedRooms        Int?    @default(0)
   Bathrooms       Int?    @default(0)
@@ -118,6 +124,7 @@ model Property {
   HoaFees         Int?    @default(0)
   yearBuilt       Int?
   targetType  TARGET_TYPE @default(PROPERTY)
+  
   // Relations
   Leads      Leads[]
   agent      Agent[]

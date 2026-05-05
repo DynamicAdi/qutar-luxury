@@ -1,11 +1,34 @@
 // app/api/upload/route.ts
 
-import { writeFile, unlink } from "node:fs/promises";
+import { writeFile, unlink, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+const ALLOWED_TYPES = [
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/webp",
+  "application/pdf",
+];
+
+function getExtension(type: string) {
+  switch (type) {
+    case "image/png":
+      return ".png";
+    case "image/jpeg":
+    case "image/jpg":
+      return ".jpg";
+    case "image/webp":
+      return ".webp";
+    case "application/pdf":
+      return ".pdf";
+    default:
+      return "";
+  }
+}
 
 export async function POST(req: Request) {
   try {
@@ -16,29 +39,33 @@ export async function POST(req: Request) {
       return Response.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    // ✅ Type validation
+    /* type validation */
     if (!ALLOWED_TYPES.includes(file.type)) {
       return Response.json(
-        { error: "Only PNG, JPG, JPEG, WEBP allowed" },
+        { error: "Only PNG, JPG, JPEG, WEBP and PDF files are allowed" },
         { status: 400 }
       );
     }
 
-    // ✅ Size validation
+    /* size validation */
     if (file.size > MAX_FILE_SIZE) {
       return Response.json(
-        { error: "File size must be less than 5MB" },
+        { error: "File size must be less than 10MB" },
         { status: 400 }
       );
     }
 
-    // Convert to buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Generate safe filename
-    const fileName = `${randomUUID()}.png`; // force PNG (since bg removed image)
+    const ext = getExtension(file.type);
+    const fileName = `${randomUUID()}${ext}`;
+
     const uploadDir = path.join(process.cwd(), "public/uploads");
+
+    // ensure folder exists
+    await mkdir(uploadDir, { recursive: true });
+
     const filePath = path.join(uploadDir, fileName);
 
     await writeFile(filePath, buffer);
@@ -46,6 +73,8 @@ export async function POST(req: Request) {
     return Response.json({
       success: true,
       url: `/uploads/${fileName}`,
+      fileName,
+      type: file.type,
     });
   } catch (err) {
     console.error(err);
@@ -53,24 +82,20 @@ export async function POST(req: Request) {
   }
 }
 
-// app/api/upload/route.ts
 export async function DELETE(req: Request) {
   try {
     const body = await req.json();
-    const fileUrl = body.path; // e.g. "/uploads/abc.png"
+    const fileUrl = body.path;
 
     if (!fileUrl || typeof fileUrl !== "string") {
       return Response.json({ error: "Invalid path" }, { status: 400 });
     }
 
-    // Normalize and extract filename only
     const fileName = path.basename(fileUrl);
 
-    // Construct absolute safe path
     const uploadDir = path.join(process.cwd(), "public/uploads");
     const filePath = path.join(uploadDir, fileName);
 
-    // Extra safety check (ensure inside uploads dir)
     if (!filePath.startsWith(uploadDir)) {
       return Response.json({ error: "Invalid file location" }, { status: 400 });
     }

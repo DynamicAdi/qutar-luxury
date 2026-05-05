@@ -8,8 +8,9 @@ import interior1 from "@/assets/interior-1.jpg";
 import interior2 from "@/assets/interior-2.jpg";
 import interior3 from "@/assets/interior-3.jpg";
 export type PropertyCategory =
-  | "BUY" | "RENT" | "SELL" | "PLOTS" | "RESIDENTIAL" | "COMMERCIAL";
+  | "BUY" | "RENT" | "SELL" | "PLOTS";
 
+export type PropertyUsageType = "RESIDENTIAL" | "COMMERCIAL";
 export type PropertyType = "BUILDING" | "APARTMENT" | "PLOT";
 
 export type PropertyStatus = "AVAILABLE" | "SOLD" | "RESERVED";
@@ -129,7 +130,7 @@ export const properties: Property[] = [
     images: interiors,
     amenities: ["24/7 Access", "Conference Center", "Cafeteria", "Underground Parking"],
     features: ["Floor-to-ceiling Glass", "Raised Floor", "BMS", "LEED Gold"],
-    category: "COMMERCIAL",
+    category: "BUY",
     status: "AVAILABLE",
     price: 45000000,
     Area: 24000,
@@ -159,7 +160,7 @@ export const properties: Property[] = [
     images: interiors,
     amenities: ["Private Beach", "Pool", "Kids Club", "Yoga Deck"],
     features: ["Beach Access", "Walk-in Closet", "Open Kitchen"],
-    category: "RESIDENTIAL",
+    category: "RENT",
     status: "AVAILABLE",
     price: 4800000,
     Area: 2800,

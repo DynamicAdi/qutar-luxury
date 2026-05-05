@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { PageHeader } from "@/components/qlp/PageHeader";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -12,6 +11,7 @@ import { ArrowLeft, Loader, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Overview from "@/misc/properties/tabs/Overview";
+import Documents from "@/misc/properties/tabs/Documents";
 import AgentsTab from "@/misc/properties/tabs/Agents";
 import Amenities from "@/misc/properties/tabs/Amenities";
 import Location from "@/misc/properties/tabs/Location";
@@ -48,7 +48,8 @@ const blank = (id: string, category: PropertyCategory): Property => ({
   createdAt: new Date().toISOString(),
   propertyType: "BUILDING",
   featured: false,
-  targetType: "PROPERTY"
+  targetType: "PROPERTY",
+  usageType: "RESIDENTIAL"
 });
 
 export default function PropertyEdit({
@@ -127,7 +128,9 @@ export default function PropertyEdit({
     addressId: p.addressId,
     agentIds: p.agentIds,
     featured: p.featured,
-    targetType: p.targetType
+    targetType: p.targetType,
+    usageType: p.usageType,
+    documents: p.documents
   };
 
   type ImageInput = string | File;
@@ -251,7 +254,7 @@ export default function PropertyEdit({
       <PageHeader
         eyebrow={existing ? "Edit Property" : "New Property"}
         title={p.title || "Untitled Property"}
-        subtitle={`${p.category} · ${p.city}, ${p.state}`}
+        subtitle={`${p.category}`}
         actions={
           <>
             <Button
@@ -282,7 +285,7 @@ export default function PropertyEdit({
         <div className="lg:col-span-2 space-y-4">
           <Tabs defaultValue="overview">
             <TabsList className="rounded-xl bg-secondary p-1 h-auto flex-wrap">
-              {["overview", "media", "amenities", "location", "agent"].map(
+              {["overview", "media","documents", "amenities", "location", "agent"].map(
                 (t) => (
                   <TabsTrigger
                     key={t}
@@ -301,6 +304,10 @@ export default function PropertyEdit({
 
             <TabsContent value="media">
               <Media upd={upd} p={p} />
+            </TabsContent>
+
+            <TabsContent value="documents">
+              <Documents upd={upd} p={p} />
             </TabsContent>
 
             <TabsContent value="amenities">

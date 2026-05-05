@@ -25,8 +25,7 @@ const validCategories: PropertyCategory[] = [
   "BUY",
   "SELL",
   "RENT",
-  "PLOTS",
-  "RESIDENTIAL",
+  "PLOTS"
 ];
 
 const titleCase = (s: string): PropertyCategory | null => {

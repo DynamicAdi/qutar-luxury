@@ -17,6 +17,7 @@ import axios from "axios";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { formatQAR } from "@/lib/properties";
+import { qatarCities } from "@/config";
 const PRICE_FLOOR = 0;
 const PRICE_CEIL = 50_000_000;
 export default function Hero() {
@@ -29,43 +30,28 @@ export default function Hero() {
   const fillTextRef = useRef<HTMLHeadingElement>(null);
   const smokeRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const filters = ["COMMERCIAL", "RESIDENTIAL", "BUY", "RENT", "SELL"];
-  const [type, setType] = useState("BUY");
+  const types = ["RESIDENTIAL", "COMMERCIAL"];
+  const filters = ["RENT", "BUY", "SELL"];
+  const [usageType, setUsageType] = useState(types[0]);
+  const [type, setType] = useState(filters[0]);
   const [priceRange, setPriceRange] = useState({
     priceMin: PRICE_FLOOR,
     priceMax: PRICE_CEIL,
   });
+  const [mounted, setMounted] = useState(false);
 
   const pct = (value: number) =>
     ((value - PRICE_FLOOR) / (PRICE_CEIL - PRICE_FLOOR)) * 100;
-  const [location, setLocation] = useState("");
-  const [placeData, setPlaceData] = useState<
-    Record<string, Record<string, string[]>>
-  >({});
-
-  const [loadingPlaces, setLoadingPlaces] = useState(false);
-
-  useEffect(() => {
-    const fetchPlaces = async () => {
-      try {
-        setLoadingPlaces(true);
-
-        const res = await axios.get("/api/location-filters");
-
-        if (res.status === 200) {
-          setPlaceData(res.data.data || {});
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoadingPlaces(false);
-      }
-    };
-
-    fetchPlaces();
-  }, []);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const filteredCities = qatarCities.filter(
+    (city) =>
+      city.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !selectedLocations.includes(city)
+  );
 
   useEffect(() => {
+    setMounted(true);
     const ctx = gsap.context(() => {
       /* Initial states */
       gsap.set(textWrapRef.current, {
@@ -199,38 +185,22 @@ export default function Hero() {
 
     return () => ctx.revert();
   }, []);
-  const results = useMemo(() => {
-    if (!location.trim()) return [];
-
-    const query = location.toLowerCase().trim();
-
-    const matched: string[] = [];
-    Object.entries(placeData).forEach(([state, cities]) => {
-      if (state.toLowerCase().includes(query)) {
-        matched.push(state);
-      }
-
-      Object.entries(cities).forEach(([city, streets]) => {
-        // Match city
-        if (city.toLowerCase().includes(query)) {
-          matched.push(`${city}, ${state}`);
-        }
-
-        streets.forEach((street) => {
-          // Match street
-          if (street.toLowerCase().includes(query)) {
-            matched.push(`${street}, ${city}, ${state}`);
-          }
-        });
-      });
-    });
-
-    return [...new Set(matched)].slice(0, 6);
-  }, [location, placeData]);
   const handleSearch = () => {
+    const locations = encodeURIComponent(selectedLocations.join(","));
     router.push(
-      `/properties?type=${type}&location=${location}&priceMin=${priceRange.priceMin}&priceMax=${priceRange.priceMax}`
+      `/properties?type=${type}&location=${locations}&priceMin=${priceRange.priceMin}&priceMax=${priceRange.priceMax}`
     );
+  };
+  const handleSelectLocation = (city: string) => {
+    if (selectedLocations.includes(city)) return;
+    if (selectedLocations.length >= 3) return;
+
+    setSelectedLocations((prev) => [...prev, city]);
+    setSearchTerm("");
+  };
+
+  const removeLocation = (city: string) => {
+    setSelectedLocations((prev) => prev.filter((c) => c !== city));
   };
   return (
     <section
@@ -272,11 +242,11 @@ export default function Hero() {
           {/* Tabs */}
           <ToggleGroup
             type="single"
-            value={type}
-            onValueChange={(val) => val && setType(val)}
-            className="grid w-full grid-cols-2 md:grid-cols-6 gap-3 bg-background p-3 rounded-3xl shadow-sm"
+            value={usageType}
+            onValueChange={(val) => val && setUsageType(val)}
+            className="grid w-full md:grid-cols-2 gap-3 bg-background p-3 rounded-3xl shadow-sm"
           >
-            {filters.map((item,index) => (
+            {types.map((item, index) => (
               <ToggleGroupItem
                 key={item}
                 value={item}
@@ -288,14 +258,40 @@ export default function Hero() {
         data-[state=on]:bg-emerald-800
         data-[state=on]:text-white
         data-[state=on]:shadow-md
-        data-[state=on]:border-black
-        ${index<2 ? "col-span-3":"col-span-2"}        
+        data-[state=on]:border-black    
         `}
               >
                 {item}
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
+
+          <ToggleGroup
+            type="single"
+            value={type}
+            onValueChange={(val) => val && setType(val)}
+            className="grid w-full md:grid-cols-3 gap-3 bg-background p-3 rounded-3xl shadow-sm"
+          >
+            {filters.map((item, index) => (
+              <ToggleGroupItem
+                key={item}
+                value={item}
+                className={`
+        h-10 w-full rounded-full! border border-transparent
+        bg-white text-sm font-medium text-zinc-700
+        transition-all duration-200
+        hover:bg-zinc-50 hover:border-zinc-200
+        data-[state=on]:bg-emerald-800
+        data-[state=on]:text-white
+        data-[state=on]:shadow-md
+        data-[state=on]:border-black     
+        `}
+              >
+                {item}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+
           <div className="w-full rounded-3xl border border-white/40 bg-white p-5 py-2 pb-3 backdrop-blur-xl shadow-xl">
             <div className="flex flex-col">
               {/* Header */}
@@ -318,39 +314,40 @@ export default function Hero() {
               </div>
 
               {/* Slider */}
-              <div className="pt-1">
-                <div className="relative h-10">
-                  {/* base track */}
-                  <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1.5 rounded-full bg-secondary" />
+              {mounted ? (
+                <div className="pt-1">
+                  <div className="relative h-10">
+                    {/* base track */}
+                    <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1.5 rounded-full bg-secondary" />
 
-                  {/* active track */}
-                  <div
-                    className="absolute top-1/2 -translate-y-1/2 h-1.5 rounded-full bg-emerald-800"
-                    style={{
-                      left: `${pct(priceRange.priceMin)}%`,
-                      right: `${100 - pct(priceRange.priceMax)}%`,
-                    }}
-                  />
+                    {/* active track */}
+                    <div
+                      className="absolute top-1/2 -translate-y-1/2 h-1.5 rounded-full bg-emerald-800"
+                      style={{
+                        left: `${pct(priceRange.priceMin)}%`,
+                        right: `${100 - pct(priceRange.priceMax)}%`,
+                      }}
+                    />
 
-                  {/* Min slider */}
-                  <input
-                    type="range"
-                    min={PRICE_FLOOR}
-                    max={PRICE_CEIL}
-                    step={100000}
-                    value={priceRange.priceMin}
-                    onChange={(e) => {
-                      const v = Math.min(
-                        Number(e.target.value),
-                        priceRange.priceMax - 100000
-                      );
+                    {/* Min slider */}
+                    <input
+                      type="range"
+                      min={PRICE_FLOOR}
+                      max={PRICE_CEIL}
+                      step={100000}
+                      value={priceRange.priceMin}
+                      onChange={(e) => {
+                        const v = Math.min(
+                          Number(e.target.value),
+                          priceRange.priceMax - 100000
+                        );
 
-                      setPriceRange((prev) => ({
-                        ...prev,
-                        priceMin: v,
-                      }));
-                    }}
-                    className="absolute inset-0 w-full appearance-none bg-transparent pointer-events-none
+                        setPriceRange((prev) => ({
+                          ...prev,
+                          priceMin: v,
+                        }));
+                      }}
+                      className="absolute inset-0 w-full appearance-none bg-transparent pointer-events-none
           [&::-webkit-slider-thumb]:pointer-events-auto
           [&::-webkit-slider-thumb]:appearance-none
           [&::-webkit-slider-thumb]:h-5
@@ -361,27 +358,27 @@ export default function Hero() {
           [&::-webkit-slider-thumb]:border-white
           [&::-webkit-slider-thumb]:shadow-lg
           [&::-webkit-slider-thumb]:cursor-pointer"
-                  />
+                    />
 
-                  {/* Max slider */}
-                  <input
-                    type="range"
-                    min={PRICE_FLOOR}
-                    max={PRICE_CEIL}
-                    step={100000}
-                    value={priceRange.priceMax}
-                    onChange={(e) => {
-                      const v = Math.max(
-                        Number(e.target.value),
-                        priceRange.priceMin + 100000
-                      );
+                    {/* Max slider */}
+                    <input
+                      type="range"
+                      min={PRICE_FLOOR}
+                      max={PRICE_CEIL}
+                      step={100000}
+                      value={priceRange.priceMax}
+                      onChange={(e) => {
+                        const v = Math.max(
+                          Number(e.target.value),
+                          priceRange.priceMin + 100000
+                        );
 
-                      setPriceRange((prev) => ({
-                        ...prev,
-                        priceMax: v,
-                      }));
-                    }}
-                    className="absolute inset-0 w-full appearance-none bg-transparent pointer-events-none
+                        setPriceRange((prev) => ({
+                          ...prev,
+                          priceMax: v,
+                        }));
+                      }}
+                      className="absolute inset-0 w-full appearance-none bg-transparent pointer-events-none
           [&::-webkit-slider-thumb]:pointer-events-auto
           [&::-webkit-slider-thumb]:appearance-none
           [&::-webkit-slider-thumb]:h-5
@@ -392,19 +389,23 @@ export default function Hero() {
           [&::-webkit-slider-thumb]:border-white
           [&::-webkit-slider-thumb]:shadow-lg
           [&::-webkit-slider-thumb]:cursor-pointer"
-                  />
-                </div>
+                    />
+                  </div>
 
-                {/* Bottom labels */}
-                {/* <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                  {/* Bottom labels */}
+                  {/* <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
                   <span>{formatQAR(PRICE_FLOOR)}</span>
                   <span>{formatQAR(PRICE_CEIL)}+</span>
                 </div> */}
-              </div>
+                </div>
+              ) : (
+                <div className="w-full rounded-3xl border border-white/40 bg-white p-5 py-2 pb-3 backdrop-blur-xl shadow-xl h-[118px]" />
+              )}
             </div>
           </div>
+
           {/* Search */}
-          <div className="relative">
+          {/* <div className="relative">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
 
@@ -458,6 +459,79 @@ export default function Hero() {
                   </div>
                 )}
               </Card>
+            )}
+          </div> */}
+          <div className="relative">
+            {mounted && (
+              <>
+                <div className="relative flex min-h-14 w-full items-center rounded-full border border-gray-200 bg-white pl-4 pr-32 shadow-sm focus-within:ring-2 focus-within:ring-primary/20">
+                  <Search className="h-4 w-4 text-muted-foreground mr-3 shrink-0" />
+
+                  <div className="flex flex-wrap items-center gap-2 flex-1 py-2">
+                    {selectedLocations.map((city) => (
+                      <div
+                        key={city}
+                        className="flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
+                      >
+                        {city}
+                        <button
+                          onClick={() => removeLocation(city)}
+                          className="text-primary hover:text-red-500"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+
+                    {selectedLocations.length < 3 && (
+                      <input
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        placeholder={
+                          selectedLocations.length === 0
+                            ? "Search by location..."
+                            : ""
+                        }
+                        className="flex-1 min-w-[140px] bg-transparent outline-none text-sm"
+                      />
+                    )}
+                  </div>
+
+                  <Button
+                    onClick={handleSearch}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-10 rounded-full text-base px-5 shadow-sm"
+                  >
+                    Explore <LucideArrowRightCircle size={14} />
+                  </Button>
+                </div>
+                {searchTerm.trim() && selectedLocations.length < 3 && (
+                  <Card className="absolute top-full mt-2 w-full z-50 overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-xl">
+                    {filteredCities.length > 0 ? (
+                      <div className="space-y-1 max-h-72 overflow-y-auto">
+                        {filteredCities.slice(0, 8).map((item) => (
+                          <button
+                            key={item}
+                            onClick={() => handleSelectLocation(item)}
+                            className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors hover:bg-muted"
+                          >
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
+                              <MapPin className="h-4 w-4 text-muted-foreground" />
+                            </div>
+
+                            <span className="text-sm font-medium text-foreground">
+                              {item}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="px-3 py-4 text-center text-sm text-muted-foreground">
+                        No locations found
+                      </div>
+                    )}
+                  </Card>
+                )}
+              </>
             )}
           </div>
         </div>

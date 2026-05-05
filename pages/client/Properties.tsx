@@ -2,73 +2,68 @@
 
 import { useEffect, useState, useTransition } from "react";
 import axios from "axios";
-
 import Filters, {
   FilterState,
-  PRICE_FLOOR,
   PRICE_CEIL,
+  PRICE_FLOOR,
 } from "@/components/client/properties/Filters";
-
 import PropertyCard from "@/components/client/properties/PropertyCard";
 import { Property } from "@/store/cms";
 import { useDebounce } from "@/components/useDebounce";
 import { useSearchParams } from "next/navigation";
 
 const LIMIT = 9;
+
 const Properties = () => {
   const searchParams = useSearchParams();
-
-  const location = searchParams?.get("location")?.trim() ?? "";
-
-  const category = searchParams?.get("type") ?? "ALL";
-
-  const priceMinParam = searchParams?.get("priceMin");
-  const priceMaxParam = searchParams?.get("priceMax");
-
-  const priceMin =
-    priceMinParam && Number.isInteger(Number(priceMinParam))
-      ? Number(priceMinParam)
-      : PRICE_FLOOR;
-
-  const priceMax =
-    priceMaxParam && Number.isInteger(Number(priceMaxParam))
-      ? Number(priceMaxParam)
-      : PRICE_CEIL;
-
-  const parts = location
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-
-  let state = "";
-  let city = "";
-  let street = "";
-
-  if (parts.length === 1) state = parts[0];
-  if (parts.length === 2) {
-    state = parts[0];
-    city = parts[1];
-  }
-
-  if (parts.length >= 3) {
-    state = parts[0];
-    city = parts[1];
-    street = parts[2];
-  }
-
+  const [noResults, setNoResults] = useState(false);
+  const [suggestions, setSuggestions] = useState<Property[]>([]);
+  const [suggestionMessage, setSuggestionMessage] = useState("");
   const [filters, setFilters] = useState<FilterState>({
-    category: category as any,
-    state,
-    city,
-    street,
-    priceMin: priceMin,
-    priceMax: priceMax,
+    category: "ALL",
+    usageType: "RESIDENTIAL",
+    state: "",
+    cities: [],
+    street: "",
+    priceMin: PRICE_FLOOR,
+    priceMax: PRICE_CEIL,
   });
+  useEffect(() => {
+    const selectedLocations =
+      searchParams
+        ?.get("location")
+        ?.split(",")
+        .map((item) => item.trim())
+        .filter(Boolean) ?? [];
 
+    const category = searchParams?.get("type")?.trim() || ("ALL" as any);
+    const usageType =
+      searchParams?.get("usageType")?.trim() || ("RESIDENTIAL" as any);
+
+    const rawPriceMin = searchParams?.get("priceMin");
+    const rawPriceMax = searchParams?.get("priceMax");
+
+    const parsedPriceMin =
+      rawPriceMin !== null && !isNaN(Number(rawPriceMin))
+        ? Number(rawPriceMin)
+        : PRICE_FLOOR;
+
+    const parsedPriceMax =
+      rawPriceMax !== null && !isNaN(Number(rawPriceMax))
+        ? Number(rawPriceMax)
+        : PRICE_CEIL;
+
+    setFilters((prev) => ({
+      ...prev,
+      category,
+      usageType,
+      cities: selectedLocations,
+      priceMin: parsedPriceMin,
+      priceMax: parsedPriceMax,
+    }));
+  }, [searchParams]);
   const [data, setData] = useState<Property[]>([]);
-
   const [page, setPage] = useState(1);
-
   const debouncedFilters = useDebounce(filters, 500);
 
   const [pagination, setPagination] = useState({
@@ -82,7 +77,6 @@ const Properties = () => {
 
   const [isPending, startTransition] = useTransition();
 
-  /* fetch filtered properties directly */
   const fetchProperties = () => {
     startTransition(async () => {
       try {
@@ -91,43 +85,41 @@ const Properties = () => {
           limit: LIMIT,
         };
 
-        /* category */
         if (debouncedFilters.category && debouncedFilters.category !== "ALL") {
           params.category = debouncedFilters.category;
         }
 
-        /* call current api */
+        if (debouncedFilters.usageType) {
+          params.usageType = debouncedFilters.usageType;
+        }
+
+        if (debouncedFilters.state) {
+          params.state = debouncedFilters.state;
+        }
+
+        if (debouncedFilters.cities.length > 0) {
+          params.location = debouncedFilters.cities.join(",");
+        }
+
+        if (debouncedFilters.street) {
+          params.street = debouncedFilters.street;
+        }
+
+        if (debouncedFilters.priceMin > PRICE_FLOOR) {
+          params.priceMin = debouncedFilters.priceMin;
+        }
+
+        if (debouncedFilters.priceMax < PRICE_CEIL) {
+          params.priceMax = debouncedFilters.priceMax;
+        }
         const req = await axios.get("/api/properties", { params });
 
         if (req.status === 200) {
-          let rows: Property[] = req.data.data || [];
-
-          /* frontend filters because api doesn't support these yet */
-          rows = rows.filter((item) => {
-            const address: any = item.address || {};
-
-            const stateOk =
-              !debouncedFilters.state ||
-              address.state === debouncedFilters.state;
-
-            const cityOk =
-              !debouncedFilters.city || address.city === debouncedFilters.city;
-
-            const streetOk =
-              !debouncedFilters.street ||
-              address.street === debouncedFilters.street;
-
-            const price = Number(item.price) || 0;
-
-            const priceOk =
-              price >= debouncedFilters.priceMin &&
-              price <= debouncedFilters.priceMax;
-
-            return stateOk && cityOk && streetOk && priceOk;
-          });
-
-          setData(rows);
+          setData(req.data.data || []);
           setPagination(req.data.pagination);
+          setNoResults(req.data.noResults || false);
+          setSuggestions(req.data.suggestions || []);
+          setSuggestionMessage(req.data.suggestionMessage || "");
         }
       } catch (error) {
         console.error(error);
@@ -139,13 +131,12 @@ const Properties = () => {
     fetchProperties();
   }, [page, debouncedFilters]);
 
-  /* reset page when filters change */
   useEffect(() => {
     setPage(1);
   }, [
     filters.category,
     filters.state,
-    filters.city,
+    filters.cities,
     filters.street,
     filters.priceMin,
     filters.priceMax,
@@ -157,7 +148,6 @@ const Properties = () => {
         background: "hsl(44 38% 96%)",
       }}
     >
-      {/* Header */}
       <section className="mx-auto px-6 pt-10 pb-6 md:px-12 lg:px-24 md:pt-14 md:pb-8">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
@@ -186,57 +176,87 @@ const Properties = () => {
         </div>
       </section>
 
-      {/* Filters */}
       <section className="mx-auto px-6 pb-10 md:px-12 lg:px-24">
         <div className="border border-border bg-card p-5 shadow-card md:p-7">
           <Filters value={filters} onChange={setFilters} />
         </div>
       </section>
 
-      {/* Cards */}
       <section className="mx-auto px-6 pb-20 md:px-12 lg:px-24 lg:pb-32">
         {isPending ? (
           <div className="py-32 text-center text-muted-foreground">
             Loading properties...
           </div>
-        ) : data.length === 0 ? (
+        ) : data.length === 0 && !noResults ? (
           <div className="border border-dashed border-border py-32 text-center text-muted-foreground">
-            No properties match your filters.
+            No properties available.
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 gap-x-8 gap-y-20 sm:grid-cols-2 lg:grid-cols-3 lg:gap-y-24">
-              {data.map((p, i) => (
-                <PropertyCard key={p.id} property={p} index={i} />
-              ))}
-            </div>
+            {/* MAIN FILTERED RESULTS */}
+            {data.length > 0 && (
+              <>
+                <div className="grid grid-cols-1 gap-x-8 gap-y-20 sm:grid-cols-2 lg:grid-cols-3 lg:gap-y-24">
+                  {data.map((p, i) => (
+                    <PropertyCard key={p.id} property={p} index={i} />
+                  ))}
+                </div>
 
-            {/* Pagination */}
-            <div className="mt-16 flex items-center justify-center gap-4">
-              <button
-                disabled={!pagination.hasPrevPage}
-                onClick={() => setPage((prev) => prev - 1)}
-                className="rounded-full border px-5 py-2 disabled:opacity-40"
-              >
-                Prev
-              </button>
+                <div className="mt-16 flex items-center justify-center gap-4">
+                  <button
+                    disabled={!pagination.hasPrevPage}
+                    onClick={() => setPage((prev) => prev - 1)}
+                    className="rounded-full border px-5 py-2 disabled:opacity-40"
+                  >
+                    Prev
+                  </button>
 
-              <p className="text-sm text-muted-foreground">
-                Page {pagination.page} of {pagination.totalPages}
-              </p>
+                  <p className="text-sm text-muted-foreground">
+                    Page {pagination.page} of {pagination.totalPages}
+                  </p>
 
-              <button
-                disabled={!pagination.hasNextPage}
-                onClick={() => setPage((prev) => prev + 1)}
-                className="rounded-full border px-5 py-2 disabled:opacity-40"
-              >
-                Next
-              </button>
-            </div>
+                  <button
+                    disabled={!pagination.hasNextPage}
+                    onClick={() => setPage((prev) => prev + 1)}
+                    className="rounded-full border px-5 py-2 disabled:opacity-40"
+                  >
+                    Next
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* NO EXACT MATCH => SUGGESTIONS */}
+            {noResults && suggestions.length > 0 && (
+              <div className="space-y-10">
+                <div className="border border-dashed border-border py-16 px-6 text-center">
+                  <h3 className="text-2xl font-semibold mb-3">
+                    No exact properties matched your search
+                  </h3>
+
+                  <p className="text-muted-foreground max-w-2xl mx-auto">
+                    {suggestionMessage}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="mb-8 text-xl font-semibold">
+                    You may also like these alternatives
+                  </h4>
+
+                  <div className="grid grid-cols-1 gap-x-8 gap-y-20 sm:grid-cols-2 lg:grid-cols-3 lg:gap-y-24">
+                    {suggestions.map((p, i) => (
+                      <PropertyCard key={p.id} property={p} index={i} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </>
         )}
       </section>
     </main>
   );
 };
+
 export default Properties;

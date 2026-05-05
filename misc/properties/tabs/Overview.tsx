@@ -14,7 +14,7 @@ import { Field } from "@/components/ui/field";
 import { Property, PropertyCategory } from "@/store/cms";
 import { Textarea } from "@/components/ui/textarea";
 
-function Overview({ p, upd }: { p: any; upd: any }) {
+function Overview({ p, upd }: { p: Property; upd: any }) {
   return (
     <Card className="rounded-2xl p-5 shadow-card border-0 space-y-4">
       <Field label="Title">
@@ -63,7 +63,7 @@ function Overview({ p, upd }: { p: any; upd: any }) {
             <SelectContent>
               {["AVAILABLE", "RESERVED", "SOLD", "IN_PROGRESS"].map((s) => (
                 <SelectItem key={s} value={s}>
-                  {s?.replaceAll("_"," ")}
+                  {s?.replaceAll("_", " ")}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -91,29 +91,52 @@ function Overview({ p, upd }: { p: any; upd: any }) {
             </SelectContent>
           </Select>
         </Field>
-        
+
         <div className="col-span-3">
-        <Field label="Target Type">
-          <Select
-            value={p.targetType || "PROPERTY"}
-            onValueChange={(v) =>
-              upd("targetType", v as Property["targetType"])
-            }
-          >
-            <SelectTrigger className="rounded-xl w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {["PROPERTY","PROJECT",...(p.category === "RESIDENTIAL" ? ["BOTH"] : [])].map(
-                (s) => (
+          <Field label="Target Type">
+            <Select
+              value={p.targetType || "PROPERTY"}
+              onValueChange={(v) =>
+                upd("targetType", v as Property["targetType"])
+              }
+            >
+              <SelectTrigger className="rounded-xl w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[
+                  "PROPERTY",
+                  "PROJECT",
+                  ...(p.usageType === "RESIDENTIAL" ? ["BOTH"] : []),
+                ].map((s) => (
                   <SelectItem key={s} value={s}>
                     {s}
                   </SelectItem>
-                )
-              )}
-            </SelectContent>
-          </Select>
-        </Field>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+        </div>
+        <div className="col-span-3">
+          <Field label="Usage Type">
+            <Select
+              value={p.usageType || "RESIDENTIAL"}
+              onValueChange={(v) =>
+                upd("usageType", v as Property["usageType"])
+              }
+            >
+              <SelectTrigger className="rounded-xl w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {["RESIDENTIAL", "COMMERCIAL"].map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
         </div>
       </div>
       <Field label="Description">
@@ -126,7 +149,7 @@ function Overview({ p, upd }: { p: any; upd: any }) {
 
       {/* Common: price + area */}
       <div className="grid md:grid-cols-3 gap-3">
-        <Field label={p.category === "Rent" ? "Rent (QAR)" : "Price (QAR)"}>
+        <Field label={p.category === "RENT" ? "Rent (QAR)" : "Price (QAR)"}>
           <Input
             type="number"
             value={p.price}
@@ -136,7 +159,7 @@ function Overview({ p, upd }: { p: any; upd: any }) {
         </Field>
         <Field
           label={
-            p.category === "Plots" ? "Land Area (sqft)" : "Built-up Area (sqft)"
+            p.category === "PLOTS" ? "Land Area (sqft)" : "Built-up Area (sqft)"
           }
         >
           <Input
@@ -159,7 +182,7 @@ function Overview({ p, upd }: { p: any; upd: any }) {
       </div>
 
       {/* Building fields — hidden for Plots */}
-      {p.category !== "Plots" && (
+      {p.category !== "PLOTS" && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <Field label="Bedrooms">
             <Input
@@ -212,7 +235,7 @@ function Overview({ p, upd }: { p: any; upd: any }) {
               </SelectContent>
             </Select>
           </Field>
-          {p.category !== "Rent" && (
+          {p.category !== "RENT" && (
             <Field label="HOA Fee (QAR/mo)">
               <Input
                 type="number"
@@ -226,7 +249,7 @@ function Overview({ p, upd }: { p: any; upd: any }) {
       )}
 
       {/* Plot-specific */}
-      {p.category === "Plots" && (
+      {p.category === "PLOTS" && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <Field label="Zoning">
             <Select
@@ -308,7 +331,7 @@ function Overview({ p, upd }: { p: any; upd: any }) {
       )}
 
       {/* Rent-specific */}
-      {p.category === "Rent" && (
+      {p.category === "RENT" && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <Field label="Rent Period">
             <Select

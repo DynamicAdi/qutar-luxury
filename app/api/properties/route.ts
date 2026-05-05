@@ -2,84 +2,126 @@ import { PROPERTY_STATUS, PROPERTY_TYPE } from "@/generated/prisma/enums";
 import { db } from "@/lib/client";
 import { NextResponse, NextRequest } from "next/server";
 
- 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
+    const searchParams = req.nextUrl.searchParams;
 
-    // Query params
     const page = Number(searchParams.get("page")) || 1;
     const limit = Number(searchParams.get("limit")) || 10;
-    const search = searchParams.get("search") || "";
-    const status = searchParams.get("status");
-    const category = searchParams.get("category");
-    const full = searchParams.get("details");
-    const id = searchParams.get("id");
-    const custm = searchParams.get("customers")
-
     const skip = (page - 1) * limit;
 
-    // Filters
-    const where: any = {
-        ...(category && {category}),
-      ...(status && { status }),
+    const search = searchParams.get("search")?.trim() || "";
+    const status = searchParams.get("status")?.trim() || "";
+    const category = searchParams.get("category")?.trim() || "";
+    const usageType = searchParams.get("usageType")?.trim() || "";
 
-      ...(search && {
-        OR: [
-          {
-            title: {
-              contains: search,
-              mode: "insensitive",
-            },
-          }
-        ],
-      }),
-    };
+    const state = searchParams.get("state")?.trim() || "";
+    const street = searchParams.get("street")?.trim() || "";
+    const locationsParam = searchParams.get("location")?.trim() || "";
 
-    // Total count
-    const total = await db.property.count({ where });
+    const full = searchParams.get("details");
+    const id = searchParams.get("id");
+    const custm = searchParams.get("customers");
+
+    const priceMinRaw = searchParams.get("priceMin");
+    const priceMaxRaw = searchParams.get("priceMax");
+
+    const priceMin =
+      priceMinRaw !== null && priceMinRaw !== "" ? Number(priceMinRaw) : null;
+
+    const priceMax =
+      priceMaxRaw !== null && priceMaxRaw !== "" ? Number(priceMaxRaw) : null;
+
+    const cities = locationsParam
+      ? locationsParam
+          .split(",")
+          .map((c) => c.trim())
+          .filter(Boolean)
+      : [];
 
     if (custm) {
       const forCustomers = await db.property.findMany({
         where: {
-          OR: [
-            {status: "AVAILABLE"},
-            {status: "RESERVED"}
-          ]
+          OR: [{ status: "AVAILABLE" }, { status: "RESERVED" }],
         },
         select: {
           id: true,
           title: true,
           address: true,
           price: true,
-        }
-      })
+        },
+      });
 
-      return NextResponse.json({data: forCustomers}, {status: 200})
+      return NextResponse.json({ data: forCustomers }, { status: 200 });
     }
 
     if (full) {
-        if (!id) {
-            return NextResponse.json({error: "ID is not provided"}, {status: 400})
-        }
-        const detailed = await db.property.findMany({
-            where: {
-                id: id
-            },
-            include: {
+      if (!id) {
+        return NextResponse.json(
+          { error: "ID is not provided" },
+          { status: 400 }
+        );
+      }
 
-                address: true,
-                agent: true,
-            }
-        })
-        return NextResponse.json({
-            data: detailed
-        }, {status: 200})
+      const detailed = await db.property.findMany({
+        where: { id },
+        include: {
+          address: true,
+          agent: true,
+        },
+      });
+
+      return NextResponse.json({ data: detailed }, { status: 200 });
     }
-    // Paginated data
+
+    /* ===========================
+       MAIN STRICT WHERE
+    =========================== */
+
+    const where: any = {};
+
+    if (category && category !== "ALL") where.category = category;
+    if (usageType && usageType !== "ALL") where.usageType = usageType;
+    if (status) where.status = status;
+
+    if (search) {
+      where.OR = [
+        {
+          title: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ];
+    }
+
+    if (state || street || cities.length > 0) {
+      where.address = { is: {} };
+
+      if (state) where.address.is.state = state;
+      if (street) where.address.is.street = street;
+
+      if (cities.length > 0) {
+        where.address.is.city = {
+          in: cities,
+        };
+      }
+    }
+
+    if (priceMin !== null || priceMax !== null) {
+      where.price = {};
+
+      if (priceMin !== null && !isNaN(priceMin)) where.price.gte = priceMin;
+      if (priceMax !== null && !isNaN(priceMax)) where.price.lte = priceMax;
+    }
+
+    const total = await db.property.count({ where });
+
     const property = await db.property.findMany({
       where,
       skip,
+      take: limit,
+      orderBy: { createdAt: "desc" },
       select: {
         id: true,
         title: true,
@@ -87,6 +129,7 @@ export async function GET(req: NextRequest) {
         status: true,
         description: true,
         propertyType: true,
+        usageType: true,
         pngImage: true,
         isHidden: true,
         address: true,
@@ -94,16 +137,100 @@ export async function GET(req: NextRequest) {
         Bathrooms: true,
         Area: true,
         price: true,
-        category: true
+        category: true,
       },
-      take: limit,
-      orderBy: {
-        createdAt: "desc",
-      }
     });
+
+    /* ===========================
+       IF NO RESULTS -> FALLBACK SUGGESTIONS
+    =========================== */
+
+    let suggestions: any[] = [];
+    let suggestionMessage = "";
+    let noResults = false;
+
+    if (property.length === 0) {
+      noResults = true;
+
+      const suggestionWhere: any = {};
+
+      if (category && category !== "ALL") suggestionWhere.category = category;
+      if (usageType && usageType !== "ALL")
+        suggestionWhere.usageType = usageType;
+
+      if (state) {
+        suggestionWhere.address = {
+          is: {
+            state,
+          },
+        };
+        suggestionMessage = `No exact matches found. Explore similar properties in other areas of ${state}.`;
+      } else if (cities.length > 0) {
+        suggestionMessage = `No exact matches found. Explore similar properties in nearby Qatar locations.`;
+      } else {
+        suggestionMessage = `No exact matches found. Here are some other premium listings you may like.`;
+      }
+
+      suggestions = await db.property.findMany({
+        where: suggestionWhere,
+        take: 6,
+        orderBy: {
+          createdAt: "desc",
+        },
+        select: {
+          id: true,
+          title: true,
+          images: true,
+          status: true,
+          description: true,
+          propertyType: true,
+          usageType: true,
+          pngImage: true,
+          isHidden: true,
+          address: true,
+          BedRooms: true,
+          Bathrooms: true,
+          Area: true,
+          price: true,
+          category: true,
+        },
+      });
+
+      if (suggestions.length === 0) {
+        suggestions = await db.property.findMany({
+          take: 6,
+          orderBy: {
+            createdAt: "desc",
+          },
+          select: {
+            id: true,
+            title: true,
+            images: true,
+            status: true,
+            description: true,
+            propertyType: true,
+            usageType: true,
+            pngImage: true,
+            isHidden: true,
+            address: true,
+            BedRooms: true,
+            Bathrooms: true,
+            Area: true,
+            price: true,
+            category: true,
+          },
+        });
+
+        suggestionMessage =
+          "No exact matches found. Here are some featured alternatives across Qatar.";
+      }
+    }
 
     return NextResponse.json({
       data: property,
+      noResults,
+      suggestions,
+      suggestionMessage,
       pagination: {
         total,
         page,
@@ -117,7 +244,7 @@ export async function GET(req: NextRequest) {
     console.error(error);
 
     return NextResponse.json(
-      { error: "Failed to fetch leads" },
+      { error: "Failed to fetch properties" },
       { status: 500 }
     );
   }
@@ -126,23 +253,24 @@ export async function GET(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const id = searchParams.get("id");
-    if (!id) {
-        return NextResponse.json({error: "ID is not provided"}, {status: 404})
-    }
+  if (!id) {
+    return NextResponse.json({ error: "ID is not provided" }, { status: 404 });
+  }
 
-    try {
-        const leads = await db.property.delete({
-            where: { id }
-        })
-        if (leads) {
-            return NextResponse.json({message: "Deleted Successfully"}, {status: 200, statusText: "OK"});
-        }
+  try {
+    const leads = await db.property.delete({
+      where: { id },
+    });
+    if (leads) {
+      return NextResponse.json(
+        { message: "Deleted Successfully" },
+        { status: 200, statusText: "OK" }
+      );
     }
-    catch (error) {
-        return NextResponse.json({error: error}, {status: 500})
-    }
+  } catch (error) {
+    return NextResponse.json({ error: error }, { status: 500 });
+  }
 }
-
 
 export async function POST(req: NextRequest) {
   try {
@@ -151,6 +279,7 @@ export async function POST(req: NextRequest) {
     const {
       title,
       description,
+      documents = [],
       images = [],
       youtubeLink,
       amenities = [],
@@ -171,6 +300,7 @@ export async function POST(req: NextRequest) {
       NearByLocations,
       targetType,
       addressId,
+      usageType,
       agentIds = [],
     } = body;
 
@@ -199,13 +329,14 @@ export async function POST(req: NextRequest) {
         Area,
         featured,
         BedRooms,
+        documents,
         Bathrooms,
         parking,
         furnishing,
         HoaFees,
         yearBuilt,
         targetType,
-        // connect address
+        usageType,
         address: {
           connect: {
             id: addressId,
@@ -246,7 +377,6 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-
     const body = await req.json();
     const {
       id,
@@ -274,23 +404,23 @@ export async function PUT(req: NextRequest) {
       yearBuilt,
       targetType,
       addressId,
+      documents,
       agentIds = [],
-
-      toggleHide
+      usageType,
+      toggleHide,
     } = body;
 
     if (toggleHide) {
       const data = await db.property.update({
         where: {
-          id: id
+          id: id,
         },
         data: {
-          isHidden: Boolean(toggleHide)
-        }
+          isHidden: Boolean(toggleHide),
+        },
       });
-    return NextResponse.json({data}, {status: 200})  
-}
-
+      return NextResponse.json({ data }, { status: 200 });
+    }
 
     if (!id) {
       return NextResponse.json(
@@ -307,6 +437,7 @@ export async function PUT(req: NextRequest) {
         ...(title !== undefined && { title }),
         ...(description !== undefined && { description }),
         ...(images !== undefined && { images }),
+        ...(documents !== undefined && { documents }),
         ...(youtubeLink !== undefined && { youtubeLink }),
         ...(amenities !== undefined && { amenities }),
         ...(features !== undefined && { features }),
@@ -318,7 +449,7 @@ export async function PUT(req: NextRequest) {
         ...(status !== undefined && {
           status: status as PROPERTY_STATUS,
         }),
-
+        usageType,
         ...(price !== undefined && { price }),
         ...(Area !== undefined && { Area }),
         ...(pngImage !== undefined && { pngImage }),
@@ -330,8 +461,8 @@ export async function PUT(req: NextRequest) {
         ...(furnishing !== undefined && { furnishing }),
         ...(HoaFees !== undefined && { HoaFees }),
         ...(yearBuilt !== undefined && { yearBuilt }),
-        ...(NearByLocations !== undefined && {NearByLocations}),
-        ...(targetType !== undefined && {targetType}),
+        ...(NearByLocations !== undefined && { NearByLocations }),
+        ...(targetType !== undefined && { targetType }),
         // update address relation
         ...(addressId && {
           address: {
@@ -340,7 +471,7 @@ export async function PUT(req: NextRequest) {
             },
           },
         }),
-        ...(featured !== undefined && {featured}),
+        ...(featured !== undefined && { featured }),
         ...(agentIds && {
           agent: {
             connect: agentIds.map((agentId: string) => ({
@@ -362,9 +493,6 @@ export async function PUT(req: NextRequest) {
   } catch (error) {
     console.error(error);
 
-    return NextResponse.json(
-      { error: error },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error }, { status: 500 });
   }
 }

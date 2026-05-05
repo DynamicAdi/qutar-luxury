@@ -5,6 +5,7 @@ import p2 from "@/assets/property-2.jpg";
 import p3 from "@/assets/property-3.jpg";
 import p4 from "@/assets/property-4.jpg";
 import p5 from "@/assets/property-5.jpg";
+import { PropertyUsageType } from "@/generated/prisma/enums";
 
 export enum CUSTOMER_STATUS {
   PURCHASED = "PURCHASED",
@@ -19,8 +20,7 @@ export type PropertyCategory =
   | "BUY"
   | "SELL"
   | "RENT"
-  | "PLOTS"
-  | "RESIDENTIAL";
+  | "PLOTS";
 export type PropertyStatus = "AVAILABLE" | "SOLD" | "RESERVED" | "IN_PROGRESS";
 export type PropertyType = "BUILDING" | "APARTMENT" | "PLOT";
 export type TargetType = "PROJECT" | "PROPERTY" | "BOTH";
@@ -58,6 +58,7 @@ export interface Property {
   roadAccess?: "Paved" | "Unpaved" | "Highway-adjacent" | "None";
   utilitiesReady?: boolean;
   cornerPlot?: boolean;
+  usageType: PropertyUsageType;
   // Rent-specific (optional)
   rentPeriod?: "Monthly" | "Yearly";
   minLeaseMonths?: number;

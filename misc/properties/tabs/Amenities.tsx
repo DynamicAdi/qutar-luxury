@@ -1,13 +1,13 @@
 "use client";
 
 import React from "react";
-import { ChipEditor } from "../ChipEditor";
 import { Card } from "@/components/ui/card";
+import { SelectableChipEditor } from "@/components/client/properties/SelectableChipEditor";
 
-function Amenities({p, upd}: {p: any, upd: any}) {
+function Amenities({ p, upd }: { p: any; upd: any }) {
   return (
-    <Card className="rounded-2xl p-5 shadow-card border-0 space-y-4">
-      <ChipEditor
+    <Card className="rounded-2xl p-5 shadow-card border-0 space-y-6">
+      <SelectableChipEditor
         label="Amenities"
         items={p.amenities}
         onChange={(v) => upd("amenities", v)}
@@ -26,7 +26,8 @@ function Amenities({p, upd}: {p: any, upd: any}) {
           "Tennis Court",
         ]}
       />
-      <ChipEditor
+
+      <SelectableChipEditor
         label="Features"
         items={p.features}
         onChange={(v) => upd("features", v)}

@@ -49,11 +49,11 @@ const nav: NavItem[] = [
       { href: "/dashboard/properties/sell", label: "Sell", icon: Tag },
       { href: "/dashboard/properties/rent", label: "Rent", icon: Key },
       { href: "/dashboard/properties/plots", label: "Plots", icon: MapPin },
-      {
-        href: "/dashboard/properties/residential",
-        label: "Residential",
-        icon: HomeIcon,
-      },
+      // {
+      //   href: "/dashboard/properties/residential",
+      //   label: "Residential",
+      //   icon: HomeIcon,
+      // },
     ],
   },
   { href: "/dashboard/addresses", label: "Addresses", icon: MapPin },

@@ -13,7 +13,7 @@ import { toast } from "sonner";
 function Media({ p, upd }: { p: any; upd: any }) {
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [previewImage, setPreviewImage] = useState<string[]>([])
+  const [previewImage, setPreviewImage] = useState<string[]>(p.images || []);
   const [deleteThread, setDeleteThread] = useState<boolean>(false);
 
 type ImageInput = File | string;
@@ -38,7 +38,6 @@ function handleImageUpload(
   const existingPreviews = currentImages.map((img) =>
     typeof img === "string" ? img : URL.createObjectURL(img)
   );
-  console.log(existingPreviews);
   
 
   const newPreviews = files.map((file) =>
