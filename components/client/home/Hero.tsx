@@ -188,7 +188,7 @@ export default function Hero() {
   const handleSearch = () => {
     const locations = encodeURIComponent(selectedLocations.join(","));
     router.push(
-      `/properties?type=${type}&location=${locations}&priceMin=${priceRange.priceMin}&priceMax=${priceRange.priceMax}`
+      `/properties?type=${type}&location=${locations}&priceMin=${priceRange.priceMin}&priceMax=${priceRange.priceMax}&usageType=${usageType}`
     );
   };
   const handleSelectLocation = (city: string) => {

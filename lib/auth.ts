@@ -1,5 +1,5 @@
 import { JWTPayload, SignJWT, jwtVerify } from "jose";
-
+import {cookies} from "next/headers";
 const secret = new TextEncoder().encode(
   process.env.JWT_SECRET || "supersecret"
 );
@@ -16,6 +16,8 @@ export async function verifyToken(token: string) {
     const { payload } = await jwtVerify(token, secret);
     return payload;
   } catch (err) {
+    const cookiesControl = await cookies();
+    cookiesControl.delete("token");
     return null;
   }
 }

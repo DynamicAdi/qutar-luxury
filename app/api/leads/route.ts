@@ -94,7 +94,6 @@ export async function DELETE(req: NextRequest) {
   if (!id) {
     return NextResponse.json({ error: "ID is not provided" }, { status: 404 });
   }
-
   try {
     const leads = await db.leads.delete({
       where: { id },

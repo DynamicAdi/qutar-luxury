@@ -24,60 +24,102 @@ export type PropertyCategory =
 export type PropertyStatus = "AVAILABLE" | "SOLD" | "RESERVED" | "IN_PROGRESS";
 export type PropertyType = "BUILDING" | "APARTMENT" | "PLOT";
 export type TargetType = "PROJECT" | "PROPERTY" | "BOTH";
+
 export interface Property {
   id: string;
+
   title: string;
   featured: boolean;
+
   category: PropertyCategory;
   propertyType: PropertyType;
+  targetType: TargetType;
+
   price: number;
   currency: string;
-  pngImage?: string;
-  youtubeLink?: string;
-  address?: AddressEntry;
+
+  pngImage?: string | null;
+  youtubeLink?: string | null;
+
+  description: string;
+
+  // Location
+  address?: AddressEntry | null;
   city: string;
   state: string;
-  lat?: number;
-  targetType: TargetType; 
-  lng?: number;
-  description: string;
+  lat?: number | null;
+  lng?: number | null;
+
+  // Core specs
   BedRooms: number;
   Bathrooms: number;
   Area: number; // sqft
   yearBuilt: number;
+
   furnishing: "Furnished" | "Semi-Furnished" | "Unfurnished";
   parking: number;
-  // Plot-specific (optional)
-  plotArea?: number; // sqm
+
+  // Plot-specific
+  plotArea?: number | null;
   zoning?:
     | "Residential"
     | "Commercial"
     | "Mixed-Use"
     | "Industrial"
-    | "Agricultural";
-  roadAccess?: "Paved" | "Unpaved" | "Highway-adjacent" | "None";
-  utilitiesReady?: boolean;
-  cornerPlot?: boolean;
+    | "Agricultural"
+    | null;
+
+  roadAccess?:
+    | "Paved"
+    | "Unpaved"
+    | "Highway-adjacent"
+    | "None"
+    | null;
+
+  utilitiesReady?: boolean | null;
+  cornerPlot?: boolean | null;
+
   usageType: PropertyUsageType;
-  // Rent-specific (optional)
-  rentPeriod?: "Monthly" | "Yearly";
-  minLeaseMonths?: number;
-  depositMonths?: number;
-  availableFrom?: string;
+
+  // Rent-specific
+  rentPeriod?: "Monthly" | "Yearly" | null;
+  minLeaseMonths?: number | null;
+  depositMonths?: number | null;
+  availableFrom?: string | null;
+
+  // Media
   images: string[];
-  floorPlanUrl?: string;
-  videoTourUrl?: string;
-  virtualTourUrl?: string;
+  floorPlanUrl?: string | null;
+  videoTourUrl?: string | null;
+  virtualTourUrl?: string | null;
+
+  // Extras
   amenities: string[];
   features: string[];
-  NearByLocations: { name: string; type: string }[];
+
+  NearByLocations: {
+    name: string;
+    type: string;
+  }[];
+
+  // Agents
   agent: AgentEntry[];
-  agentIds?: string[]; // multi-agent assignment
-  addressId?: string;
-  documents: { name: string; url: string }[];
+  agentIds?: string[] | null;
+
+  // Address relation
+  addressId?: string | null;
+
+  // Documents
+  documents: {
+    name: string;
+    url: string;
+  }[];
+
   isHidden: boolean;
   status: PropertyStatus;
-  hoaFee?: number;
+
+  hoaFee?: number | null;
+
   createdAt: string;
 }
 
@@ -91,15 +133,21 @@ export type status = "NEW" | "CONTACTED" | "QUALIFIED" | "CONVERTED" | "LOST";
 
 export interface Lead {
   id: string;
+
   name: string;
   email: string;
   phone: string;
-  propertyId?: string;
+
+  propertyId?: string | null;
+
   budget: LeadBudget;
   status: status;
-  message: string;
+
+  message?: string | null;
+
   createdAt: string;
-  property: { title: string; id: string, price: string };
+
+  property?: Property;
 }
 
 export interface Customer {
@@ -164,3 +212,30 @@ export const formatPrice = (n: number, c = "QAR") =>
     currency: c,
     maximumFractionDigits: 0,
   }).format(n);
+
+
+export interface Response {
+  success: boolean;
+  data: Lead;
+  errors?: string[];
+}
+
+export type TaskStatus = "PENDING" | "COMPLETED";
+export type TaskPriority = "LOW" | "MEDIUM" | "HIGH";
+
+export interface LeadTask {
+  id: string;
+  leadId: string;
+
+  title: string;
+
+  dueDate?: string | null;
+
+  status: TaskStatus;
+  priority: TaskPriority;
+
+  completedAt?: string | null;
+
+  createdAt: string;
+  updatedAt: string;
+}

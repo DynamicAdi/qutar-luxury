@@ -18,7 +18,6 @@ export async function proxy(req: NextRequest) {
     }
 
     const valid = await verifyToken(token);
-
     if (!valid) {
       return NextResponse.redirect(new URL("/login", req.url));
     }

@@ -31,6 +31,7 @@ import {
   ArrowUpRight,
   UserCheck,
   LucideLoader2,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
@@ -38,6 +39,7 @@ import { Field } from "@/components/ui/field";
 import LoaderScreen from "@/misc/LoaderScreen";
 import { usePaginatedFetch } from "@/components/usePaginationFetch";
 import Pagination from "@/components/Pagination";
+import { useRouter, usePathname } from "next/navigation";
 
 const statusStyle: Record<Lead["status"], string> = {
   NEW: "bg-primary/10 text-primary-deep border-primary/30",
@@ -49,10 +51,10 @@ const statusStyle: Record<Lead["status"], string> = {
 
 export default function Leads() {
   const [convertLead, setConvertLead] = useState<Lead | null>(null);
-
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [deleteThread, startDeleteThread] = useTransition();
-
+  const pathName = usePathname();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const {
@@ -190,6 +192,7 @@ export default function Leads() {
                 </th>
                 <th className="text-left px-4 py-3.5">Status</th>
                 <th className="text-right px-4 py-3.5">Actions</th>
+                <th className="text-right px-4 py-3.5">Operations</th>
               </tr>
             </thead>
 
@@ -312,6 +315,17 @@ export default function Leads() {
                       </button>
                     </div>
                   </td>
+                  <td className="text-center">
+                    <Button
+                      onClick={() => {
+                        router.push(`${pathName}/${l.id}`);
+                      }}
+                      className="group"
+                    >
+                      Manage{" "}
+                      <ArrowRight className="group-hover:ml-1 transition-all duration-400" />
+                    </Button>
+                  </td>
                 </tr>
               ))}
 
@@ -404,7 +418,7 @@ function ConvertDialog({
         name: lead?.name,
         email: lead?.email,
         phone: lead?.phone,
-        propertyIds: [lead?.property.id],
+        propertyIds: [lead?.property!.id],
         nationality: nationality,
         dealAmount: dealAmount,
         paymentMethod: paymentMethod,

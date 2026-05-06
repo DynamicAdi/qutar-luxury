@@ -7,7 +7,6 @@ import { LoaderCircle } from "lucide-react";
 import { getCookie, setCookie } from "cookies-next";
 import { formatQAR } from "@/lib/properties";
 
-
 const schema = z.object({
   name: z.string().trim().min(2, "Enter your name").max(100),
   email: z.string().trim().email("Invalid email").max(255),
@@ -16,113 +15,134 @@ const schema = z.object({
   note: z.string().max(1000).optional().or(z.literal("")),
 });
 
-const EnquiryForm = ({ property, price }: { property: string, price: number }) => {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", budget: "", note: "" });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [transition, startTransition] = useTransition()
-  const [userFingers, setUserFingers] = useState<string | null>(null)
-  const [isSubmitted, setSubmitted] = useState<boolean>(false)
-const submitLead = () =>
-  startTransition(async () => {
-    try {
-      const req = await axios.post("/api/leads", {
-        name: form.name,
-        email: form.email,
-        phone: form.phone,
-        budget: String(form.budget),
-        note: form.note,
-        propertyId: property,
-        fingerprint: userFingers,
-      });
-
-      if (req.status === 201) {
-        toast.success(
-          "Your enquiry has been received\nWe will connect with you shortly"
-        );
-
-        setForm({
-          name: "",
-          email: "",
-          phone: "",
-          budget: "",
-          note: "",
-        });
-      }
-
-      if (req.status === 403) {
-        toast.error(req.data.data)
-      }
-    } catch (error: any) {
-      const message =
-        error?.response?.data?.data || "Something went wrong";
-
-      toast.error(message);
-    }
+const EnquiryForm = ({
+  property,
+  price,
+}: {
+  property: string;
+  price: number;
+}) => {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    budget: "",
+    note: "",
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [transition, startTransition] = useTransition();
+  const [userFingers, setUserFingers] = useState<string | null>(null);
+  const [isSubmitted, setSubmitted] = useState<boolean>(false);
+  const submitLead = () =>
+    startTransition(async () => {
+      try {
+        const req = await axios.post("/api/leads", {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          budget: String(form.budget),
+          note: form.note,
+          propertyId: property,
+          fingerprint: userFingers,
+        });
 
+        if (req.status === 201) {
+          toast.success(
+            "Your enquiry has been received\nWe will connect with you shortly"
+          );
 
-  const checkFingerprint = (fingerprint: string) => startTransition(async() => {
-    const req = await axios.get(`/api/fingerprint?fingerprint=${fingerprint}`)
-    if (req.status === 200) {
-      setSubmitted(req.data.success)
-    }
-  })
+          setForm({
+            name: "",
+            email: "",
+            phone: "",
+            budget: "",
+            note: "",
+          });
+        }
+
+        if (req.status === 403) {
+          toast.error(req.data.data);
+        }
+      } catch (error: any) {
+        const message = error?.response?.data?.data || "Something went wrong";
+
+        toast.error(message);
+      }
+    });
+
+  const checkFingerprint = (fingerprint: string) =>
+    startTransition(async () => {
+      const req = await axios.get(
+        `/api/fingerprint?fingerprint=${fingerprint}`
+      );
+      if (req.status === 200) {
+        setSubmitted(req.data.success);
+      }
+    });
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = schema.safeParse(form);
     if (!parsed.success) {
       const errs: Record<string, string> = {};
-      parsed.error.issues.forEach((i) => { errs[i.path[0] as string] = i.message; });
+      parsed.error.issues.forEach((i) => {
+        errs[i.path[0] as string] = i.message;
+      });
       setErrors(errs);
       return;
     }
     setErrors({});
-    submitLead()
+    submitLead();
   };
 
-    useEffect(() => {
+  useEffect(() => {
     let id = getCookie("userId");
     if (!id) {
       id = crypto.randomUUID();
       setCookie("userId", id, { maxAge: 60 * 60 * 24 * 365 }); // 1 year
     }
-    checkFingerprint(id as string)
+    checkFingerprint(id as string);
     setUserFingers(id as string);
   }, []);
 
+  const STEP = 1000;
 
+  const getBudgetRange = (price: number) => {
+    const min = Math.floor((price * 0.5) / STEP) * STEP; // -30%
+    const max = Math.ceil((price * 1.5) / STEP) * STEP; // +30%
 
-const STEP = 1000;
-
-const getBudgetRange = (price: number) => {
-  const min = Math.floor((price * 0.5) / STEP) * STEP; // -30%
-  const max = Math.ceil((price * 1.5) / STEP) * STEP;  // +30%
-
-  return {
-    floor: Math.max(0, min),
-    ceil: max,
+    return {
+      floor: Math.max(0, min),
+      ceil: max,
+    };
   };
-};
 
-const { floor: PRICE_FLOOR, ceil: PRICE_CEIL } = getBudgetRange(price);
+  const { floor: PRICE_FLOOR, ceil: PRICE_CEIL } = getBudgetRange(price);
 
-// parse current string budget
-const [minBudget, maxBudget] = form.budget
-  ? form.budget.split("-").map(Number)
-  : [PRICE_FLOOR, PRICE_CEIL];
+  // parse current string budget
+  const [minBudget, maxBudget] = form.budget
+    ? form.budget.split("-").map(Number)
+    : [PRICE_FLOOR, PRICE_CEIL];
 
-const pct = (val: number) =>
-  ((val - PRICE_FLOOR) / (PRICE_CEIL - PRICE_FLOOR)) * 100;
+  const pct = (val: number) =>
+    ((val - PRICE_FLOOR) / (PRICE_CEIL - PRICE_FLOOR)) * 100;
 
-const updateBudget = (min: number, max: number) => {
-  setForm({
-    ...form,
-    budget: `${min}-${max}`,
-  });
-};
-  const field = (name: keyof typeof form, label: string, type = "text", placeholder = "", required: boolean) => (
+  const updateBudget = (min: number, max: number) => {
+    setForm({
+      ...form,
+      budget: `${min}-${max}`,
+    });
+  };
+  const field = (
+    name: keyof typeof form,
+    label: string,
+    type = "text",
+    placeholder = "",
+    required: boolean
+  ) => (
     <div>
-      <label className="block font-display text-sm text-muted-foreground mb-1">{label}</label>
+      <label className="block font-display text-sm text-muted-foreground mb-1">
+        {label}
+      </label>
       <input
         type={type}
         required={required}
@@ -131,46 +151,57 @@ const updateBudget = (min: number, max: number) => {
         placeholder={placeholder}
         className="w-full bg-background border border-border px-3 py-2.5 font-body text-foreground outline-none focus:border-emerald transition-colors"
       />
-      {errors[name] && <p className="mt-1 text-xs text-destructive">{errors[name]}</p>}
+      {errors[name] && (
+        <p className="mt-1 text-xs text-destructive">{errors[name]}</p>
+      )}
     </div>
   );
 
   return (
-    <form onSubmit={submit} className="bg-card border border-border p-6 shadow-card">
-      <p className="font-display tracking-[0.3em] text-emerald text-xs mb-2">ENQUIRE</p>
+    <form
+      onSubmit={submit}
+      className="bg-card border border-border p-6 shadow-card"
+    >
+      <p className="font-display tracking-[0.3em] text-emerald text-xs mb-2">
+        ENQUIRE
+      </p>
       <h3 className="font-display text-3xl leading-none mb-1">TALK TO US</h3>
-      <p className="text-sm text-muted-foreground mb-5">No commitment. A specialist will reach out within 24 hours.</p>
+      <p className="text-sm text-muted-foreground mb-5">
+        No commitment. A specialist will reach out within 24 hours.
+      </p>
 
       <div className="space-y-4">
         {field("name", "Full Name", "text", "Your name", true)}
         {field("email", "Email", "email", "you@example.com", true)}
         {field("phone", "Phone", "tel", "+974 …", true)}
-        <p className="block font-display text-sm text-muted-foreground -mb-1">Budget</p>
-<div className="relative h-20 w-full">
-  {/* Track */}
-  <div className="absolute top-5 left-0 right-0 h-1 rounded-full bg-secondary" />
+        <p className="block font-display text-sm text-muted-foreground -mb-1">
+          Budget
+        </p>
+        <div className="relative h-20 w-full">
+          {/* Track */}
+          <div className="absolute top-5 left-0 right-0 h-1 rounded-full bg-secondary" />
 
-  {/* Active Range */}
-  <div
-    className="absolute top-5 h-1 rounded-full bg-emerald"
-    style={{
-      left: `${pct(minBudget)}%`,
-      width: `${pct(maxBudget) - pct(minBudget)}%`,
-    }}
-  />
+          {/* Active Range */}
+          <div
+            className="absolute top-5 h-1 rounded-full bg-emerald"
+            style={{
+              left: `${pct(minBudget)}%`,
+              width: `${pct(maxBudget) - pct(minBudget)}%`,
+            }}
+          />
 
-  {/* MIN Slider */}
-  <input
-    type="range"
-    min={PRICE_FLOOR}
-    max={PRICE_CEIL}
-    step={STEP}
-    value={minBudget}
-    onChange={(e) => {
-      const val = Math.min(+e.target.value, maxBudget - 1000);
-      updateBudget(val, maxBudget);
-    }}
-    className="absolute top-0 left-0 w-full h-10 appearance-none bg-transparent z-20
+          {/* MIN Slider */}
+          <input
+            type="range"
+            min={PRICE_FLOOR}
+            max={PRICE_CEIL}
+            step={STEP}
+            value={minBudget}
+            onChange={(e) => {
+              const val = Math.min(+e.target.value, maxBudget - 1000);
+              updateBudget(val, maxBudget);
+            }}
+            className="absolute top-0 left-0 w-full h-10 appearance-none bg-transparent z-20
     pointer-events-none
     [&::-webkit-slider-thumb]:pointer-events-auto
     [&::-webkit-slider-thumb]:appearance-none
@@ -179,20 +210,20 @@ const updateBudget = (min: number, max: number) => {
     [&::-webkit-slider-thumb]:rounded-full
     [&::-webkit-slider-thumb]:bg-emerald
     [&::-webkit-slider-thumb]:cursor-pointer"
-  />
+          />
 
-  {/* MAX Slider */}
-  <input
-    type="range"
-    min={PRICE_FLOOR}
-    max={PRICE_CEIL}
-    step={1000}
-    value={maxBudget}
-    onChange={(e) => {
-      const val = Math.max(+e.target.value, minBudget + 1000);
-      updateBudget(minBudget, val);
-    }}
-    className="absolute top-0 left-0 w-full h-10 appearance-none bg-transparent z-10
+          {/* MAX Slider */}
+          <input
+            type="range"
+            min={PRICE_FLOOR}
+            max={PRICE_CEIL}
+            step={1000}
+            value={maxBudget}
+            onChange={(e) => {
+              const val = Math.max(+e.target.value, minBudget + 1000);
+              updateBudget(minBudget, val);
+            }}
+            className="absolute top-0 left-0 w-full h-10 appearance-none bg-transparent z-10
     pointer-events-none
     [&::-webkit-slider-thumb]:pointer-events-auto
     [&::-webkit-slider-thumb]:appearance-none
@@ -201,16 +232,18 @@ const updateBudget = (min: number, max: number) => {
     [&::-webkit-slider-thumb]:rounded-full
     [&::-webkit-slider-thumb]:bg-gold
     [&::-webkit-slider-thumb]:cursor-pointer"
-  />
+          />
 
-  {/* Static Values */}
-  <div className="absolute bottom-6 left-0 right-0 flex justify-between text-xs font-medium">
-    <span className="text-emerald">{formatQAR(minBudget)}</span>
-    <span className="text-gold">{formatQAR(maxBudget)}</span>
-  </div>
-</div>
+          {/* Static Values */}
+          <div className="absolute bottom-6 left-0 right-0 flex justify-between text-xs font-medium">
+            <span className="text-emerald">{formatQAR(minBudget)}</span>
+            <span className="text-gold">{formatQAR(maxBudget)}</span>
+          </div>
+        </div>
         <div>
-          <label className="block font-display text-sm text-muted-foreground mb-1">Note (optional)</label>
+          <label className="block font-display text-sm text-muted-foreground mb-1">
+            Note (optional)
+          </label>
           <textarea
             value={form.note}
             onChange={(e) => setForm({ ...form, note: e.target.value })}
@@ -219,7 +252,9 @@ const updateBudget = (min: number, max: number) => {
             className="w-full bg-background border border-border px-3 py-2.5 font-body text-foreground outline-none focus:border-emerald transition-colors resize-none"
             placeholder="Anything specific?"
           />
-          {errors.note && <p className="mt-1 text-xs text-destructive">{errors.note}</p>}
+          {errors.note && (
+            <p className="mt-1 text-xs text-destructive">{errors.note}</p>
+          )}
         </div>
       </div>
 
@@ -228,9 +263,17 @@ const updateBudget = (min: number, max: number) => {
         disabled={isSubmitted || transition}
         className="mt-6 w-full bg-emerald text-primary-foreground font-display text-lg font-medium uppercase disabled:bg-emerald-deep tracking-widest disabled:cursor-not-allowed py-4 hover:bg-emerald-deep transition-colors grid place-items-center"
       >
-        {transition ? <LoaderCircle className="animate-spin" size={16}/> : isSubmitted ? "Already submitted" : "SEND ENQUIRY"}
+        {transition ? (
+          <LoaderCircle className="animate-spin" size={16} />
+        ) : isSubmitted ? (
+          "Already submitted"
+        ) : (
+          "SEND ENQUIRY"
+        )}
       </button>
-      <p className="mt-3 text-center text-xs text-muted-foreground">By submitting you agree to our terms.</p>
+      <p className="mt-3 text-center text-xs text-muted-foreground">
+        By submitting you agree to our terms.
+      </p>
     </form>
   );
 };

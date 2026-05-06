@@ -7,6 +7,26 @@ datasource db {
   provider = "postgresql"
 }
 
+model AdminUsers {
+  id        String   @id @default(nanoid())
+  name      String
+  username  String   @unique
+  email     String   @unique
+  password  String
+
+  // role      ADMIN_ROLE @default(ADMIN)
+
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// enum ADMIN_ROLE {
+//   ADMIN
+//   MANAGER
+//   STAFF
+// }
+
 enum STATUS {
   NEW
   CONTACTED
@@ -44,7 +64,7 @@ enum PROPERTY_CATEGORY {
   PLOT
 }
 
-enum TARGET_TYPE{
+enum TARGET_TYPE {
   PROJECT
   PROPERTY
   BOTH
@@ -82,7 +102,7 @@ model Address {
 model Leads {
   id     String  @id @default(nanoid())
   name   String
-  email  String  @unique
+  email  String
   phone  String
   budget String?
   status STATUS  @default(NEW)
@@ -90,41 +110,107 @@ model Leads {
 
   // Relations with property
   propertyId   String?
-  property     Property?     @relation(fields: [propertyId], references: [id])
+  property     Property?     @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   updatedAt    DateTime      @updatedAt
   createdAt    DateTime      @default(now())
   fingerprints Fingerprints?
+
+  followups LeadFollowup[]
+  meetings  LeadMeeting[]
+  tasks     LeadTask[]
+
+  @@index([email])
+  @@index([phone])
+}
+
+model LeadFollowup {
+  id     String @id @default(nanoid())
+  leadId String
+  lead   Leads  @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  message   String
+  createdAt DateTime @default(now())
+}
+
+enum MEETING_STATUS {
+  SCHEDULED
+  EMAIL_SENT
+  COMPLETED
+  CANCELLED
+}
+
+model LeadMeeting {
+  id     String @id @default(nanoid())
+  leadId String
+  lead   Leads  @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  title String
+
+  // 🔥 NEW CORE FIELDS (IMPORTANT)
+  location    String // site visit location / office / property address
+  scheduledAt DateTime // date + time of meeting
+
+  status MEETING_STATUS @default(SCHEDULED)
+
+  emailSent Boolean @default(false)
+
+  createdAt DateTime @default(now())
+}
+
+enum TASK_STATUS {
+  PENDING
+  COMPLETED
+}
+
+enum TASK_PRIORITY {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model LeadTask {
+  id     String @id @default(nanoid())
+  leadId String
+  lead   Leads  @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  title       String
+  dueDate     DateTime?
+  status      TASK_STATUS   @default(PENDING)
+  completedAt DateTime?
+  priority    TASK_PRIORITY @default(MEDIUM)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 model Property {
-  id           String            @id @default(uuid())
-  title        String
-  description  String
-  images       String[]
-  documents    Json?
-  youtubeLink  String?
-  amenities    String[]
-  features     String[]
-  isHidden     Boolean           @default(false)
-  category     PROPERTY_TYPE
-  status       PROPERTY_STATUS   @default(AVAILABLE)
-  propertyType PROPERTY_CATEGORY @default(APARTMENT)
-  pngImage     String?
-  price        Int
-  Area         Int
-  featured Boolean @default(false)
-  usageType PropertyUsageType @default(RESIDENTIAL)
+  id              String            @id @default(uuid())
+  title           String
+  description     String
+  images          String[]
+  documents       Json?
+  youtubeLink     String?
+  amenities       String[]
+  features        String[]
+  isHidden        Boolean           @default(false)
+  category        PROPERTY_TYPE
+  status          PROPERTY_STATUS   @default(AVAILABLE)
+  propertyType    PROPERTY_CATEGORY @default(APARTMENT)
+  pngImage        String?
+  price           Int
+  Area            Int
+  featured        Boolean           @default(false)
+  usageType       PropertyUsageType @default(RESIDENTIAL)
   NearByLocations Json[]
 
   // optional I d k what to keep what to not
-  BedRooms        Int?    @default(0)
-  Bathrooms       Int?    @default(0)
-  parking         Int?    @default(0)
-  furnishing      String? @default("Unfurnished")
-  HoaFees         Int?    @default(0)
-  yearBuilt       Int?
-  targetType  TARGET_TYPE @default(PROPERTY)
-  
+  BedRooms   Int?        @default(0)
+  Bathrooms  Int?        @default(0)
+  parking    Int?        @default(0)
+  furnishing String?     @default("Unfurnished")
+  HoaFees    Int?        @default(0)
+  yearBuilt  Int?
+  targetType TARGET_TYPE @default(PROPERTY)
+
   // Relations
   Leads      Leads[]
   agent      Agent[]
@@ -138,21 +224,21 @@ model Property {
 }
 
 model Customers {
-  id            String          @id @default(uuid())
-  name          String
-  image         String?
-  email         String          @unique
-  phone         String
+  id    String  @id @default(uuid())
+  name  String
+  image String?
+  email String  @unique
+  phone String
 
   dealAmount    Int?
   paymentMethod String?
   closingDate   DateTime?
   note          String?
-  
-  nationality   String?         @default("Qatari")
-  status        CUSTOMER_STATUS @default(BOOKED)
-  properties    Property[]
-  createdAt     DateTime        @default(now())
+
+  nationality String?         @default("Qatari")
+  status      CUSTOMER_STATUS @default(BOOKED)
+  properties  Property[]
+  createdAt   DateTime        @default(now())
 }
 
 model Fingerprints {
@@ -160,5 +246,5 @@ model Fingerprints {
   fingerprint String
   username    String
   leadId      String @unique
-  Lead        Leads  @relation(fields: [leadId], references: [id])
+  Lead        Leads  @relation(fields: [leadId], references: [id],onDelete: Cascade)
 }
