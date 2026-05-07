@@ -20,6 +20,7 @@ type TaskInput = {
   title: string;
   dueDate?: string | null;
   priority: "LOW" | "MEDIUM" | "HIGH";
+  tags: string[];
 };
 
 type Props = {
@@ -53,14 +54,33 @@ export default function TaskDialog({
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [priority, setPriority] = useState<"LOW" | "MEDIUM" | "HIGH">("MEDIUM");
-
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
   // 🧠 Prefill when updating
+  const addTag = () => {
+    const value = tagInput.trim();
+
+    if (!value) return;
+
+    if (tags.includes(value)) {
+      setTagInput("");
+      return;
+    }
+
+    setTags((prev) => [...prev, value]);
+    setTagInput("");
+  };
+
+  const removeTag = (tag: string) => {
+    setTags((prev) => prev.filter((t) => t !== tag));
+  };
   useEffect(() => {
     if (mode === "update" && initialData) {
       console.log(initialData);
       setTitle(initialData.title || "");
       setDueDate(toDateTimeLocal(initialData.dueDate!));
       setPriority(initialData.priority || "MEDIUM");
+      setTags(initialData.tags);
     }
   }, [mode, initialData]);
 
@@ -83,6 +103,7 @@ export default function TaskDialog({
             title,
             dueDate: formatToISO(dueDate) || null,
             priority,
+            tags,
           }),
         });
 
@@ -155,6 +176,67 @@ export default function TaskDialog({
               onChange={(e) => setDueDate(e.target.value)}
               className="h-11 rounded-xl"
             />
+          </div>
+          {/* Tags */}
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium text-muted-foreground">Tags</h3>
+
+            <div className="flex gap-2">
+              <Input
+                placeholder="Add tags..."
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addTag();
+                  }
+                }}
+                className="h-11 rounded-xl"
+              />
+
+              <button
+                type="button"
+                onClick={addTag}
+                className="
+        px-4 rounded-xl border
+        bg-primary text-white
+        text-sm font-medium
+        hover:opacity-90
+        transition
+      "
+              >
+                Add
+              </button>
+            </div>
+
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {tags.map((tag) => (
+                  <div
+                    key={tag}
+                    className="
+            flex items-center gap-2
+            rounded-full
+            bg-primary/10
+            text-primary
+            px-3 py-1.5
+            text-xs font-medium
+          "
+                  >
+                    <span>{tag}</span>
+
+                    <button
+                      type="button"
+                      onClick={() => removeTag(tag)}
+                      className="hover:text-red-500 transition"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* PRIORITY */}

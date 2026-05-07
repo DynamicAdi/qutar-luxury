@@ -18,6 +18,7 @@ import {
   Tag,
   Key,
   Home as HomeIcon,
+  Users2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/qlp/Logo";
@@ -40,6 +41,7 @@ type NavItem = {
 
 const nav: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/dashboard/admin-management", label: "Admins", icon: Users2 },
   {
     href: "/dashboard/properties",
     label: "Properties",

@@ -9,6 +9,7 @@ import { fetcher } from "@/lib/fetcher";
 import PropertyCard from "@/components/client/properties/PropertyCard";
 import { Property } from "@/store/cms";
 import SimplePropertyCard from "../properties/SimplePropertyCard";
+import CustomSwiper from "@/components/Swiper";
 const CONTENT = [
   {
     image:
@@ -44,7 +45,7 @@ export default function WhyFindSection() {
     error: projectsError,
     isLoading: projectsLoading,
   } = useSWR<{ data: Property[] }>(
-    "/api/featured?targetType=PROJECT",
+    "/api/featured",
     fetcher,
     options
   );
@@ -317,8 +318,8 @@ function FirstSection({ index, item, data, error, loading }: Props) {
             </div>
 
             {loading ? (
-              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {Array.from({ length: 6 }).map((_, i) => (
+              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 h-screen overflow-hidden">
+                {Array.from({ length: 3 }).map((_, i) => (
                   <div
                     key={i}
                     className="h-[420px] animate-pulse rounded-3xl bg-zinc-100"
@@ -334,10 +335,12 @@ function FirstSection({ index, item, data, error, loading }: Props) {
                 No featured projects available right now.
               </div>
             ) : (
-              <div className="grid w-full gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {data.map((project: Property) => (
-                  <PropertyCard key={project.id} property={project} />
-                ))}
+              <div className="grid">
+                <CustomSwiper>
+                  {data.map((project: Property) => (
+                    <PropertyCard key={project.id} property={project} />
+                  ))}
+                </CustomSwiper>
               </div>
             )}
           </div>
@@ -377,8 +380,8 @@ function SecondSection({ index, item, data, error, loading }: Props) {
             </div>
 
             {loading ? (
-              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {Array.from({ length: 6 }).map((_, i) => (
+              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 h-screen overflow-hidden">
+                {Array.from({ length: 3 }).map((_, i) => (
                   <div
                     key={i}
                     className="h-[420px] animate-pulse rounded-3xl bg-zinc-100"
@@ -394,10 +397,12 @@ function SecondSection({ index, item, data, error, loading }: Props) {
                 No featured projects available right now.
               </div>
             ) : (
-              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {data.map((project: Property) => (
-                  <SimplePropertyCard key={project.id} property={project} />
-                ))}
+              <div className="grid">
+                <CustomSwiper>
+                  {data.map((project: Property) => (
+                    <SimplePropertyCard key={project.id} property={project} />
+                  ))}
+                </CustomSwiper>
               </div>
             )}
           </div>

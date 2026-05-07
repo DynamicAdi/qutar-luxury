@@ -10,12 +10,10 @@ datasource db {
 model AdminUsers {
   id        String   @id @default(nanoid())
   name      String
-  username  String   @unique
   email     String   @unique
   password  String
-
   // role      ADMIN_ROLE @default(ADMIN)
-
+  isActive  Boolean  @default(true)
   image     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -177,6 +175,7 @@ model LeadTask {
   dueDate     DateTime?
   status      TASK_STATUS   @default(PENDING)
   completedAt DateTime?
+  tags        String[]
   priority    TASK_PRIORITY @default(MEDIUM)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -221,8 +220,29 @@ model Property {
 
   updateAt  DateTime @updatedAt
   createdAt DateTime @default(now())
+  proposalmails PropertyProposalMail[]
 }
 
+model PropertyProposalMail {
+  id            String   @id @default(cuid())
+  propertyId    String
+  property      Property @relation(fields: [propertyId], references: [id])
+  recipientName  String
+  recipientEmail String
+  subject       String
+  body          String
+  attachmentUrl String?
+  sentAt        DateTime?
+  createdAt     DateTime @default(now())
+  createdById   String?
+  status        MAIL_STATUS @default(DRAFT)
+}
+
+enum MAIL_STATUS {
+  DRAFT
+  SENT
+  FAILED
+}
 model Customers {
   id    String  @id @default(uuid())
   name  String
@@ -246,5 +266,5 @@ model Fingerprints {
   fingerprint String
   username    String
   leadId      String @unique
-  Lead        Leads  @relation(fields: [leadId], references: [id],onDelete: Cascade)
+  Lead        Leads  @relation(fields: [leadId], references: [id], onDelete: Cascade)
 }

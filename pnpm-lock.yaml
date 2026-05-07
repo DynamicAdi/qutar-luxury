@@ -11,6 +11,9 @@ importers:
       '@base-ui/react':
         specifier: ^1.4.1
         version: 1.4.1(@date-fns/tz@1.4.1)(@types/react@19.2.14)(date-fns@4.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@google/generative-ai':
+        specifier: ^0.24.1
+        version: 0.24.1
       '@imgly/background-removal':
         specifier: ^1.7.0
         version: 1.7.0(onnxruntime-web@1.21.0)
@@ -113,6 +116,9 @@ importers:
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      swiper:
+        specifier: ^12.1.4
+        version: 12.1.4
       swr:
         specifier: ^2.4.1
         version: 2.4.1(react@19.2.4)
@@ -579,6 +585,10 @@ packages:
 
   '@floating-ui/utils@0.2.11':
     resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
+
+  '@google/generative-ai@0.24.1':
+    resolution: {integrity: sha512-MqO+MLfM6kjxcKoy0p1wRzG3b4ZZXtPI+z2IE26UogS2Cm/XHO+7gGRBh6gcJsOiIVoH93UwKvW4HdgiOZCy9Q==}
+    engines: {node: '>=18.0.0'}
 
   '@hono/node-server@1.19.11':
     resolution: {integrity: sha512-dr8/3zEaB+p0D2n/IUrlPF1HZm586qgJNXK1a9fhg/PzdtkK7Ksd5l312tJX2yBuALqDYBlG20QEbayqPyxn+g==}
@@ -4526,6 +4536,10 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
+  swiper@12.1.4:
+    resolution: {integrity: sha512-bihiwoKMOQwW8FfdUbo1DgkVH25E+4ZELIq0oopL1KTKBteLuaTMi/wwFjMxtlhTkk45k3XQ89D1Fvv0spSqBA==}
+    engines: {node: '>= 4.7.0'}
+
   swr@2.4.1:
     resolution: {integrity: sha512-2CC6CiKQtEwaEeNiqWTAw9PGykW8SR5zZX8MZk6TeAvEAnVS7Visz8WzphqgtQ8v2xz/4Q5K+j+SeMaKXeeQIA==}
     peerDependencies:
@@ -5245,6 +5259,8 @@ snapshots:
       react-dom: 19.2.4(react@19.2.4)
 
   '@floating-ui/utils@0.2.11': {}
+
+  '@google/generative-ai@0.24.1': {}
 
   '@hono/node-server@1.19.11(hono@4.12.15)':
     dependencies:
@@ -9420,6 +9436,8 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  swiper@12.1.4: {}
 
   swr@2.4.1(react@19.2.4):
     dependencies:

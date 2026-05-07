@@ -187,3 +187,266 @@ export function meetingCancelledEmailTemplate({
 </div>
 `;
 }
+
+interface PropertyProposalTemplateProps {
+  subject: string;
+  body: string;
+  attachmentUrl?: string;
+}
+
+export function propertyProposalTemplate({
+  subject,
+  body,
+  attachmentUrl,
+}: PropertyProposalTemplateProps) {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>${subject}</title>
+</head>
+
+<body
+  style="
+    margin:0;
+    padding:0;
+    background:#f4f7fb;
+    font-family:Inter,Arial,sans-serif;
+    color:#111827;
+  "
+>
+  <div
+    style="
+      width:100%;
+      padding:40px 16px;
+      box-sizing:border-box;
+    "
+  >
+    <div
+      style="
+        max-width:680px;
+        margin:0 auto;
+        background:#ffffff;
+        border-radius:28px;
+        overflow:hidden;
+        border:1px solid #e5e7eb;
+        box-shadow:0 12px 40px rgba(15,23,42,0.08);
+      "
+    >
+
+      <!-- HEADER -->
+      <div
+        style="
+          padding:36px 34px;
+          background:linear-gradient(135deg,#0f172a,#111827,#1e293b);
+        "
+      >
+        <table width="100%" cellspacing="0" cellpadding="0">
+          <tr>
+            <td align="left">
+              <p
+                style="
+                  margin:0;
+                  color:#94a3b8;
+                  font-size:12px;
+                  letter-spacing:2px;
+                  text-transform:uppercase;
+                "
+              >
+                Personalized Property Proposal
+              </p>
+
+              <h1
+                style="
+                  margin:12px 0 0;
+                  font-size:30px;
+                  line-height:1.2;
+                  font-weight:700;
+                  color:#ffffff;
+                "
+              >
+                ${subject}
+              </h1>
+            </td>
+
+            <td align="right" width="72">
+              <div
+                style="
+                  width:60px;
+                  height:60px;
+                  border-radius:18px;
+                  background:rgba(255,255,255,0.08);
+                  text-align:center;
+                  line-height:60px;
+                  font-size:28px;
+                "
+              >
+                🏡
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- CONTENT -->
+      <div
+        style="
+          padding:36px 34px;
+        "
+      >
+
+        <!-- EMAIL BODY -->
+        <div
+          style="
+            font-size:15px;
+            line-height:1.9;
+            color:#374151;
+            white-space:pre-wrap;
+          "
+        >
+          ${body}
+        </div>
+
+        ${
+          attachmentUrl
+            ? `
+        <!-- ATTACHMENT -->
+        <div
+          style="
+            margin-top:34px;
+            padding:20px;
+            border-radius:20px;
+            background:#f8fafc;
+            border:1px solid #e5e7eb;
+          "
+        >
+          <table width="100%" cellspacing="0" cellpadding="0">
+            <tr>
+              <td width="56" valign="top">
+                <div
+                  style="
+                    width:48px;
+                    height:48px;
+                    border-radius:14px;
+                    background:#111827;
+                    text-align:center;
+                    line-height:48px;
+                    color:#ffffff;
+                    font-size:20px;
+                  "
+                >
+                  📄
+                </div>
+              </td>
+
+              <td valign="top">
+                <p
+                  style="
+                    margin:0;
+                    font-size:14px;
+                    font-weight:600;
+                    color:#111827;
+                  "
+                >
+                  Property Proposal PDF
+                </p>
+
+                <p
+                  style="
+                    margin:6px 0 14px;
+                    font-size:13px;
+                    line-height:1.6;
+                    color:#6b7280;
+                  "
+                >
+                  Click below to download the attached proposal document.
+                </p>
+
+                <a
+                  href="${attachmentUrl}"
+                  target="_blank"
+                  download
+                  style="
+                    display:inline-block;
+                    padding:11px 18px;
+                    border-radius:12px;
+                    background:#111827;
+                    color:#ffffff;
+                    text-decoration:none;
+                    font-size:13px;
+                    font-weight:600;
+                  "
+                >
+                  Download Proposal PDF
+                </a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        `
+            : ""
+        }
+
+      </div>
+
+      <!-- FOOTER -->
+      <div
+        style="
+          padding:24px 34px;
+          border-top:1px solid #eef2f7;
+          background:#fafafa;
+        "
+      >
+        <table width="100%" cellspacing="0" cellpadding="0">
+          <tr>
+            <td align="left">
+              <p
+                style="
+                  margin:0;
+                  font-size:14px;
+                  font-weight:600;
+                  color:#111827;
+                "
+              >
+                Real Estate Team
+              </p>
+
+              <p
+                style="
+                  margin:4px 0 0;
+                  font-size:12px;
+                  color:#9ca3af;
+                "
+              >
+                Premium Property Solutions
+              </p>
+            </td>
+
+            <td align="right">
+              <span
+                style="
+                  display:inline-block;
+                  padding:9px 16px;
+                  border-radius:999px;
+                  background:#111827;
+                  color:#ffffff;
+                  font-size:12px;
+                  font-weight:600;
+                "
+              >
+                Personalized Proposal
+              </span>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
+`;
+}

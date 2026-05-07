@@ -6,6 +6,7 @@ export const createTaskSchema = z.object({
   title: z.string().min(1),
   dueDate: z.string().optional(),
   priority: z.enum(["LOW", "MEDIUM", "HIGH"]).default("MEDIUM"),
+  tags: z.array(z.string().min(1)).default([])
 });
 
 // GET all tasks for a lead
@@ -60,6 +61,7 @@ export async function POST(
         title: parsed.data.title,
         priority: parsed.data.priority,
         dueDate: parsed.data.dueDate ? new Date(parsed.data.dueDate) : null,
+        tags: parsed.data.tags
       },
     });
 

@@ -20,6 +20,7 @@ import Media from "@/misc/properties/tabs/Media";
 import axios from "axios";
 import LoaderScreen from "@/misc/LoaderScreen";
 import { uploadFile } from "@/lib/uploadImage";
+import PersonalizedDocsTab from "@/misc/properties/tabs/PersonalizedDocs";
 
 const blank = (id: string, category: PropertyCategory): Property => ({
   id,
@@ -285,14 +286,14 @@ export default function PropertyEdit({
         <div className="lg:col-span-2 space-y-4">
           <Tabs defaultValue="overview">
             <TabsList className="rounded-xl bg-secondary p-1 h-auto flex-wrap">
-              {["overview", "media","documents", "amenities", "location", "agent"].map(
+              {["overview", "media","documents","personalized_documents", "amenities", "location", "agent"].map(
                 (t) => (
                   <TabsTrigger
                     key={t}
                     value={t}
                     className="rounded-lg capitalize data-[state=active]:bg-card data-[state=active]:shadow-card px-3.5 py-1.5 text-xs sm:text-sm"
                   >
-                    {t}
+                    {t.replaceAll("_"," ")}
                   </TabsTrigger>
                 )
               )}
@@ -309,7 +310,9 @@ export default function PropertyEdit({
             <TabsContent value="documents">
               <Documents upd={upd} p={p} />
             </TabsContent>
-
+            <TabsContent value="personalized_documents">
+              <PersonalizedDocsTab id={id} p={p} />
+            </TabsContent>
             <TabsContent value="amenities">
               <Amenities upd={upd} p={p} />
             </TabsContent>

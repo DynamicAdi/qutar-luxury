@@ -16,7 +16,7 @@ import {
 import Pagination from "@/components/Pagination";
 import { useLeadTasks } from "@/hooks/leads/useLeadTasks";
 import { usePaginationFrontend } from "@/hooks/usePaginationFrontend";
-import { LeadTask } from "@/generated/prisma/client";
+import { LeadTask } from "@/store/cms";
 import TaskDialog from "./TaskDialog";
 
 const priorityColor = {
@@ -150,7 +150,17 @@ export default function Tasks({ id }: { id: string }) {
                             {new Date(t.createdAt).toLocaleDateString()}
                           </p>
                         </div>
+                        {t.tags?.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {t.tags.slice(0, 5).map((tag: string) => (
+                              <Tag key={tag} text={"#"+tag}/>
+                            ))}
 
+                            {t.tags.length > 5 && (
+                              <Tag text={`+${t.tags.length - 5} more`} />
+                            )}
+                          </div>
+                        )}
                         {/* META CHIPS */}
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge
@@ -204,7 +214,12 @@ export default function Tasks({ id }: { id: string }) {
                     <div className="flex flex-col justify-between items-end">
                       <div className="mt-5 flex flex-col gap-2 opacity-0 translate-x-3 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
                         {/* EDIT */}
-                        <TaskDialog onSuccess={mutate} mode="update" initialData={t} leadId={id}>
+                        <TaskDialog
+                          onSuccess={mutate}
+                          mode="update"
+                          initialData={t}
+                          leadId={id}
+                        >
                           <button
                             className="h-9 w-9 rounded-xl border bg-blue-50 border-blue-200 flex items-center justify-center hover:scale-105 transition"
                             disabled={isPending}
@@ -255,5 +270,24 @@ export default function Tasks({ id }: { id: string }) {
         onPageChange={setPage}
       />
     </Card>
+  );
+}
+
+function Tag({ text }: { text: string }) {
+  return (
+    <div
+      key={text}
+      className="
+        rounded-full
+        border border-primary/10
+        bg-primary/5
+        px-2.5 py-1
+        text-[10px]
+        font-medium
+        text-primary
+      "
+    >
+      {text}
+    </div>
   );
 }

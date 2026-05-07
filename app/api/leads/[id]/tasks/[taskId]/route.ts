@@ -7,6 +7,7 @@ export const updateTaskSchema = z.object({
   dueDate: z.string().optional(),
   priority: z.enum(["LOW", "MEDIUM", "HIGH"]).optional(),
   status: z.enum(["PENDING", "COMPLETED"]).optional(),
+  tags: z.array(z.string().min(1)).default([]),
 });
 
 // UPDATE task
@@ -25,7 +26,11 @@ export async function PATCH(
 
     if (!parsed.success) {
       return NextResponse.json(
-        { success: false, message: "Failed To Update Task",errors: parsed.error.flatten() },
+        {
+          success: false,
+          message: "Failed To Update Task",
+          errors: parsed.error.flatten(),
+        },
         { status: 400 }
       );
     }

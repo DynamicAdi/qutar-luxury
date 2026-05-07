@@ -233,9 +233,21 @@ export interface LeadTask {
 
   status: TaskStatus;
   priority: TaskPriority;
-
+  tags: string[];
   completedAt?: string | null;
 
   createdAt: string;
   updatedAt: string;
 }
+
+
+export type Admin = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  image?: string;
+  updatedAt: string;
+  isActive?: boolean;
+};

@@ -234,10 +234,6 @@ export default function Hero() {
           </span>
         </p>
 
-        {/* <Button className="mt-8 inline-flex items-center gap-4 rounded-full bg-[#161819] px-6 py-5 text-md font-medium text-white">
-          Find Properties <ArrowRight size={20} />
-        </Button> */}
-
         <div className="w-full space-y-4 max-w-2xl mt-14">
           {/* Tabs */}
           <ToggleGroup
@@ -403,64 +399,6 @@ export default function Hero() {
               )}
             </div>
           </div>
-
-          {/* Search */}
-          {/* <div className="relative">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-
-              <Input
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Search by location..."
-                className="h-14 w-full rounded-full border border-gray-200 bg-white pl-11 pr-32 shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20"
-              />
-
-              <Button
-                onClick={handleSearch}
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-10 rounded-full text-base px-5 shadow-sm"
-              >
-                Explore <LucideArrowRightCircle size={14} />
-              </Button>
-            </div>
-
-            {location.trim() && (
-              <Card className="absolute top-full mt-2 w-full z-50 overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-xl">
-                {loadingPlaces ? (
-                  <div className="space-y-2">
-                    {[1, 2, 3].map((item) => (
-                      <div
-                        key={item}
-                        className="h-11 w-full animate-pulse rounded-xl bg-muted"
-                      />
-                    ))}
-                  </div>
-                ) : results.length > 0 ? (
-                  <div className="space-y-1">
-                    {results.map((item) => (
-                      <button
-                        key={item}
-                        onClick={() => setLocation(item)}
-                        className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors hover:bg-muted"
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
-                        </div>
-
-                        <span className="text-sm font-medium text-foreground">
-                          {item}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="px-3 py-4 text-center text-sm text-muted-foreground">
-                    No locations found
-                  </div>
-                )}
-              </Card>
-            )}
-          </div> */}
           <div className="relative">
             {mounted && (
               <>
