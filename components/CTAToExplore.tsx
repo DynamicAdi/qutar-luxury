@@ -98,9 +98,9 @@ export default function CTAToExplore() {
           size="lg"
           className="
     group fixed bottom-5 left-1/2 z-50 -translate-x-1/2
-    h-14 rounded-full px-5
-    border border-white/30
-    bg-white/15 backdrop-blur-xl
+    h-14 rounded-full px-3
+    border border-black/40
+    bg-black/40 backdrop-blur-xl
     shadow-[0_8px_30px_rgba(0,0,0,0.18)]
     text-md
     hover:scale-105 hover:shadow-[0_12px_40px_rgba(0,0,0,0.22)]
@@ -112,11 +112,11 @@ export default function CTAToExplore() {
           {/* <span className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-500/20 via-white/10 to-cyan-500/20 opacity-80 group-hover:opacity-100 transition-opacity" /> */}
 
           {/* moving shine */}
-          <span className="absolute -left-20 top-0 h-full w-16 rotate-12 bg-white/30 blur-md group-hover:left-[120%] transition-all duration-700" />
+          <span className="absolute -left-20 top-0 h-full w-16 rotate-12 bg-emerald/60 blur-md group-hover:left-[120%] transition-all duration-700" />
 
           {/* content */}
-          <span className="relative flex items-center gap-3 text-gray-500 font-semibold tracking-wide">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
+          <span className="relative flex items-center gap-3 text-white font-semibold tracking-wide">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black/20 backdrop-blur-md">
               <Search className="h-4 w-4" />
             </span>
             Search Properties
@@ -125,7 +125,7 @@ export default function CTAToExplore() {
         </Button>
       </DrawerTrigger>
 
-      <DrawerContent className="max-w-2xl min-h-[80vh] mx-auto">
+      <DrawerContent className="max-w-2xl min-h-[60vh] mx-auto">
         <div className="mx-auto w-full px-4 pb-8">
           <DrawerHeader className="px-0">
             <DrawerTitle>Find Your Property</DrawerTitle>
