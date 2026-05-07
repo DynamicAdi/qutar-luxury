@@ -50,7 +50,7 @@ export default function WhyFindSection() {
   );
   const featuredProjects = projectsData?.data ?? [];
   return (
-    <div className="grid">
+    <div className="grid h-auto">
       {/* SECTION 1 */}
       <section className="overflow-hidden px-6 py-20 md:px-10 lg:px-16 xl:px-24">
         <div className="grid gap-12 lg:grid-cols-[0.42fr_1fr]">

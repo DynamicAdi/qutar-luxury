@@ -223,7 +223,7 @@ export default function useZoomScroll() {
           scrollTrigger: {
             trigger: card,
             start: "top top",
-            end: "+=150%",
+            end: "+=200%",
             scrub: true,
             pin: true,
             anticipatePin: 1,

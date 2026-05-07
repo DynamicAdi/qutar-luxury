@@ -25,7 +25,7 @@ const STEPS = [
 
 export default function RealEstateRewiredSection() {
   return (
-    <section className="px-6 max-w-[1400px] mx-auto py-20 md:px-10 lg:px-16 xl:px-24 overflow-hidden">
+    <section className="px-6 max-w-[1400px] mx-auto py-20 md:px-10 lg:px-16 xl:px-24 min-h-screen overflow-hidden">
       <motion.div
         variants={staggerWrap}
         initial="hidden"

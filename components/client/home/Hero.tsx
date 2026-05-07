@@ -567,7 +567,7 @@ export default function Hero() {
               WebkitTextStroke: "2px #111",
             }}
           >
-            QUATAR LUXURY PROPERTIES
+            QUATAR <br /> LUXURY <br /> PROPERTIES
           </h2>
 
           {/* Fill */}
@@ -583,7 +583,7 @@ export default function Hero() {
               backgroundPosition: "50% 0%",
             }}
           >
-            QUATAR LUXURY PROPERTIES
+            QUATAR  <br /> LUXURY <br /> PROPERTIES
           </h2>
         </div>
       </div>
