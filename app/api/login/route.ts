@@ -56,7 +56,6 @@ export async function POST(req: Request) {
     const admin = await db.adminUsers.findFirst({
       where: {
         OR: [
-          { username },
           { email: username },
         ],
       },
@@ -106,7 +105,8 @@ export async function POST(req: Request) {
     });
 
     return res;
-  } catch (err) {
+  } catch (err: any) {
+    console.log(err.message);
     return NextResponse.json(
       { success: false, message: "Login failed" },
       { status: 500 }
