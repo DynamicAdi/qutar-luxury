@@ -125,7 +125,7 @@ export default function CTAToExplore() {
         </Button>
       </DrawerTrigger>
 
-      <DrawerContent className="max-w-2xl min-h-[60vh] mx-auto">
+      <DrawerContent className="max-w-2xl min-h-[80vh] h-full mx-auto">
         <div className="mx-auto w-full px-4 pb-8">
           <DrawerHeader className="px-0">
             <DrawerTitle>Find Your Property</DrawerTitle>
@@ -342,7 +342,7 @@ export default function CTAToExplore() {
                   {searchTerm.trim() && selectedLocations.length < 3 && (
                     <Card className="absolute top-full mt-2 w-full z-50 overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-xl">
                       {filteredCities.length > 0 ? (
-                        <div className="space-y-1 max-h-72 overflow-y-auto">
+                        <div className="space-y-1 overflow-y-auto">
                           {filteredCities.slice(0, 8).map((item) => (
                             <button
                               key={item}

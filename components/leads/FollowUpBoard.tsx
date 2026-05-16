@@ -3,7 +3,7 @@
 import React, { useState, startTransition } from "react";
 import useSWR, { mutate } from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; 
 import { Textarea } from "../ui/textarea";
 import Pagination from "@/components/Pagination";
 import { usePaginationFrontend } from "@/hooks/usePaginationFrontend";
@@ -63,7 +63,7 @@ export default function FollowUpBoard({ id }: { id: string }) {
           <CardTitle>Followup Messages Board</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Loading followups...</p>
+          <div className="h-24 animate-pulse bg-muted rounded-xl" />
         </CardContent>
       </Card>
     );

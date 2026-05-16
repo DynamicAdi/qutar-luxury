@@ -82,7 +82,6 @@ export async function POST(req: Request) {
     // 🎟️ sign token (no role now)
     const token = await signToken({
       id: admin.id,
-      username: admin.username,
       email: admin.email,
     });
 
@@ -92,7 +91,6 @@ export async function POST(req: Request) {
       admin: {
         id: admin.id,
         name: admin.name,
-        username: admin.username,
         email: admin.email,
         image: admin.image,
       },
