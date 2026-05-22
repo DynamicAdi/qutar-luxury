@@ -7,7 +7,6 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // expects ARRAY from postman
     if (!Array.isArray(body)) {
       return NextResponse.json(
         {
