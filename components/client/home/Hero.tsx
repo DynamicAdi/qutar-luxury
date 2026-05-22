@@ -383,7 +383,7 @@ export default function Hero() {
         />
       </div>
 
-      <section className="w-full relative z-[699] px-6 md:px-10 py-14">
+      <section className="w-full relative z-[299] px-6 md:px-10 py-14">
         <div className="max-w-6xl mx-auto">
 
           {/* Heading */}
