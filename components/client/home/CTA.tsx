@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
+import Image from "next/image";
 
 export default function CTA() {
   return (

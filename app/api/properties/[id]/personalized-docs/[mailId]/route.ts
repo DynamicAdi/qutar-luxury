@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/client";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 export const updateMailSchema = z.object({

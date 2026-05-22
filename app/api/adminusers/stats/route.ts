@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
 import { db } from "@/lib/client";
 import { getAdmin } from "@/lib/getAdmin";
+import { NextResponse } from "next/server";
 
 export async function GET() {
   try {

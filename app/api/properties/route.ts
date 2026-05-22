@@ -1,11 +1,10 @@
 import { PROPERTY_STATUS, PROPERTY_TYPE } from "@/generated/prisma/enums";
 import { db } from "@/lib/client";
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
-
     const page = Number(searchParams.get("page")) || 1;
     const limit = Number(searchParams.get("limit")) || 10;
     const skip = (page - 1) * limit;
@@ -83,7 +82,6 @@ export async function GET(req: NextRequest) {
     if (category && category !== "ALL") where.category = category;
     if (usageType && usageType !== "ALL") where.usageType = usageType;
     if (status) where.status = status;
-
     if (search) {
       where.OR = [
         {

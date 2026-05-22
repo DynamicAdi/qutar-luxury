@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
 import { signToken } from "@/lib/auth";
 import { db } from "@/lib/client";
-import { z } from "zod";
 import bcrypt from "bcrypt";
+import { NextResponse } from "next/server";
+import { z } from "zod";
 
 // export async function POST(req: Request) {
 //   const { username, password } = await req.json();

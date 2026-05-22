@@ -28,7 +28,7 @@ export default function CustomSwiper({ children }: React.PropsWithChildren) {
             slidesPerView: 3,
           },
         }}
-        className="w-full grid"
+        className="w-full grid p-2!"
       >
         {Array.isArray(children) ? (
           children.map((child, idx) => (

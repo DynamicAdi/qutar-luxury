@@ -64,7 +64,6 @@ export default function Properties({
 
     pagination,
     page,
-    pageNumbers,
 
     nextPage,
     prevPage,
@@ -207,44 +206,6 @@ export default function Properties({
             ))}
           </div>
 
-          {/* PAGINATION */}
-          {/* {pagination && pagination.totalPages > 1 && (
-            <Card className="mt-4 border-0 py-0">
-              <div className="flex items-center justify-between px-4 py-4">
-                <button
-                  onClick={prevPage}
-                  disabled={!pagination.hasPrevPage}
-                  className="px-3 py-1 rounded-md border disabled:opacity-40"
-                >
-                  Prev
-                </button>
-
-                <div className="flex items-center gap-2 flex-wrap">
-                  {pageNumbers.map((num) => (
-                    <button
-                      key={num}
-                      onClick={() => goToPage(num)}
-                      className={`h-9 w-9 rounded-md border text-sm ${
-                        page === num
-                          ? "bg-primary text-white"
-                          : "hover:bg-muted"
-                      }`}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  onClick={nextPage}
-                  disabled={!pagination.hasNextPage}
-                  className="px-3 py-1 rounded-md border disabled:opacity-40"
-                >
-                  Next
-                </button>
-              </div>
-            </Card>
-          )} */}
           <Pagination
             page={page}
             totalPages={pagination?.totalPages ?? 0}

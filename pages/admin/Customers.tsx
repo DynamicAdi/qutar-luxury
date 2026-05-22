@@ -1,61 +1,59 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import Pagination from "@/components/Pagination";
 import { PageHeader } from "@/components/qlp/PageHeader";
-import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+    Command,
+    CommandEmpty,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command";
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-  Command,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandEmpty,
-} from "@/components/ui/command";
-import { Customer, formatPrice } from "@/store/cms";
-import {
-  Plus,
-  Trash2,
-  Link2,
-  Mail,
-  Phone,
-  ChevronsUpDown,
-  Check,
-  Loader,
-  Edit2,
-  Banknote,
-  WalletCards,
-} from "lucide-react";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-import axios from "axios";
-import { handleKeyDown } from "@/lib/InputKeyDown";
-import { CUSTOMER_STATUS } from "@/generated/prisma/enums";
-import LoaderScreen from "@/misc/LoaderScreen";
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { usePaginatedFetch } from "@/components/usePaginationFetch";
-import Pagination from "@/components/Pagination";
+import { CUSTOMER_STATUS } from "@/generated/prisma/enums";
+import { handleKeyDown } from "@/lib/InputKeyDown";
+import { cn } from "@/lib/utils";
+import LoaderScreen from "@/misc/LoaderScreen";
+import { Customer, formatPrice } from "@/store/cms";
+import axios from "axios";
+import {
+    Banknote,
+    Check,
+    Edit2,
+    Loader,
+    Mail,
+    Phone,
+    Plus,
+    Trash2,
+    WalletCards
+} from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
 
 export default function Customers() {
   const [openLink, setOpenLink] = useState(false);

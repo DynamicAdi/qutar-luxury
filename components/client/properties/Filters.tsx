@@ -1,12 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { qatarCitiesByState } from "@/config";
 import {
-  Property,
-  PropertyCategory,
-  PropertyUsageType,
-  formatQAR,
+    PropertyCategory,
+    PropertyUsageType,
+    formatQAR
 } from "@/lib/properties";
-import axios from "axios";
-import { qatarCities, qatarCitiesByState, qatarStates } from "@/config";
+import { useState } from "react";
 
 export interface FilterState {
   category: PropertyCategory | "ALL";

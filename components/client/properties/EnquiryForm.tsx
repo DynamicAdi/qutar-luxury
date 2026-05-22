@@ -1,11 +1,9 @@
-import { useEffect, useState, useTransition } from "react";
-import { z } from "zod";
-import { toast } from "sonner";
-import { Property } from "@/store/cms";
 import axios from "axios";
-import { LoaderCircle } from "lucide-react";
 import { getCookie, setCookie } from "cookies-next";
-import { formatQAR } from "@/lib/properties";
+import { LoaderCircle } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Enter your name").max(100),
@@ -174,14 +172,11 @@ const EnquiryForm = ({
         {field("name", "Full Name", "text", "Your name", true)}
         {field("email", "Email", "email", "you@example.com", true)}
         {field("phone", "Phone", "tel", "+974 …", true)}
-        <p className="block font-display text-sm text-muted-foreground -mb-1">
+        {/* <p className="block font-display text-sm text-muted-foreground -mb-1">
           Budget
-        </p>
-        <div className="relative h-20 w-full">
-          {/* Track */}
+        </p> */}
+        {/* <div className="relative h-20 w-full">
           <div className="absolute top-5 left-0 right-0 h-1 rounded-full bg-secondary" />
-
-          {/* Active Range */}
           <div
             className="absolute top-5 h-1 rounded-full bg-emerald"
             style={{
@@ -190,7 +185,6 @@ const EnquiryForm = ({
             }}
           />
 
-          {/* MIN Slider */}
           <input
             type="range"
             min={PRICE_FLOOR}
@@ -212,7 +206,6 @@ const EnquiryForm = ({
     [&::-webkit-slider-thumb]:cursor-pointer"
           />
 
-          {/* MAX Slider */}
           <input
             type="range"
             min={PRICE_FLOOR}
@@ -233,13 +226,11 @@ const EnquiryForm = ({
     [&::-webkit-slider-thumb]:bg-gold
     [&::-webkit-slider-thumb]:cursor-pointer"
           />
-
-          {/* Static Values */}
           <div className="absolute bottom-6 left-0 right-0 flex justify-between text-xs font-medium">
             <span className="text-emerald">{formatQAR(minBudget)}</span>
             <span className="text-gold">{formatQAR(maxBudget)}</span>
           </div>
-        </div>
+        </div> */}
         <div>
           <label className="block font-display text-sm text-muted-foreground mb-1">
             Note (optional)

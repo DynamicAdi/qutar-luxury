@@ -1,26 +1,26 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import placeholderImg from "@/assets/property-2.jpg";
 import { PageHeader } from "@/components/qlp/PageHeader";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Property, PropertyCategory } from "@/store/cms";
-import { ArrowLeft, Loader, Save, Trash2 } from "lucide-react";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import Overview from "@/misc/properties/tabs/Overview";
-import Documents from "@/misc/properties/tabs/Documents";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { uploadFile } from "@/lib/uploadImage";
+import LoaderScreen from "@/misc/LoaderScreen";
 import AgentsTab from "@/misc/properties/tabs/Agents";
 import Amenities from "@/misc/properties/tabs/Amenities";
+import Documents from "@/misc/properties/tabs/Documents";
 import Location from "@/misc/properties/tabs/Location";
-import placeholderImg from "@/assets/property-2.jpg";
 import Media from "@/misc/properties/tabs/Media";
-import axios from "axios";
-import LoaderScreen from "@/misc/LoaderScreen";
-import { uploadFile } from "@/lib/uploadImage";
+import Overview from "@/misc/properties/tabs/Overview";
 import PersonalizedDocsTab from "@/misc/properties/tabs/PersonalizedDocs";
+import { Property, PropertyCategory } from "@/store/cms";
+import axios from "axios";
+import { ArrowLeft, Loader, Save, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
 
 const blank = (id: string, category: PropertyCategory): Property => ({
   id,
@@ -52,7 +52,7 @@ const blank = (id: string, category: PropertyCategory): Property => ({
   targetType: "PROPERTY",
   usageType: "RESIDENTIAL"
 });
-
+ 
 export default function PropertyEdit({
   search,
   id,
@@ -131,7 +131,8 @@ export default function PropertyEdit({
     featured: p.featured,
     targetType: p.targetType,
     usageType: p.usageType,
-    documents: p.documents
+    documents: p.documents,
+    isHidden: p.isHidden
   };
 
   type ImageInput = string | File;

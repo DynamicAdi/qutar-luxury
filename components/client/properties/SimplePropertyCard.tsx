@@ -1,11 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { BedDouble, Bath, Maximize, MapPin, ArrowUpRight } from "lucide-react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { formatQAR } from "@/lib/properties";
 import { Property } from "@/store/cms";
+import { motion } from "framer-motion";
+import { ArrowUpRight, Bath, BedDouble, MapPin, Maximize } from "lucide-react";
+import Link from "next/link";
 
 interface Props {
   property: Property;
@@ -43,7 +43,7 @@ const SimplePropertyCard = ({ property, index = 0 }: Props) => {
           </span>
 
           <span className="rounded-full bg-black/70 px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm">
-            {property.status}
+            {property.status?.replaceAll("_"," ")}
           </span>
         </div>
       </div>

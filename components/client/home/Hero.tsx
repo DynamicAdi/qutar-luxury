@@ -1,34 +1,51 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
+import { CategoryCard, CategoryCardSkeleton } from "@/components/client/CategoryCard";
+import LineRevealOnScroll from "@/components/LineReveal";
+import CustomSwiper from "@/components/Swiper";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { qatarCities } from "@/config";
+import { formatQAR } from "@/lib/properties";
 import {
-  ArrowRight,
   LucideArrowRightCircle,
   MapPin,
-  Search,
+  Search
 } from "lucide-react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
-import LineRevealOnScroll from "@/components/LineReveal";
-import { Button } from "@/components/ui/button";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Input } from "@/components/ui/input";
-import axios from "axios";
-import { Card } from "@/components/ui/card";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { formatQAR } from "@/lib/properties";
-import { qatarCities } from "@/config";
+import { useEffect, useState } from "react";
 const PRICE_FLOOR = 0;
 const PRICE_CEIL = 50_000_000;
+const categories = [
+  {
+    title: "All",
+    href: "/properties",
+    description: "Explore every available property in one place.",
+  },
+  {
+    title: "BUY",
+    href: "/properties?type=BUY",
+    description: "Find properties ready for ownership and investment.",
+  },
+  {
+    title: "RENT",
+    href: "/properties?type=RENT",
+    description: "Browse flexible rental homes and apartments.",
+  },
+  {
+    title: "SELL",
+    href: "/properties?type=SELL",
+    description: "List or discover properties available for sale.",
+  },
+  {
+    title: "PLOTS",
+    href: "/properties?type=PLOTS",
+    description: "Open land and plots for future development.",
+  },
+];
 export default function Hero() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const houseWrapRef = useRef<HTMLDivElement>(null);
-  const houseRef = useRef<HTMLDivElement>(null);
-  const textWrapRef = useRef<HTMLDivElement>(null);
-  const strokeTextRef = useRef<HTMLHeadingElement>(null);
-  const fillTextRef = useRef<HTMLHeadingElement>(null);
-  const smokeRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const types = ["RESIDENTIAL", "COMMERCIAL"];
   const filters = ["RENT", "BUY", "SELL"];
@@ -38,6 +55,7 @@ export default function Hero() {
     priceMin: PRICE_FLOOR,
     priceMax: PRICE_CEIL,
   });
+  const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   const pct = (value: number) =>
@@ -49,142 +67,12 @@ export default function Hero() {
       city.toLowerCase().includes(searchTerm.toLowerCase()) &&
       !selectedLocations.includes(city)
   );
-
   useEffect(() => {
     setMounted(true);
-    const ctx = gsap.context(() => {
-      /* Initial states */
-      gsap.set(textWrapRef.current, {
-        autoAlpha: 0,
-      });
-
-      gsap.set(strokeTextRef.current, {
-        clipPath: "inset(0 100% 0 0)",
-      });
-      // gsap.set(smokeRef.current, {
-      //   height: 100, // initial small height
-      //   y: 0,
-      // });
-      gsap.set(fillTextRef.current, {
-        clipPath: "inset(0 100% 0 0)",
-        backgroundPosition: "50% 0%",
-      });
-
-      /* House starts below + smaller */
-      gsap.set(houseWrapRef.current, {
-        y: 320,
-        scale: 1.5,
-      });
-
-      gsap.set(houseRef.current, {
-        scale: 0.8,
-        transformOrigin: "center bottom",
-        opacity: 1,
-      });
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top top",
-          end: "+=3800",
-          scrub: 1.15,
-          pin: true,
-        },
-      });
-
-      /* 1 Hero content leaves */
-      tl.to(
-        contentRef.current,
-        {
-          y: 220,
-          opacity: 0,
-          ease: "none",
-        },
-        0
-      )
-
-        /* 2 House rises from below + expands */
-        .to(
-          houseWrapRef.current,
-          {
-            y: -260,
-            ease: "none",
-          },
-          0
-        )
-
-        .to(
-          houseRef.current,
-          {
-            scale: 1.18,
-            ease: "none",
-          },
-          0
-        )
-
-        /* 3 Text appears after house settles */
-        .to(
-          textWrapRef.current,
-          {
-            autoAlpha: 1,
-            ease: "none",
-          },
-          0.58
-        )
-
-        /* 4 Stroke draws */
-        .to(
-          strokeTextRef.current,
-          {
-            clipPath: "inset(0 0% 0 0)",
-            ease: "none",
-          },
-          0.62
-        )
-
-        /* 5 House fades out */
-        .to(
-          houseRef.current,
-          {
-            opacity: 0,
-            ease: "none",
-          },
-          0.78
-        )
-
-        /* 6 Image fill enters text */
-        .to(
-          fillTextRef.current,
-          {
-            clipPath: "inset(0 0% 0 0)",
-            ease: "none",
-          },
-          0.82
-        )
-        .to(smokeRef.current, {
-          height: 400, // grows taller slowly
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top center",
-            end: "bottom top",
-            scrub: 1.4,
-          },
-        })
-
-        /* 7 Move image inside text */
-        .to(
-          fillTextRef.current,
-          {
-            backgroundPosition: "50% 100%",
-            ease: "none",
-          },
-          0.88
-        );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  }, [])
   const handleSearch = () => {
     const locations = encodeURIComponent(selectedLocations.join(","));
     router.push(
@@ -204,7 +92,6 @@ export default function Hero() {
   };
   return (
     <section
-      ref={sectionRef}
       className="relative min-h-screen overflow-hidden bg-[#eef4fb]"
     >
       {/* Background */}
@@ -218,7 +105,6 @@ export default function Hero() {
 
       {/* Hero Content */}
       <div
-        ref={contentRef}
         className="relative z-20 mx-auto flex max-w-[1600px] flex-col items-center px-6 pt-32 text-center md:px-10"
       >
         <h1 className="max-w-[1500px] text-[3.3rem] font-bold leading-[0.9] tracking-tight text-black sm:text-[5rem] md:text-[7rem] lg:text-8xl">
@@ -388,11 +274,6 @@ export default function Hero() {
                     />
                   </div>
 
-                  {/* Bottom labels */}
-                  {/* <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{formatQAR(PRICE_FLOOR)}</span>
-                  <span>{formatQAR(PRICE_CEIL)}+</span>
-                </div> */}
                 </div>
               ) : (
                 <div className="w-full rounded-3xl border border-white/40 bg-white p-5 py-2 pb-3 backdrop-blur-xl shadow-xl h-[118px]" />
@@ -476,10 +357,9 @@ export default function Hero() {
       </div>
 
       {/* House */}
-      <div ref={houseWrapRef} className="absolute inset-0 z-10">
+      <div className="absolute inset-0 z-10">
         <div
-          ref={houseRef}
-          className="absolute inset-x-0 bottom-0 md:-bottom-20 h-[100%] w-[140%] left-1/2 -translate-x-1/2"
+          className="absolute inset-x-0 bottom-0 md:-bottom-20 h-[50%] w-[140%] left-1/2 -translate-x-1/2"
         >
           <Image
             src="/house.png"
@@ -491,44 +371,8 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* PERFECT CENTER TEXT */}
-      <div
-        ref={textWrapRef}
-        className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none"
-      >
-        <div className="relative flex items-center justify-center">
-          {/* Stroke */}
-          <h2
-            ref={strokeTextRef}
-            className="block text-center text-[2.5rem] font-black leading-none tracking-tight text-transparent sm:text-[6rem] md:text-[8rem]"
-            style={{
-              WebkitTextStroke: "2px #111",
-            }}
-          >
-            QUATAR <br /> LUXURY <br /> PROPERTIES
-          </h2>
-
-          {/* Fill */}
-          <h2
-            ref={fillTextRef}
-            className="absolute inset-0 block text-center text-[2.5rem] font-black leading-none tracking-tight text-transparent sm:text-[6rem] md:text-[8rem]"
-            style={{
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              backgroundImage: "url('/house.png')",
-              backgroundSize: "cover",
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "50% 0%",
-            }}
-          >
-            QUATAR  <br /> LUXURY <br /> PROPERTIES
-          </h2>
-        </div>
-      </div>
-
       {/* Smoke */}
       <div
-        ref={smokeRef}
         className="pointer-events-none absolute inset-x-0 -bottom-30 z-[999] h-40"
       >
         <Image
@@ -538,6 +382,32 @@ export default function Hero() {
           className="object-cover object-top"
         />
       </div>
+
+      <section className="w-full relative z-[699] px-6 md:px-10 py-14">
+        <div className="max-w-6xl mx-auto">
+
+          {/* Heading */}
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-8">
+            Explore Categories
+          </h2>
+
+          {/* Grid */}
+          <CustomSwiper>
+            {loading
+              ? Array.from({ length: 5 }).map((_, i) => (
+                <CategoryCardSkeleton key={i} />
+              ))
+              : categories.map((cat) => (
+                <CategoryCard
+                  key={cat.title}
+                  title={cat.title}
+                  description={cat.description}
+                  href={cat.href}
+                />
+              ))}
+          </CustomSwiper>
+        </div>
+      </section>
     </section>
   );
 }
