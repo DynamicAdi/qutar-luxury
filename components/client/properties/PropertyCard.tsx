@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
-import { ArrowUpRight, BedDouble, Bath, Maximize, MapPin } from "lucide-react";
-import {  formatQAR } from "@/lib/properties";
-import Link from "next/link";
+import { formatQAR } from "@/lib/properties";
 import { Property } from "@/store/cms";
+import { ArrowUpRight, Bath, BedDouble, MapPin, Maximize } from "lucide-react";
+import Link from "next/link";
+import { useRef, useState } from "react";
 
 interface Props {
   property: Property;

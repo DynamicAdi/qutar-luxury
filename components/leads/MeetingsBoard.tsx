@@ -1,22 +1,22 @@
 "use client";
 
-import useSWR from "swr";
-import { useState, useTransition } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { usePaginationFrontend } from "@/hooks/usePaginationFrontend";
 import { fetcher } from "@/lib/fetcher";
-import Pagination from "../Pagination";
+import { MoreHorizontal } from "lucide-react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { Loader2, MoreHorizontal } from "lucide-react";
+import useSWR from "swr";
+import Pagination from "../Pagination";
 export default function MeetingsBoard({ id }: { id: string }) {
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");

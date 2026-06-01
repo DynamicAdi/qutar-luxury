@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
 import { db } from "@/lib/client";
-import { z } from "zod";
-import { sendEmail } from "@/lib/transporter";
 import { meetingEmailTemplate } from "@/lib/templates";
+import { sendEmail } from "@/lib/transporter";
+import { NextResponse } from "next/server";
+import { z } from "zod";
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }

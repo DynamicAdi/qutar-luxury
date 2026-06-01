@@ -4,10 +4,10 @@ import { Card } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ImageIcon, LucideLoader, X } from "lucide-react";
-import React, { useEffect, useState } from "react";
 import { removeBgAndPreview } from "@/lib/bgRemover";
 import { deleteFile } from "@/lib/uploadImage";
+import { ImageIcon, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 function Media({ p, upd }: { p: any; upd: any }) {
@@ -133,7 +133,7 @@ function handleImageUpload(
         </div>
       </div>
 
-      <Field label="3D IMAGE *">
+      {/* <Field label="3D IMAGE *">
         <p className="text-xs text-gray-500 mb-3">
           Please use <span className="text-rose-400">3D style image</span> of
           property, Background will be removed automatically. <span className="text-rose-400">{"(MAX 5MB)"}</span>
@@ -183,7 +183,7 @@ function handleImageUpload(
             </>
           )}
         </div>
-      </Field>
+      </Field> */}
       <Field label="Video Tour URL">
         <Input
           value={p.videoTourUrl || ""}

@@ -1,29 +1,27 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Home,
-  Building2,
-  Users,
-  UserSquare2,
-  MapPin,
-  BadgeCheck,
-  LogOut,
-  Menu,
-  X,
-  ChevronDown,
-  ShoppingBag,
-  Tag,
-  Key,
-  Home as HomeIcon,
-  Users2,
-} from "lucide-react";
-import { useEffect, useState } from "react";
 import { Logo } from "@/components/qlp/Logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import {
+    BadgeCheck,
+    Building2,
+    ChevronDown,
+    Key,
+    LayoutDashboard,
+    LogOut,
+    MapPin,
+    Menu,
+    ShoppingBag,
+    Tag,
+    Users,
+    Users2,
+    UserSquare2,
+    X
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type NavChild = {
   href: string;

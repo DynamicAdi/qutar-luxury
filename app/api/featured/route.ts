@@ -1,6 +1,5 @@
 import { db } from "@/lib/client";
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 
 export async function GET(req: NextRequest) {
   try {

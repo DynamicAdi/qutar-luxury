@@ -1,21 +1,19 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { SITE_NAME } from "@/config";
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import HoverSlideText from "@/components/HoverSlideText";
 import {
-  NavigationMenu,
-  NavigationMenuList,
+    NavigationMenu,
+    NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import { NAV_ITEMS } from "@/config";
-import Link from "next/link";
-import HoverSlideText from "@/components/HoverSlideText";
-import { ChevronDown, ChevronUp, Menu, X } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 import logo from "@/public/logo.png";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, ChevronUp, Menu, X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 export default function Navbar() {
   const [show, setShow] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);

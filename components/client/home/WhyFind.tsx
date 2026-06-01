@@ -1,15 +1,13 @@
 "use client";
 
-import Image from "next/image";
-import { motion } from "framer-motion";
 import useZoomScroll, { fadeUp, stagger } from "@/animations";
-import { useEffect } from "react";
-import useSWR from "swr";
-import { fetcher } from "@/lib/fetcher";
-import PropertyCard from "@/components/client/properties/PropertyCard";
-import { Property } from "@/store/cms";
-import SimplePropertyCard from "../properties/SimplePropertyCard";
 import CustomSwiper from "@/components/Swiper";
+import { fetcher } from "@/lib/fetcher";
+import { Property } from "@/store/cms";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import useSWR from "swr";
+import SimplePropertyCard from "../properties/SimplePropertyCard";
 const CONTENT = [
   {
     image:
@@ -101,7 +99,7 @@ export default function WhyFindSection() {
         >
           {/* Loading */}
           {propertiesLoading &&
-            Array.from({ length: 3 }).map((_, i) => (
+            Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
                 className="overflow-hidden rounded-3xl border border-zinc-200 bg-white"
@@ -154,7 +152,7 @@ export default function WhyFindSection() {
                 }}
                 viewport={{ once: true }}
               >
-                <PropertyCard index={index} property={property} />
+                <SimplePropertyCard index={index} property={property} />
               </motion.div>
             ))}
         </motion.div>
@@ -338,7 +336,7 @@ function FirstSection({ index, item, data, error, loading }: Props) {
               <div className="grid">
                 <CustomSwiper>
                   {data.map((project: Property) => (
-                    <PropertyCard key={project.id} property={project} />
+                    <SimplePropertyCard key={project.id} property={project} />
                   ))}
                 </CustomSwiper>
               </div>

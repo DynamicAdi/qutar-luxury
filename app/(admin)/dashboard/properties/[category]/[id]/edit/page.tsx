@@ -3,7 +3,7 @@ import PropertyEdit from "@/pages/admin/PropertyEdit";
 
 export default async function Page({
   params,
-}: Readonly<{
+}: Readonly<{ 
   params: Promise<{ category: string; id: string }>;
 }>) {
   const { category, id } = await params;

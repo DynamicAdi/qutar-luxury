@@ -1,30 +1,29 @@
 "use client";
 
+import axios from "axios";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
-import axios from "axios";
 
 import {
-  Search,
-  Mail,
-  FileText,
-  Clock3,
-  Send,
-  Eye,
-  Trash2,
-  Clipboard,
-  ClipboardCopy,
+    ClipboardCopy,
+    Clock3,
+    Eye,
+    FileText,
+    Mail,
+    Search,
+    Send,
+    Trash2
 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { PersonalizedMailDialog } from "@/components/client/admins/PersonalizedEmailDialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { fetcher } from "@/lib/fetcher";
 import { Property } from "@/store/cms";
-import { ConfirmDialog } from "../ConfirmDialog";
 import { toast } from "sonner";
+import { ConfirmDialog } from "../ConfirmDialog";
 import { EditPersonalizedMailDialog } from "../PersonalizedMailUpdate";
 interface Props {
   id: string;

@@ -1,6 +1,6 @@
 import { db } from "@/lib/client";
-import { z } from "zod";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 export const updateFollowupSchema = z.object({
   message: z.string().min(1).optional(),

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/client";
-import bcrypt from "bcrypt";
-import { z } from "zod";
 import { uploadFile } from "@/lib/uploadImage";
+import bcrypt from "bcrypt";
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 
 const updateAdminSchema = z.object({
   name: z

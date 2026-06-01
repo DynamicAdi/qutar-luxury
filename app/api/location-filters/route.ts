@@ -1,7 +1,7 @@
 // app/api/location-filters/route.ts
 
-import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/client";
+import { NextRequest, NextResponse } from "next/server";
 
 type StreetMap = Record<string, string[]>;
 type CityMap = Record<string, StreetMap>;

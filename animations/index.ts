@@ -2,9 +2,9 @@
 
 "use client";
 
-import { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { Variants } from "framer-motion";
+import { useEffect, useRef } from "react";
 
 type UseSectionRevealOnScrollProps = {
   start?: string;

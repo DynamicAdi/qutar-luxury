@@ -1,6 +1,5 @@
-import useSWR from "swr";
-import { Response } from "@/store/cms";
 import { fetcher } from "@/lib/fetcher";
+import useSWR from "swr";
 
 export function useLead(id: string) {
   const { data, error, isLoading } = useSWR(

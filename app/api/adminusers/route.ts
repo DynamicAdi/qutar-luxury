@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/client";
-import bcrypt from "bcrypt";
-import { z } from "zod";
 import { getAdmin } from "@/lib/getAdmin";
 import { uploadFile } from "@/lib/uploadImage";
+import bcrypt from "bcrypt";
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 
 export async function GET(req: NextRequest) {
   try {

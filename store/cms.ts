@@ -27,7 +27,6 @@ export type TargetType = "PROJECT" | "PROPERTY" | "BOTH";
 
 export interface Property {
   id: string;
-
   title: string;
   featured: boolean;
 

@@ -1,39 +1,43 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
 import {
-  BedDouble,
   Bath,
-  Maximize,
-  Car,
-  Calendar,
-  MapPin,
-  Play,
-  ZoomIn,
-  Home,
+  BedDouble,
   Building2,
-  Share2,
-  Heart,
+  Calendar,
+  Car,
   ChevronRight,
-  Compass,
-  Wallet,
-  Ruler,
-  FileText,
-  ShieldCheck,
-  Clock,
-  TrendingUp,
-  Layers,
-  Pyramid,
   CircleCheckBig,
+  Clock,
+  Compass,
+  FileText,
+  Heart,
+  Home,
+  Layers,
+  MapPin,
+  Maximize,
+  Play,
+  Pyramid,
+  Ruler,
+  Share2,
+  ShieldCheck,
+  TrendingUp,
+  Wallet,
+  ZoomIn,
 } from "lucide-react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 
 import ImageLightbox from "@/components/client/properties/ImageLightbox";
 
-import Link from "next/link";
+import CheaperPropertyCard, { CheaperPropertyCardSkeleton } from "@/components/client/properties/CheaperProperty";
+import CustomSwiper from "@/components/Swiper";
+import { fetcher } from "@/lib/fetcher";
+import LoaderScreen from "@/misc/LoaderScreen";
 import { formatPrice, Property } from "@/store/cms";
 import axios from "axios";
-import LoaderScreen from "@/misc/LoaderScreen";
+import Link from "next/link";
+import useSWR from "swr";
 import StickySidebar from "./EnquireSide";
 
 const ytId = (url?: string) => {
@@ -49,14 +53,17 @@ const PropertyDetails = ({ id }: { id: string }) => {
   const heroRef = useRef<HTMLDivElement>(null);
   const [property, setProperty] = useState<Property>();
   const [load, startLoad] = useTransition();
-
+  const { data, isLoading, error } = useSWR(
+    id ? `/api/cheaper-properties?id=${id}` : null,
+    fetcher
+  );
+  const cheaperProperties = data?.data || [];
   const fetchData = () =>
     startLoad(async () => {
       const req = await axios.get(
         `/api/properties?id=${id}&details=${Boolean("true")}`,
       );
       if (req.status === 200) {
-        console.log(req.data.data[0]);
         setProperty(req.data.data[0]);
       }
     });
@@ -94,7 +101,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
     );
   }
 
-  const youtubeId = ytId(property.youtubeLink);
+  const youtubeId = ytId(property.youtubeLink!);
   const pricePerSqft = Math.round(property.price / property.Area);
   // Mock financing breakdown — 20% down, ~0.5% monthly placeholder
   const downPayment = Math.round(property.price * 0.2);
@@ -187,7 +194,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
                 style={{ transformStyle: "preserve-3d" }}
               >
                 <img
-                  src={property.pngImage}
+                  src={property.pngImage || ""}
                   alt=""
                   aria-hidden
                   className="w-full h-full object-cover animate-float"
@@ -307,32 +314,8 @@ const PropertyDetails = ({ id }: { id: string }) => {
               ))}
             </div>
 
-            <div className="flex items-center gap-2 mb-3">
-              <Building2 className="size-4 text-emerald" />
-              <p className="font-display tracking-[0.3em] text-emerald text-xs uppercase">
-                Location
-              </p>
-            </div>
-            <h3 className="font-display text-3xl font-bold mb-2">
-              {property?.address?.label}, {property?.address?.city}
-            </h3>
-            <p className="text-muted-foreground text-sm mb-6">
-              {property?.address?.street}, {property?.address?.state},{" "}
-              {property?.address?.zipCode}
-            </p>
-            {
-              property.address?.gmaps && (
-            <div className="h-96 w-full">
-                <iframe
-                    title="Maps"
-                      src={property.address?.gmaps || undefined}
-                      loading="lazy"
-                      className="w-full h-full my-2"
-                      referrerPolicy="no-referrer-when-downgrade"
-                    ></iframe>
-            </div>
-              )
-            }
+
+
             {/* Description — light, breathable */}
             <div>
               <p className="font-display tracking-[0.3em] text-emerald text-xs uppercase mb-3">
@@ -530,7 +513,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
                   }}
                 />
                 <img
-                  src={property.pngImage}
+                  src={property.pngImage || ""}
                   alt={`${property.title} 3D view`}
                   loading="lazy"
                   className="relative max-h-[400px] w-auto object-contain animate-float"
@@ -729,6 +712,54 @@ const PropertyDetails = ({ id }: { id: string }) => {
                 ))}
               </div>
             </div>
+
+            {/*location*/}
+            <>
+              <div className="flex items-center gap-2 mb-3">
+                <Building2 className="size-4 text-emerald" />
+                <p className="font-display tracking-[0.3em] text-emerald text-xs uppercase">
+                  Location
+                </p>
+              </div>
+              <h3 className="font-display text-3xl font-bold mb-2">
+                {property?.address?.label}, {property?.address?.city}
+              </h3>
+              <p className="text-muted-foreground text-sm mb-6">
+                {property?.address?.street}, {property?.address?.state},{" "}
+                {property?.address?.zipCode}
+              </p>
+              {
+                property.address?.gmaps && (
+                  <div className="h-96 w-full">
+                    <iframe
+                      title="Maps"
+                      src={property.address?.gmaps || undefined}
+                      loading="lazy"
+                      className="w-full h-full my-2"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                  </div>
+                )
+              }
+            </>
+
+            <section className="w-full py-10">
+              <h2 className="text-2xl font-bold mb-6">
+                Similar Lower Price Properties
+              </h2>
+
+              <CustomSwiper>
+                {isLoading
+                  ? Array.from({ length: 4 }).map((_, i) => (
+                    <CheaperPropertyCardSkeleton key={i} />
+                  ))
+                  : cheaperProperties.map((property: any) => (
+                    <CheaperPropertyCard key={property.id} property={property} />
+                  ))}
+              </CustomSwiper>
+              {!isLoading && cheaperProperties.length === 0 && <h2 className="text-center text-xl font-semibold">No Related Properties Found!</h2>}
+            </section>
+
           </div>
 
           {/* SIDEBAR — 40% sticky */}

@@ -21,3 +21,17 @@ export async function verifyToken(token: string) {
     return null;
   }
 }
+
+export async function getUser(): Promise<JWTPayload | null> {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    if (!token) return null;
+
+    const payload = await verifyToken(token);
+    return payload;
+  } catch {
+    return null;
+  }
+}

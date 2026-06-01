@@ -1,8 +1,8 @@
 // lib/getAdmin.ts
 
-import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth"; // your verify function
 import { db } from "@/lib/client";
+import { cookies } from "next/headers";
 
 export async function getAdmin() {
   try {

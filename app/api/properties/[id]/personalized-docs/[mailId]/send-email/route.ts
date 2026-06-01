@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/client";
-import { sendEmail } from "@/lib/transporter";
 import { propertyProposalTemplate } from "@/lib/templates";
+import { sendEmail } from "@/lib/transporter";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   req: NextRequest,
