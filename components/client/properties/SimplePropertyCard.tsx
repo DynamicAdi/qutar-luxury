@@ -6,6 +6,7 @@ import { Property } from "@/store/cms";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Bath, BedDouble, MapPin, Maximize } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Props {
   property: Property;
@@ -13,6 +14,8 @@ interface Props {
 }
 
 const SimplePropertyCard = ({ property, index = 0 }: Props) => {
+
+  const router = useRouter();
   return (
     <motion.article
       initial={{ opacity: 0, y: 30 }}
@@ -24,7 +27,8 @@ const SimplePropertyCard = ({ property, index = 0 }: Props) => {
         ease: [0.22, 1, 0.36, 1],
       }}
       whileHover={{ y: -8 }}
-      className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm"
+      className="overflow-hidden border border-border bg-card cursor-pointer"
+      onClick={() => router.push(`/properties/${property.id}`)}
     >
       {/* Image */}
       <div className="relative aspect-[4/2.6] overflow-hidden bg-muted">
@@ -51,7 +55,7 @@ const SimplePropertyCard = ({ property, index = 0 }: Props) => {
       {/* Content */}
       <div className="space-y-2.5 p-3.5">
         <div>
-          <h3 className="line-clamp-1 text-base font-semibold text-foreground">
+          <h3 className="line-clamp-1 text-xl font-semibold text-foreground">
             {property.title}
           </h3>
 

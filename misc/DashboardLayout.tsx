@@ -9,6 +9,7 @@ import {
     ChevronDown,
     Key,
     LayoutDashboard,
+    LineStyle,
     LogOut,
     MapPin,
     Menu,
@@ -60,6 +61,8 @@ const nav: NavItem[] = [
   { href: "/dashboard/agents", label: "Agents", icon: BadgeCheck },
   { href: "/dashboard/leads", label: "Leads", icon: Users },
   { href: "/dashboard/customers", label: "Customers", icon: UserSquare2 },
+  { href: "/dashboard/blog", label: "Blogs", icon: LineStyle },
+
 ];
 
 export default function DashboardLayout({
@@ -104,7 +107,7 @@ export default function DashboardLayout({
   return (
     <div className="min-h-screen w-full p-3 md:p-5">
       {/* Mobile top bar */}
-      <div className="md:hidden mb-3 flex items-center justify-between rounded-2xl bg-card/90 backdrop-blur px-4 py-3 shadow-card">
+      <div className="md:hidden mb-3 flex items-center justify-between rounded-2xl bg-card/90 backdrop-blur px-4 py-3">
         <Logo />
 
         <Button
@@ -127,7 +130,7 @@ export default function DashboardLayout({
           className={cn(
             "fixed md:sticky inset-y-3 left-3 md:left-0 md:top-5 z-40 w-64 md:w-60",
             "h-[calc(100vh-1.5rem)] md:h-[calc(100vh-2.5rem)]",
-            "rounded-3xl bg-emerald text-white shadow-float",
+            "rounded-3xl bg-emerald text-white",
             "flex flex-col p-4 transition-transform duration-300",
             open ? "translate-x-0" : "-translate-x-[110%] md:translate-x-0"
           )}
@@ -181,7 +184,7 @@ export default function DashboardLayout({
                               className={cn(
                                 "flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium transition-all",
                                 childActive
-                                  ? "bg-gradient-gold-soft text-gradient-gold shadow-gold"
+                                  ? "bg-gradient-gold-soft text-gradient-gold"
                                   : "hover:bg-gradient-gold-soft hover:text-gradient-gold"
                               )}
                             >
@@ -206,7 +209,7 @@ export default function DashboardLayout({
                   className={cn(
                     "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                     active
-                      ? "bg-gradient-gold-soft text-gradient-gold shadow-gold"
+                      ? "bg-gradient-gold-soft text-gradient-gold"
                       : "text-white hover:bg-gradient-gold-soft hover:text-gradient-gold"
                   )}
                 >

@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
+// import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 interface PropertyCardProps {
@@ -32,10 +32,10 @@ export default function CheaperPropertyCard({ property }: PropertyCardProps) {
     >
       {/* IMAGE */}
       <div className="relative h-48 w-full overflow-hidden">
-        <Image
+        <img
           src={property.images?.[0] || "/placeholder.jpg"}
           alt={property.title}
-          fill
+          // fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
 

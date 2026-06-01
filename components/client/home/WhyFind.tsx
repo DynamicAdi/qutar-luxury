@@ -60,7 +60,7 @@ export default function WhyFindSection() {
             whileInView="show"
             viewport={{ once: true, amount: 0.6 }}
           >
-            <p className="text-2xl font-semibold uppercase text-black md:text-sm">
+            <p className="text-2xl font-semibold font-display text-black md:text-3xl">
               Featured Properties
             </p>
           </motion.div>
@@ -73,14 +73,13 @@ export default function WhyFindSection() {
             viewport={{ once: true, amount: 0.35 }}
             className="ml-auto max-w-xl"
           >
-            <h2 className="text-2xl font-medium leading-[1.02] tracking-tight text-black md:text-6xl lg:text-3xl">
-              Featured properties curated for your next chapter.{" "}
-              <span className="text-black/22">
+            {/* <h2 className="text-2xl font-medium leading-[1.02] tracking-tight text-black md:text-6xl lg:text-3xl"> */}
+              <span className="text-black/40 text-xl">
                 Explore premium homes, high-potential investments, and standout
                 listings carefully selected to help you buy, invest, or move
                 with confidence.
               </span>
-            </h2>
+            {/* </h2> */}
           </motion.div>
         </div>
         {/* Property Cards */}
@@ -141,7 +140,7 @@ export default function WhyFindSection() {
           {/* Data */}
           {!propertiesLoading &&
             !error &&
-            featuredProperties.map((property, index) => (
+            featuredProperties.slice(0, 6).map((property, index) => (
               <motion.div
                 key={property.id}
                 initial={{ opacity: 0, y: 30 }}

@@ -189,7 +189,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
                   </span>
                 </div>
               </div>
-              <div
+              {/* <div
                 className="w-[600px] h-[380px] max-h-[380px] relative"
                 style={{ transformStyle: "preserve-3d" }}
               >
@@ -205,7 +205,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
                       "drop-shadow(30px 40px 50px hsl(var(--emerald-deep) / 0.8))",
                   }}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
         </section>
@@ -512,7 +512,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
                     backgroundSize: "32px 32px",
                   }}
                 />
-                <img
+                {/* <img
                   src={property.pngImage || ""}
                   alt={`${property.title} 3D view`}
                   loading="lazy"
@@ -521,7 +521,7 @@ const PropertyDetails = ({ id }: { id: string }) => {
                     filter:
                       "drop-shadow(0 30px 40px hsl(var(--emerald-deep) / 0.3))",
                   }}
-                />
+                /> */}
               </div>
             </div>
 

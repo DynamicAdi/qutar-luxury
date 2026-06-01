@@ -11,6 +11,7 @@ import PropertyCard from "@/components/client/properties/PropertyCard";
 import { Property } from "@/store/cms";
 import { useDebounce } from "@/components/useDebounce";
 import { useSearchParams } from "next/navigation";
+import SimplePropertyCard from "@/components/client/properties/SimplePropertyCard";
 
 const LIMIT = 9;
 
@@ -198,7 +199,7 @@ const Properties = () => {
               <>
                 <div className="grid grid-cols-1 gap-x-8 gap-y-20 sm:grid-cols-2 lg:grid-cols-3 lg:gap-y-24">
                   {data.map((p, i) => (
-                    <PropertyCard key={p.id} property={p} index={i} />
+                    <SimplePropertyCard key={p.id} property={p} index={i} />
                   ))}
                 </div>
 

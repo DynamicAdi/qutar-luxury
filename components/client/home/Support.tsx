@@ -11,7 +11,7 @@ type ServiceItem = {
 };
 const SERVICES: ServiceItem[] = [
   {
-    title: "Mortgage",
+    title: "COMMERCIAL",
     href: "#",
     image:
       "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1600&auto=format&fit=crop",
@@ -19,18 +19,10 @@ const SERVICES: ServiceItem[] = [
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Saepe iure officiis dolore tenetur quidem fugiat ab molestiae autem quae nulla. Beatae aut voluptatibus cumque rerum iste. Voluptatem, quas quasi qui cumque saepe sapiente asperiores tenetur vero odio in pariatur facere ratione iste? Dignissimos perferendis sapiente molestias repellat aperiam provident aut!",
   },
   {
-    title: "Property",
+    title: "RESIDENTIAL",
     href: "#",
     image:
       "https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1600&auto=format&fit=crop",
-    description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Saepe iure officiis dolore tenetur quidem fugiat ab molestiae autem quae nulla. Beatae aut voluptatibus cumque rerum iste. Voluptatem, quas quasi qui cumque saepe sapiente asperiores tenetur vero odio in pariatur facere ratione iste? Dignissimos perferendis sapiente molestias repellat aperiam provident aut!",
-  },
-  {
-    title: "Construction",
-    href: "#",
-    image:
-      "https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=1600&auto=format&fit=crop",
     description:
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Saepe iure officiis dolore tenetur quidem fugiat ab molestiae autem quae nulla. Beatae aut voluptatibus cumque rerum iste. Voluptatem, quas quasi qui cumque saepe sapiente asperiores tenetur vero odio in pariatur facere ratione iste? Dignissimos perferendis sapiente molestias repellat aperiam provident aut!",
   },
@@ -81,51 +73,16 @@ export default function SupportSection() {
       {" "}
       <div className="mx-auto max-w-[1400px] px-6 py-24 md:px-10 lg:px-12">
         {" "}
-        {/* Top Content */}{" "}
-        <div className="space-y-8 pt-2 max-w-xl mb-50">
-          {" "}
-          <p className="text-2xl leading-tight text-white/95 md:text-3xl">
-            {" "}
-            Our certified agents guide you through every stage of real estate{" "}
-            <span className="text-white/35 w-full">
-              {" "}
-              with expert knowledge and reliable support.{" "}
-            </span>{" "}
-          </p>{" "}
-          <Button className="bg-transparent border-border rounded-full px-5 py-5 text-lg">
-            {" "}
-            Get Started With QLP <ArrowRight size={20} />{" "}
-          </Button>{" "}
-        </div>{" "}
         <div className="flex max-md:flex-col gap-16 lg:gap-24">
           {" "}
           <div className="space-y-8 min-w-sm">
             {" "}
             <h2 className="max-w-xl text-5xl font-light leading-[0.95] tracking-tight md:text-5xl">
               {" "}
-              Support <br /> Beyond{" "}
-              <span className="text-white/35">Buying</span> <br />{" "}
-              <span className="text-white/35">and Selling</span>{" "}
+              We Work on <br /> {" "}
+              <span className="text-white/35">Buying</span> {" "}
+              <span className="text-white/35">and Selling of </span>{" "}
             </h2>{" "}
-          </div>{" "}
-          <div className="space-y-8 pt-2">
-            {" "}
-            <p className="md:min-w-3xl text-2xl leading-tight text-white/95 md:text-2xl">
-              {" "}
-              The real estate market never stands still — and neither do we.{" "}
-              <span className="text-white/35 w-full">
-                {" "}
-                Our experts offer continued support beyond the sale, helping you
-                maximize your investment.{" "}
-              </span>{" "}
-            </p>{" "}
-            <Link
-              href="#"
-              className="inline-flex items-center gap-4 rounded-full bg-white px-8 py-4 text-sm font-medium text-black transition hover:gap-6"
-            >
-              {" "}
-              Discover Our Services <ArrowRight size={20} />{" "}
-            </Link>{" "}
           </div>{" "}
         </div>{" "}
         {/* Cards */}{" "}
