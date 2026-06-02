@@ -218,24 +218,24 @@ model Property {
   customerId String?
   customer   Customers? @relation(fields: [customerId], references: [id])
 
-  updateAt  DateTime @updatedAt
-  createdAt DateTime @default(now())
+  updateAt      DateTime               @updatedAt
+  createdAt     DateTime               @default(now())
   proposalmails PropertyProposalMail[]
 }
 
 model PropertyProposalMail {
-  id            String   @id @default(cuid())
-  propertyId    String
-  property      Property @relation(fields: [propertyId], references: [id])
+  id             String      @id @default(cuid())
+  propertyId     String
+  property       Property    @relation(fields: [propertyId], references: [id])
   recipientName  String
   recipientEmail String
-  subject       String
-  body          String
-  attachmentUrl String?
-  sentAt        DateTime?
-  createdAt     DateTime @default(now())
-  createdById   String?
-  status        MAIL_STATUS @default(DRAFT)
+  subject        String
+  body           String
+  attachmentUrl  String?
+  sentAt         DateTime?
+  createdAt      DateTime    @default(now())
+  createdById    String?
+  status         MAIL_STATUS @default(DRAFT)
 }
 
 enum MAIL_STATUS {
@@ -243,6 +243,7 @@ enum MAIL_STATUS {
   SENT
   FAILED
 }
+
 model Customers {
   id    String  @id @default(uuid())
   name  String
@@ -272,17 +273,25 @@ model Fingerprints {
 // blogs
 
 model BlogPost {
-  id          String   @id @default(cuid())
-  
-  title       String
-  subtitle    String?
-  
-  slug        String   @unique
+  id String @id @default(cuid())
+
+  title    String
+  subtitle String?
+
+  slug        String @unique
   bannerImage String
 
-  published   Boolean  @default(false)
-  content     Json
+  published Boolean @default(false)
+  content   Json
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id       String  @id @default(nanoid())
+  name     String
+  subTitle String?
+  image    String?
+  slug     String  @unique
 }

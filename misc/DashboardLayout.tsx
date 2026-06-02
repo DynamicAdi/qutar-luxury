@@ -8,6 +8,7 @@ import {
     Building2,
     ChevronDown,
     Key,
+    Layers,
     LayoutDashboard,
     LineStyle,
     LogOut,
@@ -61,6 +62,7 @@ const nav: NavItem[] = [
   { href: "/dashboard/agents", label: "Agents", icon: BadgeCheck },
   { href: "/dashboard/leads", label: "Leads", icon: Users },
   { href: "/dashboard/customers", label: "Customers", icon: UserSquare2 },
+  { href: "/dashboard/category", label: "Categories", icon: Layers },
   { href: "/dashboard/blog", label: "Blogs", icon: LineStyle },
 
 ];
