@@ -27,6 +27,14 @@ const categoryStyles: Record<string, { bg: string; glow: string }> = {
     bg: "bg-gradient-to-br from-orange-100 to-orange-200",
     glow: "group-hover:shadow-orange-500/30",
   },
+    Test: {
+    bg: "bg-gradient-to-br from-orange-100 to-orange-200",
+    glow: "group-hover:shadow-orange-500/30",
+  },
+    Rest: {
+    bg: "bg-gradient-to-br from-orange-100 to-orange-200",
+    glow: "group-hover:shadow-orange-500/30",
+  },
 };
 
 type Props = {
@@ -42,25 +50,26 @@ export function CategoryCard({ title, href, description }: Props) {
     <Link href={href}>
       <Card
         className={cn(
-          "group relative aspect-square max-h-[180px] w-full overflow-hidden rounded-none border-0 p-6 shadow-md transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl",
-          style.bg,
-          style.glow
+          "group relative text-white max-h-[280px] h-60 w-full overflow-hidden rounded-none border-0 p-6 shadow-md transition-all duration-500",
         )}
+        style={{
+          backgroundImage: `url('https://picsum.photos/1080/1080')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
       >
+        <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60" />
         {/* glow orb */}
         <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-white/40 blur-3xl opacity-60 group-hover:opacity-90 transition" />
 
-        {/* inner glass layer */}
-        <div className="absolute inset-0 bg-white/10 backdrop-blur-md" />
-
         {/* content */}
-        <div className="relative z-10 flex h-full flex-col justify-end">
-          <h3 className="text-xl font-bold tracking-tight text-black">
+        <div className="relative z-10 flex h-full flex-col justify-center">
+          <h3 className="text-3xl font-bold font-display tracking-tight text-white">
             {title}
           </h3>
 
           {description && (
-            <p className="mt-1 text-sm text-black/60 line-clamp-2">
+            <p className="mt-1 text-sm text-white line-clamp-2">
               {description}
             </p>
           )}

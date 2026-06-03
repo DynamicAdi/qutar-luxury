@@ -329,3 +329,18 @@ input[type=number] {
 .ProseMirror:focus {
   outline: none !important;
 }
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.slider-track {
+  -webkit-font-smoothing: antialiased;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}

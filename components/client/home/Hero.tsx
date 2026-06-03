@@ -16,6 +16,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import CategorySlider from "./Categories";
 const PRICE_FLOOR = 0;
 const PRICE_CEIL = 50_000_000;
 const categories = [
@@ -44,6 +45,7 @@ const categories = [
     href: "/properties?type=PLOTS",
     description: "Open land and plots for future development.",
   },
+  
 ];
 export default function Hero() {
   const router = useRouter();
@@ -383,30 +385,8 @@ export default function Hero() {
         />
       </div>
 
-      <section className="w-full relative z-[299] px-6 md:px-10 py-14">
-        <div className="max-w-6xl mx-auto">
-
-          {/* Heading */}
-          <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-8">
-            Explore Categories
-          </h2>
-
-          {/* Grid */}
-          <CustomSwiper>
-            {loading
-              ? Array.from({ length: 5 }).map((_, i) => (
-                <CategoryCardSkeleton key={i} />
-              ))
-              : categories.map((cat) => (
-                <CategoryCard
-                  key={cat.title}
-                  title={cat.title}
-                  description={cat.description}
-                  href={cat.href}
-                />
-              ))}
-          </CustomSwiper>
-        </div>
+      <section className="w-full relative z-10 px-6 md:px-10 py-14">
+        <CategorySlider categories={categories} />
       </section>
     </section>
   );
