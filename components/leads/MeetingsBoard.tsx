@@ -84,7 +84,7 @@ export default function MeetingsBoard({ id }: { id: string }) {
     startTransition(async () => {
       try {
         const res = await fetch(`/api/leads/${id}/meetings/${meetingId}`, {
-          method: "PATCH",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },

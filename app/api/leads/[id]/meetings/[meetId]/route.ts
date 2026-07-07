@@ -14,7 +14,7 @@ export const updateMeetingSchema = z.object({
   emailSent: z.boolean().optional(),
 });
 
-export async function PATCH(
+export async function PUT(
   req: Request,
   { params }: { params: Promise<{ meetId: string }> }
 ) {

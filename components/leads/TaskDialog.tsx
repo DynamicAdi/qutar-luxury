@@ -94,7 +94,7 @@ export default function TaskDialog({
             ? `/api/leads/${leadId}/tasks/${initialData?.id}`
             : `/api/leads/${leadId}/tasks`;
 
-        const method = mode === "update" ? "PATCH" : "POST";
+        const method = mode === "update" ? "PUT" : "POST";
 
         const res = await fetch(url, {
           method,

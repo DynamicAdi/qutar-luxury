@@ -11,7 +11,7 @@ export const updateTaskSchema = z.object({
 });
 
 // UPDATE task
-export async function PATCH(
+export async function PUT(
   req: Request,
   {
     params,

@@ -46,7 +46,7 @@ export default function Tasks({ id }: { id: string }) {
   const updateStatus = (taskId: string) => {
     startTransition(async () => {
       await fetch(`/api/leads/${id}/tasks/${taskId}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "COMPLETED" }),
       });

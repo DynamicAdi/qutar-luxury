@@ -6,7 +6,7 @@ export const updateFollowupSchema = z.object({
   message: z.string().min(1).optional(),
 });
 
-export async function PATCH(
+export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
